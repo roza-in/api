@@ -93,25 +93,36 @@ jobs:
 
       - name: Set up Environment Variables
         id: vars
+        env:
+          ENV_PRODUCTION: ${{ secrets.ENV_PRODUCTION }}
+          ENV_STAGING: ${{ secrets.ENV_STAGING }}
         run: |
           if [ "${{ github.ref }}" = "refs/heads/main" ]; then
             echo "env_name=production" >> $GITHUB_OUTPUT
             echo "ec2_host=${{ secrets.EC2_HOST_PRODUCTION }}" >> $GITHUB_OUTPUT
-            echo "app_env=${{ secrets.ENV_PRODUCTION }}" >> $GITHUB_OUTPUT
             echo "image_tag=production" >> $GITHUB_OUTPUT
             echo "dir_name=rozx-api-production" >> $GITHUB_OUTPUT
             echo "api_port=3000" >> $GITHUB_OUTPUT
             echo "db_port=5432" >> $GITHUB_OUTPUT
             echo "redis_port=6379" >> $GITHUB_OUTPUT
+            
+            # Write multi-line app_env using heredoc
+            echo "app_env<<EOF" >> $GITHUB_OUTPUT
+            echo "$ENV_PRODUCTION" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
           else
             echo "env_name=staging" >> $GITHUB_OUTPUT
             echo "ec2_host=${{ secrets.EC2_HOST_STAGING }}" >> $GITHUB_OUTPUT
-            echo "app_env=${{ secrets.ENV_STAGING }}" >> $GITHUB_OUTPUT
             echo "image_tag=staging" >> $GITHUB_OUTPUT
             echo "dir_name=rozx-api-staging" >> $GITHUB_OUTPUT
             echo "api_port=3001" >> $GITHUB_OUTPUT
             echo "db_port=5433" >> $GITHUB_OUTPUT
             echo "redis_port=6380" >> $GITHUB_OUTPUT
+            
+            # Write multi-line app_env using heredoc
+            echo "app_env<<EOF" >> $GITHUB_OUTPUT
+            echo "$ENV_STAGING" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
           fi
 
       - name: Set up QEMU
