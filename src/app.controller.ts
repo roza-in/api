@@ -1,4 +1,4 @@
-import { Controller, Get, Logger } from '@nestjs/common';
+import { Controller, Get, Logger, VERSION_NEUTRAL } from '@nestjs/common';
 import { AppService } from './app.service';
 import { PrismaService } from './modules/prisma/prisma.service';
 import { QueueService, QueueHealthStatus } from './modules/queue/queue.service';
@@ -7,7 +7,9 @@ import Redis from 'ioredis';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @ApiTags('Health')
-@Controller()
+@Controller({
+  version: VERSION_NEUTRAL,
+})
 export class AppController {
   private readonly logger = new Logger(AppController.name);
   private readonly redis: Redis | null = null;

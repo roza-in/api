@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
-import { ValidationPipe, Logger } from '@nestjs/common';
+import { ValidationPipe, Logger, VersioningType } from '@nestjs/common';
 import helmet from 'helmet';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AllExceptionsFilter } from './common/filters/http-exception.filter';
@@ -12,6 +12,12 @@ async function bootstrap() {
 
   // Security Middleware
   app.use(helmet());
+
+  // Enable Versioning
+  app.enableVersioning({
+    type: VersioningType.URI,
+    defaultVersion: '1',
+  });
 
   // CORS Setup (whitelist origins from dashboard & websites)
   const allowedOriginsEnv = configService.get<string>('CORS_ALLOWED_ORIGINS');
