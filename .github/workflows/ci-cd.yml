@@ -1,0 +1,320 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+  pull_request:
+    branches:
+      - main
+      - staging
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Lint Code
+        run: npm run lint
+
+      - name: Run Unit Tests
+        run: npm run test
+        env:
+          NODE_ENV: test
+          PORT: 3000
+          DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/rozx_dev?schema=public"
+          REDIS_URL: "redis://localhost:6379"
+          JWT_SECRET: "mock-secret-for-ci"
+          JWT_EXPIRY: "15m"
+          JWT_REFRESH_EXPIRY: "7d"
+          RAZORPAY_KEY_ID: "mock"
+          RAZORPAY_KEY_SECRET: "mock"
+          RAZORPAY_WEBHOOK_SECRET: "mock"
+          WHATSAPP_API_URL: "mock"
+          WHATSAPP_ACCESS_TOKEN: "mock"
+          MSG91_AUTH_KEY: "mock"
+          MSG91_SENDER_ID: "mock"
+          AWS_SES_FROM_EMAIL: "mock"
+          AWS_ACCESS_KEY_ID: "mock"
+          AWS_SECRET_ACCESS_KEY: "mock"
+          AWS_S3_BUCKET: "mock"
+          AWS_REGION: "ap-south-1"
+          GOOGLE_CLIENT_ID: "mock"
+          GOOGLE_CLIENT_SECRET: "mock"
+          GOOGLE_CALLBACK_URL: "mock"
+
+      - name: Verify Build Compile
+        run: npm run build
+        env:
+          NODE_ENV: production
+          PORT: 3000
+          DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/rozx_dev?schema=public"
+          REDIS_URL: "redis://localhost:6379"
+          JWT_SECRET: "mock-secret-for-ci"
+          JWT_EXPIRY: "15m"
+          JWT_REFRESH_EXPIRY: "7d"
+          RAZORPAY_KEY_ID: "mock"
+          RAZORPAY_KEY_SECRET: "mock"
+          RAZORPAY_WEBHOOK_SECRET: "mock"
+          WHATSAPP_API_URL: "mock"
+          WHATSAPP_ACCESS_TOKEN: "mock"
+          MSG91_AUTH_KEY: "mock"
+          MSG91_SENDER_ID: "mock"
+          AWS_SES_FROM_EMAIL: "mock"
+          AWS_ACCESS_KEY_ID: "mock"
+          AWS_SECRET_ACCESS_KEY: "mock"
+          AWS_S3_BUCKET: "mock"
+          AWS_REGION: "ap-south-1"
+          GOOGLE_CLIENT_ID: "mock"
+          GOOGLE_CLIENT_SECRET: "mock"
+          GOOGLE_CALLBACK_URL: "mock"
+
+  deploy:
+    needs: test-and-build
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Environment Variables
+        id: vars
+        run: |
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            echo "env_name=production" >> $GITHUB_OUTPUT
+            echo "ec2_host=${{ secrets.EC2_HOST_PRODUCTION }}" >> $GITHUB_OUTPUT
+            echo "app_env=${{ secrets.ENV_PRODUCTION }}" >> $GITHUB_OUTPUT
+            echo "image_tag=production" >> $GITHUB_OUTPUT
+            echo "dir_name=rozx-api-production" >> $GITHUB_OUTPUT
+            echo "api_port=3000" >> $GITHUB_OUTPUT
+            echo "db_port=5432" >> $GITHUB_OUTPUT
+            echo "redis_port=6379" >> $GITHUB_OUTPUT
+          else
+            echo "env_name=staging" >> $GITHUB_OUTPUT
+            echo "ec2_host=${{ secrets.EC2_HOST_STAGING }}" >> $GITHUB_OUTPUT
+            echo "app_env=${{ secrets.ENV_STAGING }}" >> $GITHUB_OUTPUT
+            echo "image_tag=staging" >> $GITHUB_OUTPUT
+            echo "dir_name=rozx-api-staging" >> $GITHUB_OUTPUT
+            echo "api_port=3001" >> $GITHUB_OUTPUT
+            echo "db_port=5433" >> $GITHUB_OUTPUT
+            echo "redis_port=6380" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and Push Builder Image (for migrations)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          target: builder
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/rozx-api-builder:${{ steps.vars.outputs.image_tag }}
+            ${{ secrets.DOCKER_USERNAME }}/rozx-api-builder:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and Push Runner Image (for runtime API)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          target: runner
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/rozx-api:${{ steps.vars.outputs.image_tag }}
+            ${{ secrets.DOCKER_USERNAME }}/rozx-api:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Deploy to AWS EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          DIR_NAME: ${{ steps.vars.outputs.dir_name }}
+          API_PORT: ${{ steps.vars.outputs.api_port }}
+          DB_PORT: ${{ steps.vars.outputs.db_port }}
+          REDIS_PORT: ${{ steps.vars.outputs.redis_port }}
+          APP_ENV: ${{ steps.vars.outputs.app_env }}
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          GITHUB_SHA: ${{ github.sha }}
+        with:
+          host: ${{ steps.vars.outputs.ec2_host }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          envs: DIR_NAME,API_PORT,DB_PORT,REDIS_PORT,APP_ENV,DOCKER_USERNAME,GITHUB_SHA
+          script: |
+            # Create project directory
+            mkdir -p ~/$DIR_NAME
+            cd ~/$DIR_NAME
+
+            # Write environment variables securely
+            echo "$APP_ENV" > .env.docker
+
+            # Extract database name from DATABASE_URL
+            DB_URL=$(grep '^DATABASE_URL=' .env.docker | cut -d '=' -f2- | tr -d '"')
+            DB_NAME=$(echo "$DB_URL" | awk -F/ '{print $NF}' | cut -d? -f1)
+
+            # Write docker-compose configuration
+            cat << EOF > docker-compose.yml
+            version: '3.8'
+
+            services:
+              postgres:
+                image: postgres:16-alpine
+                restart: always
+                ports:
+                  - "$DB_PORT:5432"
+                environment:
+                  POSTGRES_DB: $DB_NAME
+                  POSTGRES_USER: postgres
+                  POSTGRES_PASSWORD: postgres
+                volumes:
+                  - postgres_data:/var/lib/postgresql/data
+                healthcheck:
+                  test: ["CMD-SHELL", "pg_isready -U postgres"]
+                  interval: 5s
+                  timeout: 5s
+                  retries: 5
+
+              redis:
+                image: redis:7-alpine
+                restart: always
+                ports:
+                  - "$REDIS_PORT:6379"
+                volumes:
+                  - redis_data:/data
+                healthcheck:
+                  test: ["CMD", "redis-cli", "ping"]
+                  interval: 5s
+                  timeout: 5s
+                  retries: 5
+
+              migration:
+                image: $DOCKER_USERNAME/rozx-api-builder:$GITHUB_SHA
+                env_file:
+                  - .env.docker
+                depends_on:
+                  postgres:
+                    condition: service_healthy
+                command: npx prisma migrate deploy
+
+              api:
+                image: $DOCKER_USERNAME/rozx-api:$GITHUB_SHA
+                restart: always
+                ports:
+                  - "$API_PORT:3000"
+                env_file:
+                  - .env.docker
+                depends_on:
+                  postgres:
+                    condition: service_healthy
+                  redis:
+                    condition: service_healthy
+                  migration:
+                    condition: service_completed_successfully
+
+            volumes:
+              postgres_data:
+              redis_data:
+            EOF
+
+            # Log in to Docker Registry on EC2
+            echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
+            # Pull latest containers and start orchestration
+            docker compose pull
+            docker compose down --remove-orphans
+            docker compose up -d
+
+            # Create a directory for utility scripts
+            mkdir -p ~/scripts
+
+            # Write the database backup script
+            cat << 'EOF' > ~/scripts/backup-db.sh
+            #!/bin/bash
+            set -e
+
+            if [ -z "$1" ]; then
+              echo "Usage: $0 <project-directory-path>"
+              exit 1
+            fi
+
+            PROJECT_DIR=$1
+            PROJECT_DIR=$(eval echo "$PROJECT_DIR")
+            PROJECT_DIR=$(readlink -f "$PROJECT_DIR")
+
+            if [ ! -d "$PROJECT_DIR" ]; then
+              echo "Error: Directory $PROJECT_DIR does not exist."
+              exit 1
+            fi
+
+            cd "$PROJECT_DIR"
+
+            if [ -f .env.docker ]; then
+              export $(grep -E '^(AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY|AWS_S3_BUCKET|AWS_REGION)=' .env.docker | xargs)
+              DB_URL=$(grep '^DATABASE_URL=' .env.docker | cut -d '=' -f2- | tr -d '"')
+              DB_NAME=$(echo "$DB_URL" | awk -F/ '{print $NF}' | cut -d? -f1)
+            else
+              echo "Error: .env.docker not found in $PROJECT_DIR."
+              exit 1
+            fi
+
+            if [ -z "$DB_NAME" ]; then
+              echo "Error: Could not parse database name from DATABASE_URL."
+              exit 1
+            fi
+
+            if [[ "$PROJECT_DIR" == *"staging"* ]]; then
+              ENV_NAME="staging"
+            else
+              ENV_NAME="production"
+            fi
+
+            echo "=== Starting database backup ==="
+            echo "Environment: $ENV_NAME"
+            echo "Database Name: $DB_NAME"
+
+            FILENAME="backup-$ENV_NAME-$(date +%F-%H%M%S).sql.gz"
+
+            docker compose exec -T postgres pg_dump -U postgres "$DB_NAME" | gzip > "$FILENAME"
+
+            docker run --rm \
+              -v "$(pwd)/$FILENAME:/$FILENAME" \
+              -e AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID" \
+              -e AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY" \
+              -e AWS_DEFAULT_REGION="$AWS_REGION" \
+              amazon/aws-cli s3 cp "/$FILENAME" "s3://$AWS_S3_BUCKET/$ENV_NAME/backups/db/$FILENAME"
+
+            rm "$FILENAME"
+            echo "Database backup completed successfully and uploaded to S3!"
+            EOF
+
+            chmod +x ~/scripts/backup-db.sh
+
+            # Setup cron jobs for automatic backups (Staging at 2:00 AM, Production at 3:00 AM)
+            CRON_STAGING="0 2 * * * /bin/bash ~/scripts/backup-db.sh ~/rozx-api-staging >> ~/backup-staging.log 2>&1"
+            CRON_PRODUCTION="0 3 * * * /bin/bash ~/scripts/backup-db.sh ~/rozx-api-production >> ~/backup-production.log 2>&1"
+            (crontab -l 2>/dev/null | grep -F -v "backup-db.sh"; echo "$CRON_STAGING"; echo "$CRON_PRODUCTION") | crontab -

@@ -57,18 +57,43 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
-## Deployment
+## Docker Configurations & Orchestration
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+This application includes a production-grade multi-stage Docker configuration and local docker-compose orchestration.
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### 1. File Structure
+- **[Dockerfile](file:///c:/Users/shiva/OneDrive/Documents/Desktop/Startups/rozx/api/Dockerfile)**: A 4-stage build utilizing `node:22-alpine` (builder and runner stages keep production dependencies thin and image size small).
+- **[docker-compose.yml](file:///c:/Users/shiva/OneDrive/Documents/Desktop/Startups/rozx/api/docker-compose.yml)**: Spins up the NestJS API container alongside the database (`PostgreSQL 16`) and caching/queue store (`Redis 7`).
+- **[.env.docker](file:///c:/Users/shiva/OneDrive/Documents/Desktop/Startups/rozx/api/.env.docker)**: Configuration mapping connections to internal container network hostnames.
+- **[.env.production](file:///c:/Users/shiva/OneDrive/Documents/Desktop/Startups/rozx/api/.env.production)** & **[.env.staging](file:///c:/Users/shiva/OneDrive/Documents/Desktop/Startups/rozx/api/.env.staging)**: Production and staging configuration templates.
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+### 2. Local Container Execution
+To spin up the entire stack (PostgreSQL + Redis + Migrations + API) in containers:
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+1. Build and start containers:
+   ```bash
+   $ docker compose up --build
+   ```
+2. The database migrations will execute automatically via the `migration` container before the NestJS API bootstraps.
+3. Access the API on `http://localhost:3000`.
+
+### 3. Production & Staging Deployments
+- Do not build environment files directly into the Docker image.
+- Supply staging/production credentials at container start via target orchestrator parameters or task definitions (e.g., AWS ECS Task Definition or Kubernetes Secrets).
+- Run migrations in your CI/CD pipeline or as a pre-requisite container execution step (`npx prisma migrate deploy`) before launching the updated API instances.
+
+### 4. CI/CD & EC2 Deployments (GitHub Actions)
+This project includes an automated deployment workflow configured in [ci-cd.yml](file:///c:/Users/shiva/OneDrive/Documents/Desktop/Startups/rozx/api/.github/workflows/ci-cd.yml). To enable automated builds and deploys to AWS EC2:
+
+1. Configure the following **GitHub Repository Secrets**:
+   - `EC2_SSH_KEY`: Private SSH key (`.pem` file content) used to connect to your EC2 instances.
+   - `EC2_USER`: The SSH login username (typically `ubuntu` or `ec2-user`).
+   - `EC2_HOST_STAGING` / `EC2_HOST_PRODUCTION`: The public IP addresses/hostnames of your staging and production servers.
+   - `DOCKER_USERNAME` / `DOCKER_PASSWORD`: Docker Hub credentials used to push and pull built images.
+   - `ENV_STAGING` / `ENV_PRODUCTION`: The raw key-value configuration strings containing secrets (similar to `.env.staging` / `.env.production`) to create the `.env.docker` files on target servers dynamically.
+
+2. On push to the `staging` branch, the pipeline runs lint, tests, builds, and deploys the stack to Staging EC2.
+3. On push to the `main` branch, the pipeline runs lint, tests, builds, and deploys the stack to Production EC2.
 
 ## Resources
 

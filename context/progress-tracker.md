@@ -1,0 +1,124 @@
+# Progress Tracker
+
+Update this file after every completed feature. Any AI agent reading this should immediately know what is done, what is in progress, and what is next.
+
+---
+
+## Current Status
+
+**Phase:** Completed — Phase 9 — Production Hardening
+**Last completed:** 24 Monitoring & Observability
+**Next:** Production Ready (All 24 Features Completed)
+
+---
+
+## Progress
+
+### Phase 1 — Foundation
+
+- [x] 01 Project Bootstrap & Configuration
+- [x] 02 Database Setup
+- [x] 03 Redis & BullMQ Setup
+- [x] 04 Authentication Module
+
+### Phase 2 — Core Business Modules
+
+- [x] 05 Business & Branch Module
+- [x] 06 RBAC & Permissions Module
+- [x] 07 Services Module
+- [x] 08 Staff Module
+- [x] 09 Customer Module
+
+### Phase 3 — Appointment Engine
+
+- [x] 10 Appointment Scheduling
+- [x] 11 Availability Engine
+
+### Phase 4 — Payment & Subscription
+
+- [x] 12 Payment Processing
+- [x] 13 Webhook Processing Module
+- [x] 14 Subscription & Billing Module
+
+### Phase 5 — Notifications & Communication
+
+- [x] 15 Notification Orchestration
+
+### Phase 6 — Website Builder Backend
+
+- [x] 16 Website Module
+- [x] 17 Publishing & Domain Module
+- [x] 18 Public Booking API
+
+### Phase 7 — Analytics & Reporting
+
+- [x] 19 Analytics Module
+- [x] 20 Export Module
+
+### Phase 8 — Marketing & Admin
+
+- [x] 21 Marketing Module
+- [x] 22 Rozx Admin Module
+
+### Phase 9 — Production Hardening
+
+- [x] 23 Audit & Compliance
+- [x] 24 Monitoring & Observability
+
+---
+
+## Decisions Made During Build
+
+- **JWT Expiration & Type Casting**: Access tokens expire in 15 minutes, and refresh tokens expire in 7 days. Dynamic `expiresIn` config values were cast `as any` to avoid TypeScript strict compatibility check against `StringValue` from the `ms` package.
+- **Config Service Strictness**: Used `configService.getOrThrow` for critical authentication variables (`JWT_SECRET`, Google OAuth credentials/URLs) to guarantee types at compile time and fail early if they are missing.
+- **Isolated Modules Compatibility**: Used type imports (`import type`) for interface parameter types (`Request`, `UserPayload`) within decorated controller methods to comply with `isolatedModules` and `emitDecoratorMetadata` constraints.
+- **Redis Token Blacklisting**: Stored revoked refresh token JTIs with key prefix `auth:refresh:blacklist:` and auto-expiring TTLs matching the token's remaining time.
+- **Google OAuth Integration**: Enabled `passport-google-oauth20` social authentication with a find-or-create pipeline that resolves accounts by email.
+- **Business Registration Flow**: Combined Business, Branch, BusinessMember, and trial Subscription creations into an atomic `$transaction` block to guarantee data integrity. Re-issued a fresh JWT with the newly created business and member context to authenticate subsequent client requests immediately.
+- **Dynamic Slug Generation**: Configured automatic slug generation from the business name with collision handling, appending numeric suffixes dynamically (e.g. `glow-studio-2`).
+- **Jest Mocking for ESM**: Addressed a Jest SyntaxError on ES module export imports (caused by the `uuid` package) by declaring a global module mock at the top of the service test suite.
+- **Service & Category Hierarchies & Mappings**: Supported parent-category relationships scoped to tenant business context, automated validation of linked staff and categories, and enforced soft-delete cascades of relational staff-service records within transaction blocks.
+- **Jest Matcher Type Safety**: Handled strict linter check warnings for `expect.any(Date)` unsafe assignments using explicit eslint-disable comments, preserving clean tests and rules.
+- **Operational Staff & Invitation Architecture**: Separated operational staff catalog record creation from login-user invitations. Invitations verify or create user profiles, establish business member linkage with system role `STAFF`, and queue asynchronous invite jobs into the `notifications` BullMQ queue.
+- **Leaves Conflict & Time Validations**: Enforced chronological time checks on staff leave creation (`endTime > startTime`) and prevented overlapping leaves on the same staff profile using `ConflictException` guards.
+- **Customer CRM Unique Phone Numbers**: Enforced unique phone numbers for customer profiles at the application layer scoped strictly per tenant business, preventing duplicate profile registration.
+- **DPDP Act Anonymization on Soft-Delete**: Masked personal details (`name` to `'Anonymized Customer'`, `phone` to a scrambled value, and nullified `email`, `gender`, `birthday`, and `notes`) during customer soft deletion, keeping historical visits and `totalSpent` intact.
+- **Spend Aggregation Sync helper**: Implemented a helper to sum successful payments from non-cancelled appointments, ready for future payment phase integrations.
+- **Prisma JSON Type Safety for Working Hours**: Cast `branch.workingHours` and `staff.workingHours` from database Prisma JSON type to `unknown as WorkingHoursMap` to avoid linter `any` errors under strict TypeScript checks.
+- **Timezone Hour Format Handling**: Corrected a Node `Intl.DateTimeFormat` hour12 formatting quirk that outputs `"24:00"` instead of `"00:00"` by sanitizing timezone helpers to output proper time ranges.
+- **Public Scoping for Availability**: Explicitly omitted controller-level JWT guards on the appointments controller to allow public accessibility on `GET /appointments/availability`, while using route-level guards on private endpoints to secure them.
+- **AES-256-GCM Secure Multi-Tenant Payment Configs**: Created `payment_configs` table supporting tenant-isolated config with keys encrypted using AES-256-GCM and system-level `DB_ENCRYPTION_KEY`.
+- **Extensible Payment Gateway Adapter Pattern**: Standardized interface `PaymentAdapter` and concrete `RazorpayAdapter` using `razorpay` SDK, resolving the SDK refund method call safely (`this.razorpay.payments.refund`).
+- **Dynamic Webhook Signature Verification and Idempotency**: Verified Razorpay webhooks dynamically at `/webhooks/razorpay/:businessId` using verified tenant webhook secrets, enforcing event idempotency via `WebhookEvent` provider event ID checks.
+- **Asynchronous Invoice Generation & Spend Synchronization**: Processed `payment.captured` events via BullMQ asynchronously, generating sequential invoices (`INV-YYYY-XXXX`) and triggering customer lifetime spend synchronizations safely.
+- **TypeScript & ESLint Warnings Elimination in Webhook Processing**: Added typed structures (`RazorpayWebhookPayload`, `RazorpayWebhookEventPayload`) to cast parsed JSON payloads safely, eliminating `any` and unsafe assignment errors.
+- **Centralized Notification Engine & Adapters**: Implemented multi-channel adapters (WhatsApp, MSG91 SMS, Resend Email) with placeholder template interpolation and sliding 24-hour Redis rate limiting.
+- **Consent-Driven Delivery**: Enforced strict DPDP explicit marketing opt-in checks and transactional implied opt-out rules prior to notification sending.
+- **Synchronous Fallback & Status Webhooks**: Created immediate SMS fallback when WhatsApp delivery initialization fails, and extended webhooks to capture WhatsApp and MSG91 status callbacks.
+- **Isolated Modules Decorated Parameters Fix**: Resolved decorated parameter warnings under `isolatedModules` by utilizing type-only imports (`import type { Request }`) for third-party interfaces.
+- **Public Booking IP-based Rate Limiting**: Implemented unauthenticated endpoint protection using Redis rate limiting (throttled to 20 requests/minute for catalogs and 3 requests/minute for checkout creations) to prevent brute-force abuse of availability slots.
+- **Transactional Customer Consent & Profile Resolution**: Consolidated CRM customer lookup/creation, profile email/name updates, and DPDP-compliant consent logging into an atomic database transaction.
+- **Nullable User Auditing Fallback**: Designed the `AppointmentsService` creation signature to accept nullable user contexts, automatically resolving the tenant owner's user ID for guest bookings to satisfy audit log constraints.
+- **"Any Staff" Selection Fallback**: Evaluated "Any Staff" assignments during checkout by dynamically filtering qualified active staff members and mapping them to the first match with time slot availability.
+- **Multi-Tenant Analytics Engine & Caching**: Designed tenant-scoped dashboards (Owner, Manager, Reception, Staff) backed by dynamic Prisma aggregation queries and BullMQ-independent Redis caching (5-minute TTL, with custom OWNER/MANAGER bypass). Corrected timezone shift discrepancies in staff capacity calculation by resolving leave overlaps using local dates.
+- **Multi-Tenant Report Exports & Background Workers**: Standardized appointments, revenue, and CRM customer reports in CSV, XLSX (via `exceljs`), and PDF (via `pdfkit`) formats in the `Asia/Kolkata` timezone with Indian date formats. Integrated asynchronous report generation via BullMQ `reports` queue, S3 media uploads, Redis-cached status indicators (24-hour TTL), and explicit `EXPORT` audit trail logging.
+- **Marketing Campaign & 7-Day Attribution**: Created `MarketingModule` offering Campaign CRUD and BullMQ `campaigns` worker dispatch queue. Integrated DPDP opt-in consent and Redis-based rate limiting validation inside processor execution. Established 7-day revenue attribution mapping delivered campaign notifications to successfully captured payments.
+- **Billing Interval & Amount on Subscription**: Added explicit `billingInterval` and `amount` fields to the `Subscription` table in the database schema. This secures recurring billing calculation values at charging time and safeguards the platform's MRR/ARR/ARPU dashboard metrics from future configuration drift or plan pricing changes, while ensuring provider-agnostic extensibility.
+- **Platform Incident Logging & MTTR Metrics**: Standardized platform-wide incidents logging with severity metrics (`P1` - `P4`) and automated resolution durations calculation. Aggregated monthly incident parameters including mean time to resolution (MTTR) and customer satisfaction (CSAT) scores against system reliability SLA targets.
+- **Bypass guards for Platform Admins**: Extended `TenantGuard` to allow platform-wide admins carrying `SYSTEM_ROLE_IDS.ADMIN` permissions to bypass tenant checks and securely perform global administrative modifications, business suspensions, and trial extensions.
+- **DPDP Compliance, Consent, and Data Retention Policies**: Implemented a new `ComplianceModule` exposing REST APIs for customer consent tracking, synchronous personal data JSON exports uploaded directly to S3 with an `EXPORT` audit trail, and `DataDeletionRequest` (Right to be Forgotten) scheduling with a 30-day window. Integrated a daily BullMQ repeatable job (`compliance-daily-check`) that automatically executes deletion request anonymizations and purges non-financial tables for businesses cancelled for >12 months while permanently preserving financial logs.
+- **Resilient Telemetry Interceptor**: Implemented a global `MonitoringInterceptor` that measures API request latency, volume, and error rates using Redis, running telemetry logging inside silent try/catch blocks to ensure that Redis failures or timeouts never interrupt or fail active client HTTP requests.
+- **Unified Health Endpoint**: Configured a `GET /health` endpoint combining database queries (`SELECT 1`), Redis ping checks, and dynamically queried BullMQ `QueueHealthStatus` objects from the `QueueService`, outputting real-time API latency statistics and error rates.
+- **Production Docker Containerization**: Configured a production-grade multi-stage `Dockerfile` (separating dependencies, building, and running) based on `node:22-alpine` for the NestJS API. Structured `docker-compose.yml` to orchestrate database migrations via a pre-requisite container execution step before booting the main application container, fully containerizing PostgreSQL and Redis for staging/production parity.
+- **Automated AWS EC2 CI/CD Deployment**: Integrated a GitHub Actions workflow (`.github/workflows/ci-cd.yml`) that triggers on pushes to `staging` (Staging deploy) or `main` (Production deploy). The pipeline runs linter checks, Jest unit tests, NestJS build compilation, builds target images (`builder` for database migrations and `runner` for production API execution) pushing them to Docker Hub, and continuously deploys to target AWS EC2 instances via SSH.
+- **Database Migration & Schema Audit Fixes**: Replaced orphan SQL migrations with a structured baseline migration, implemented custom check/exclusion constraints (including a double-booking prevention constraint using `btree_gist`), resolved lowercase mock enum discrepancies in unit tests, and standardized migrations seeding in `prisma.config.ts`.
+
+
+
+---
+
+## Notes
+
+- Strict TypeScript mode (`noImplicitAny: true`) was enabled in `tsconfig.json` as per coding standards.
+- Replaced custom logger (`console.log`) in `main.ts` with NestJS `Logger`.
+- All authentication endpoints are fully documented with Swagger decorators under the `Authentication` tag.

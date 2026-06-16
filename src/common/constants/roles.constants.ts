@@ -1,0 +1,26 @@
+// Deterministic UUIDs matching the seeded system roles in prisma/seed.ts
+export const SYSTEM_ROLE_IDS = {
+  OWNER: '00000000-0000-0000-0000-000000000001',
+  MANAGER: '00000000-0000-0000-0000-000000000002',
+  RECEPTION: '00000000-0000-0000-0000-000000000003',
+  STAFF: '00000000-0000-0000-0000-000000000004',
+  ADMIN: '00000000-0000-0000-0000-000000000005',
+} as const;
+
+export const SYSTEM_ROLE_NAMES = {
+  OWNER: 'OWNER',
+  MANAGER: 'MANAGER',
+  RECEPTION: 'RECEPTION',
+  STAFF: 'STAFF',
+  ADMIN: 'ADMIN',
+} as const;
+
+export type SystemRoleName = keyof typeof SYSTEM_ROLE_IDS;
+
+export enum Role {
+  OWNER = 'OWNER',
+  MANAGER = 'MANAGER',
+  RECEPTION = 'RECEPTION',
+  STAFF = 'STAFF',
+  ADMIN = 'ADMIN',
+}
