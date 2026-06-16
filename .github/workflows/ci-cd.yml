@@ -147,7 +147,7 @@ jobs:
             ${{ secrets.DOCKER_USERNAME }}/rozx-api-builder:${{ steps.vars.outputs.image_tag }}
             ${{ secrets.DOCKER_USERNAME }}/rozx-api-builder:${{ github.sha }}
           cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-to: type=gha
 
       - name: Build and Push Runner Image (for runtime API)
         uses: docker/build-push-action@v5
@@ -159,7 +159,7 @@ jobs:
             ${{ secrets.DOCKER_USERNAME }}/rozx-api:${{ steps.vars.outputs.image_tag }}
             ${{ secrets.DOCKER_USERNAME }}/rozx-api:${{ github.sha }}
           cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-to: type=gha
 
       - name: Deploy to AWS EC2 via SSH
         uses: appleboy/ssh-action@v1.0.3
