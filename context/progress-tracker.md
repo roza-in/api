@@ -112,6 +112,9 @@ Update this file after every completed feature. Any AI agent reading this should
 - **Production Docker Containerization**: Configured a production-grade multi-stage `Dockerfile` (separating dependencies, building, and running) based on `node:22-alpine` for the NestJS API. Structured `docker-compose.yml` to orchestrate database migrations via a pre-requisite container execution step before booting the main application container, fully containerizing PostgreSQL and Redis for staging/production parity.
 - **Automated AWS EC2 CI/CD Deployment**: Integrated a GitHub Actions workflow (`.github/workflows/ci-cd.yml`) that triggers on pushes to `staging` (Staging deploy) or `main` (Production deploy). The pipeline runs linter checks, Jest unit tests, NestJS build compilation, builds target images (`builder` for database migrations and `runner` for production API execution) pushing them to Docker Hub, and continuously deploys to target AWS EC2 instances via SSH.
 - **Database Migration & Schema Audit Fixes**: Replaced orphan SQL migrations with a structured baseline migration, implemented custom check/exclusion constraints (including a double-booking prevention constraint using `btree_gist`), resolved lowercase mock enum discrepancies in unit tests, and standardized migrations seeding in `prisma.config.ts`.
+- **Global URI Versioning with Version-Neutral Monitoring**: Configured NestJS URI-based versioning globally with a default version of `1` (prefixing standard routes under `/v1/`), while keeping monitoring (`/`) and health check (`/health`) endpoints version-neutral to prevent breaking E2E tests and monitoring tools.
+- **WhatsApp Cloud API Integration & Webhook Security**: Added environment validation and support for `WHATSAPP_VERIFY_TOKEN` across staging and production configurations. Configured the staging endpoint Callback URL and verified token matching with the Meta Developer Portal for automated notifications and status callbacks.
+
 
 
 

@@ -63,6 +63,10 @@ class EnvironmentVariables {
   WHATSAPP_ACCESS_TOKEN: string;
 
   @IsString()
+  @IsOptional()
+  WHATSAPP_VERIFY_TOKEN?: string;
+
+  @IsString()
   @IsNotEmpty()
   MSG91_AUTH_KEY: string;
 
