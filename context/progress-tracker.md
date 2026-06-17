@@ -114,9 +114,9 @@ Update this file after every completed feature. Any AI agent reading this should
 - **Database Migration & Schema Audit Fixes**: Replaced orphan SQL migrations with a structured baseline migration, implemented custom check/exclusion constraints (including a double-booking prevention constraint using `btree_gist`), resolved lowercase mock enum discrepancies in unit tests, and standardized migrations seeding in `prisma.config.ts`.
 - **Global URI Versioning with Version-Neutral Monitoring**: Configured NestJS URI-based versioning globally with a default version of `1` (prefixing standard routes under `/v1/`), while keeping monitoring (`/`) and health check (`/health`) endpoints version-neutral to prevent breaking E2E tests and monitoring tools.
 - **WhatsApp Cloud API Integration & Webhook Security**: Added environment validation and support for `WHATSAPP_VERIFY_TOKEN` across staging and production configurations. Configured the staging endpoint Callback URL and verified token matching with the Meta Developer Portal for automated notifications and status callbacks.
-
-
-
+- **WhatsApp-Only OTP Authentication & SMS Adapter Bypass**: Replaced MSG91 SMS OTP and fallbacks with WhatsApp Cloud API using Meta's copy-code authentication template structure, utilizing a unique database-compatible email format (`phone@rozx.in`) for phone-only signups to avoid breaking downstream business logic.
+- **Hourly Reminder Scanning Scheduler**: Configured a BullMQ-backed repeatable cron job (`appointment-reminder-check`) running hourly, scanning and sending appointment notifications 24 hours prior to booking start times.
+- **WhatsApp OTP Utility-First Design**: Configured the OTP dispatch payload in the `WhatsAppAdapter` to omit button components completely. This makes the default `auth_otp` template directly compatible with the buttonless Utility category without requiring any extra environment variables (like `WHATSAPP_OTP_HAS_BUTTONS`) or complex payload switches.
 
 ---
 

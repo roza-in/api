@@ -2,9 +2,11 @@ import {
   Injectable,
   NotFoundException,
   ConflictException,
+  Logger,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ConflictService } from './conflict.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 import { AppointmentSearchDto } from './dto/appointment-search.dto';
@@ -12,9 +14,12 @@ import { AppointmentStatus, Prisma } from '../../generated/prisma';
 
 @Injectable()
 export class AppointmentsService {
+  private readonly logger = new Logger(AppointmentsService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly conflictService: ConflictService,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   /**
@@ -77,6 +82,7 @@ export class AppointmentsService {
         staff: true,
         customer: true,
         service: true,
+        business: true,
       },
     });
 
@@ -95,6 +101,42 @@ export class AppointmentsService {
         },
       },
     });
+
+    // 5. Trigger Confirmation Notification
+    try {
+      const timezone = appointment.branch.timezone || 'Asia/Kolkata';
+      const dateStr = new Intl.DateTimeFormat('en-IN', {
+        timeZone: timezone,
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      }).format(appointment.startTime).replace(/\//g, '-');
+
+      const timeStr = new Intl.DateTimeFormat('en-IN', {
+        timeZone: timezone,
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+      }).format(appointment.startTime);
+
+      await this.notificationsService.send({
+        businessId,
+        customerId: appointment.customerId,
+        templateId: 'APPOINTMENT_CONFIRMATION',
+        variables: {
+          customerName: appointment.customer.name,
+          date: dateStr,
+          time: timeStr,
+          serviceName: appointment.service.name,
+          businessName: appointment.business.name,
+        },
+      });
+    } catch (error) {
+      this.logger.error(
+        `Failed to trigger confirmation notification for appointment ${appointment.id}`,
+        error instanceof Error ? error.stack : String(error),
+      );
+    }
 
     return appointment;
   }
@@ -277,6 +319,7 @@ export class AppointmentsService {
         staff: true,
         customer: true,
         service: true,
+        business: true,
       },
     });
 
@@ -304,6 +347,72 @@ export class AppointmentsService {
         },
       },
     });
+
+    // 5. Trigger Reschedule or Cancel Notifications
+    const timezone = updated.branch.timezone || 'Asia/Kolkata';
+
+    const formatDateStr = (date: Date) =>
+      new Intl.DateTimeFormat('en-IN', {
+        timeZone: timezone,
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      }).format(date).replace(/\//g, '-');
+
+    const formatTimeStr = (date: Date) =>
+      new Intl.DateTimeFormat('en-IN', {
+        timeZone: timezone,
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+      }).format(date);
+
+    if (updated.status === AppointmentStatus.CANCELLED) {
+      try {
+        await this.notificationsService.send({
+          businessId,
+          customerId: updated.customerId,
+          templateId: 'APPOINTMENT_CANCELLED',
+          variables: {
+            customerName: updated.customer.name,
+            date: formatDateStr(updated.startTime),
+            time: formatTimeStr(updated.startTime),
+            serviceName: updated.service.name,
+            businessName: updated.business.name,
+          },
+        });
+      } catch (error) {
+        this.logger.error(
+          `Failed to trigger cancel notification for appointment ${updated.id}`,
+          error instanceof Error ? error.stack : String(error),
+        );
+      }
+    } else if (
+      updated.status === AppointmentStatus.RESCHEDULED ||
+      new Date(existing.startTime).getTime() !== new Date(updated.startTime).getTime()
+    ) {
+      try {
+        await this.notificationsService.send({
+          businessId,
+          customerId: updated.customerId,
+          templateId: 'APPOINTMENT_RESCHEDULED',
+          variables: {
+            customerName: updated.customer.name,
+            oldDate: formatDateStr(existing.startTime),
+            oldTime: formatTimeStr(existing.startTime),
+            newDate: formatDateStr(updated.startTime),
+            newTime: formatTimeStr(updated.startTime),
+            serviceName: updated.service.name,
+            businessName: updated.business.name,
+          },
+        });
+      } catch (error) {
+        this.logger.error(
+          `Failed to trigger reschedule notification for appointment ${updated.id}`,
+          error instanceof Error ? error.stack : String(error),
+        );
+      }
+    }
 
     return updated;
   }

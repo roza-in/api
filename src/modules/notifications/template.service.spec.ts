@@ -19,6 +19,7 @@ describe('TemplateService', () => {
       date: '16-06-2026',
       time: '11:00 AM',
       serviceName: 'Hair Styling',
+      businessName: 'Glow Studio',
     };
 
     const result = service.render(
@@ -35,6 +36,7 @@ describe('TemplateService', () => {
       '16-06-2026',
       '11:00 AM',
       'Hair Styling',
+      'Glow Studio',
     ]);
   });
 

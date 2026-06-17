@@ -5345,6 +5345,7 @@ export namespace Prisma {
   export type UserMinAggregateOutputType = {
     id: string | null
     email: string | null
+    phone: string | null
     passwordHash: string | null
     oauthProvider: string | null
     oauthId: string | null
@@ -5359,6 +5360,7 @@ export namespace Prisma {
   export type UserMaxAggregateOutputType = {
     id: string | null
     email: string | null
+    phone: string | null
     passwordHash: string | null
     oauthProvider: string | null
     oauthId: string | null
@@ -5373,6 +5375,7 @@ export namespace Prisma {
   export type UserCountAggregateOutputType = {
     id: number
     email: number
+    phone: number
     passwordHash: number
     oauthProvider: number
     oauthId: number
@@ -5389,6 +5392,7 @@ export namespace Prisma {
   export type UserMinAggregateInputType = {
     id?: true
     email?: true
+    phone?: true
     passwordHash?: true
     oauthProvider?: true
     oauthId?: true
@@ -5403,6 +5407,7 @@ export namespace Prisma {
   export type UserMaxAggregateInputType = {
     id?: true
     email?: true
+    phone?: true
     passwordHash?: true
     oauthProvider?: true
     oauthId?: true
@@ -5417,6 +5422,7 @@ export namespace Prisma {
   export type UserCountAggregateInputType = {
     id?: true
     email?: true
+    phone?: true
     passwordHash?: true
     oauthProvider?: true
     oauthId?: true
@@ -5504,6 +5510,7 @@ export namespace Prisma {
   export type UserGroupByOutputType = {
     id: string
     email: string
+    phone: string | null
     passwordHash: string
     oauthProvider: string | null
     oauthId: string | null
@@ -5535,6 +5542,7 @@ export namespace Prisma {
   export type UserSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     email?: boolean
+    phone?: boolean
     passwordHash?: boolean
     oauthProvider?: boolean
     oauthId?: boolean
@@ -5551,6 +5559,7 @@ export namespace Prisma {
   export type UserSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     email?: boolean
+    phone?: boolean
     passwordHash?: boolean
     oauthProvider?: boolean
     oauthId?: boolean
@@ -5565,6 +5574,7 @@ export namespace Prisma {
   export type UserSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     email?: boolean
+    phone?: boolean
     passwordHash?: boolean
     oauthProvider?: boolean
     oauthId?: boolean
@@ -5579,6 +5589,7 @@ export namespace Prisma {
   export type UserSelectScalar = {
     id?: boolean
     email?: boolean
+    phone?: boolean
     passwordHash?: boolean
     oauthProvider?: boolean
     oauthId?: boolean
@@ -5590,7 +5601,7 @@ export namespace Prisma {
     deletedAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "passwordHash" | "oauthProvider" | "oauthId" | "mfaSecret" | "lastLogin" | "status" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "phone" | "passwordHash" | "oauthProvider" | "oauthId" | "mfaSecret" | "lastLogin" | "status" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     memberships?: boolean | User$membershipsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -5606,6 +5617,7 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: string
       email: string
+      phone: string | null
       passwordHash: string
       oauthProvider: string | null
       oauthId: string | null
@@ -6041,6 +6053,7 @@ export namespace Prisma {
   interface UserFieldRefs {
     readonly id: FieldRef<"User", 'String'>
     readonly email: FieldRef<"User", 'String'>
+    readonly phone: FieldRef<"User", 'String'>
     readonly passwordHash: FieldRef<"User", 'String'>
     readonly oauthProvider: FieldRef<"User", 'String'>
     readonly oauthId: FieldRef<"User", 'String'>
@@ -51048,6 +51061,7 @@ export namespace Prisma {
   export const UserScalarFieldEnum: {
     id: 'id',
     email: 'email',
+    phone: 'phone',
     passwordHash: 'passwordHash',
     oauthProvider: 'oauthProvider',
     oauthId: 'oauthId',
@@ -52090,6 +52104,7 @@ export namespace Prisma {
     NOT?: UserWhereInput | UserWhereInput[]
     id?: UuidFilter<"User"> | string
     email?: StringFilter<"User"> | string
+    phone?: StringNullableFilter<"User"> | string | null
     passwordHash?: StringFilter<"User"> | string
     oauthProvider?: StringNullableFilter<"User"> | string | null
     oauthId?: StringNullableFilter<"User"> | string | null
@@ -52105,6 +52120,7 @@ export namespace Prisma {
   export type UserOrderByWithRelationInput = {
     id?: SortOrder
     email?: SortOrder
+    phone?: SortOrderInput | SortOrder
     passwordHash?: SortOrder
     oauthProvider?: SortOrderInput | SortOrder
     oauthId?: SortOrderInput | SortOrder
@@ -52120,6 +52136,7 @@ export namespace Prisma {
   export type UserWhereUniqueInput = Prisma.AtLeast<{
     id?: string
     email?: string
+    phone?: string
     AND?: UserWhereInput | UserWhereInput[]
     OR?: UserWhereInput[]
     NOT?: UserWhereInput | UserWhereInput[]
@@ -52133,11 +52150,12 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"User"> | Date | string
     deletedAt?: DateTimeNullableFilter<"User"> | Date | string | null
     memberships?: BusinessMemberListRelationFilter
-  }, "id" | "email">
+  }, "id" | "email" | "phone">
 
   export type UserOrderByWithAggregationInput = {
     id?: SortOrder
     email?: SortOrder
+    phone?: SortOrderInput | SortOrder
     passwordHash?: SortOrder
     oauthProvider?: SortOrderInput | SortOrder
     oauthId?: SortOrderInput | SortOrder
@@ -52158,6 +52176,7 @@ export namespace Prisma {
     NOT?: UserScalarWhereWithAggregatesInput | UserScalarWhereWithAggregatesInput[]
     id?: UuidWithAggregatesFilter<"User"> | string
     email?: StringWithAggregatesFilter<"User"> | string
+    phone?: StringNullableWithAggregatesFilter<"User"> | string | null
     passwordHash?: StringWithAggregatesFilter<"User"> | string
     oauthProvider?: StringNullableWithAggregatesFilter<"User"> | string | null
     oauthId?: StringNullableWithAggregatesFilter<"User"> | string | null
@@ -55555,6 +55574,7 @@ export namespace Prisma {
   export type UserCreateInput = {
     id?: string
     email: string
+    phone?: string | null
     passwordHash: string
     oauthProvider?: string | null
     oauthId?: string | null
@@ -55570,6 +55590,7 @@ export namespace Prisma {
   export type UserUncheckedCreateInput = {
     id?: string
     email: string
+    phone?: string | null
     passwordHash: string
     oauthProvider?: string | null
     oauthId?: string | null
@@ -55585,6 +55606,7 @@ export namespace Prisma {
   export type UserUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     passwordHash?: StringFieldUpdateOperationsInput | string
     oauthProvider?: NullableStringFieldUpdateOperationsInput | string | null
     oauthId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -55600,6 +55622,7 @@ export namespace Prisma {
   export type UserUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     passwordHash?: StringFieldUpdateOperationsInput | string
     oauthProvider?: NullableStringFieldUpdateOperationsInput | string | null
     oauthId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -55615,6 +55638,7 @@ export namespace Prisma {
   export type UserCreateManyInput = {
     id?: string
     email: string
+    phone?: string | null
     passwordHash: string
     oauthProvider?: string | null
     oauthId?: string | null
@@ -55629,6 +55653,7 @@ export namespace Prisma {
   export type UserUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     passwordHash?: StringFieldUpdateOperationsInput | string
     oauthProvider?: NullableStringFieldUpdateOperationsInput | string | null
     oauthId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -55643,6 +55668,7 @@ export namespace Prisma {
   export type UserUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     passwordHash?: StringFieldUpdateOperationsInput | string
     oauthProvider?: NullableStringFieldUpdateOperationsInput | string | null
     oauthId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -59490,6 +59516,7 @@ export namespace Prisma {
   export type UserCountOrderByAggregateInput = {
     id?: SortOrder
     email?: SortOrder
+    phone?: SortOrder
     passwordHash?: SortOrder
     oauthProvider?: SortOrder
     oauthId?: SortOrder
@@ -59504,6 +59531,7 @@ export namespace Prisma {
   export type UserMaxOrderByAggregateInput = {
     id?: SortOrder
     email?: SortOrder
+    phone?: SortOrder
     passwordHash?: SortOrder
     oauthProvider?: SortOrder
     oauthId?: SortOrder
@@ -59518,6 +59546,7 @@ export namespace Prisma {
   export type UserMinOrderByAggregateInput = {
     id?: SortOrder
     email?: SortOrder
+    phone?: SortOrder
     passwordHash?: SortOrder
     oauthProvider?: SortOrder
     oauthId?: SortOrder
@@ -68908,6 +68937,7 @@ export namespace Prisma {
   export type UserCreateWithoutMembershipsInput = {
     id?: string
     email: string
+    phone?: string | null
     passwordHash: string
     oauthProvider?: string | null
     oauthId?: string | null
@@ -68922,6 +68952,7 @@ export namespace Prisma {
   export type UserUncheckedCreateWithoutMembershipsInput = {
     id?: string
     email: string
+    phone?: string | null
     passwordHash: string
     oauthProvider?: string | null
     oauthId?: string | null
@@ -69132,6 +69163,7 @@ export namespace Prisma {
   export type UserUpdateWithoutMembershipsInput = {
     id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     passwordHash?: StringFieldUpdateOperationsInput | string
     oauthProvider?: NullableStringFieldUpdateOperationsInput | string | null
     oauthId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -69146,6 +69178,7 @@ export namespace Prisma {
   export type UserUncheckedUpdateWithoutMembershipsInput = {
     id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     passwordHash?: StringFieldUpdateOperationsInput | string
     oauthProvider?: NullableStringFieldUpdateOperationsInput | string | null
     oauthId?: NullableStringFieldUpdateOperationsInput | string | null

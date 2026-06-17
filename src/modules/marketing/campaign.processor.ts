@@ -43,6 +43,7 @@ export class CampaignProcessor extends WorkerHost {
   ) {
     const campaign = await this.prisma.campaign.findFirst({
       where: { id: campaignId, businessId, deletedAt: null },
+      include: { business: true },
     });
 
     if (
@@ -98,6 +99,7 @@ export class CampaignProcessor extends WorkerHost {
             variables: {
               ...variables,
               customerName: customer.name,
+              businessName: campaign.business.name,
             },
             preferredChannel: campaign.channel as 'whatsapp' | 'sms',
             campaignId: campaign.id,

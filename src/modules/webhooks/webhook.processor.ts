@@ -6,6 +6,7 @@ import Redis from 'ioredis';
 import { PrismaService } from '../prisma/prisma.service';
 import { CustomersService } from '../customers/customers.service';
 import { QUEUE_WEBHOOKS } from '../queue/queue.constants';
+import { NotificationsService } from '../notifications/notifications.service';
 import {
   PaymentStatus,
   WebhookStatus,
@@ -66,6 +67,7 @@ export class WebhookProcessor extends WorkerHost {
     private readonly prisma: PrismaService,
     private readonly customersService: CustomersService,
     private readonly configService: ConfigService,
+    private readonly notificationsService: NotificationsService,
   ) {
     super();
     const redisUrl = this.configService.getOrThrow<string>('REDIS_URL');
@@ -211,6 +213,7 @@ export class WebhookProcessor extends WorkerHost {
     // 4. Recalculate customer totalSpent
     const appointment = await this.prisma.appointment.findFirst({
       where: { id: payment.appointmentId },
+      include: { customer: true, business: true },
     });
 
     if (appointment) {
@@ -218,6 +221,26 @@ export class WebhookProcessor extends WorkerHost {
         businessId,
         appointment.customerId,
       );
+
+      try {
+        await this.notificationsService.send({
+          businessId,
+          customerId: appointment.customerId,
+          templateId: 'PAYMENT_RECEIPT',
+          variables: {
+            customerName: appointment.customer?.name || 'Customer',
+            amount: payment.amount.toString(),
+            invoiceNumber,
+            businessName: appointment.business.name,
+          },
+        });
+        this.logger.log(`Payment receipt notification queued for invoice ${invoiceNumber}`);
+      } catch (notifyError) {
+        this.logger.error(
+          `Failed to trigger payment receipt notification for invoice ${invoiceNumber}`,
+          notifyError instanceof Error ? notifyError.stack : String(notifyError),
+        );
+      }
 
       // 7-day marketing campaign attribution
       const sevenDaysAgo = new Date();
@@ -311,6 +334,32 @@ export class WebhookProcessor extends WorkerHost {
         metadata: { status: PaymentStatus.FAILED },
       },
     });
+
+    const appointment = await this.prisma.appointment.findFirst({
+      where: { id: payment.appointmentId },
+      include: { customer: true, business: true },
+    });
+
+    if (appointment && appointment.customer) {
+      try {
+        await this.notificationsService.send({
+          businessId,
+          customerId: appointment.customerId,
+          templateId: 'PAYMENT_FAILURE',
+          variables: {
+            customerName: appointment.customer.name,
+            amount: payment.amount.toString(),
+            businessName: appointment.business.name,
+          },
+        });
+        this.logger.log(`Payment failure notification queued for customer ${appointment.customerId}`);
+      } catch (notifyError) {
+        this.logger.error(
+          `Failed to trigger payment failure notification for customer ${appointment.customerId}`,
+          notifyError instanceof Error ? notifyError.stack : String(notifyError),
+        );
+      }
+    }
   }
 
   private async handleRefundProcessed(

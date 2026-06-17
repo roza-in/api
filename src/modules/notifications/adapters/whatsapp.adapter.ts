@@ -96,6 +96,78 @@ export class WhatsAppAdapter {
     }
   }
 
+  async sendOtpTemplate(
+    to: string,
+    templateName: string,
+    code: string,
+    languageCode = 'en',
+  ): Promise<string> {
+    const formattedPhone = this.formatPhoneNumber(to);
+    const url = `${this.apiUrl}/messages`;
+
+    const body = {
+      messaging_product: 'whatsapp',
+      recipient_type: 'individual',
+      to: formattedPhone,
+      type: 'template',
+      template: {
+        name: templateName,
+        language: {
+          code: languageCode,
+        },
+        components: [
+          {
+            type: 'body',
+            parameters: [
+              {
+                type: 'text',
+                text: code,
+              },
+            ],
+          },
+        ],
+      },
+    };
+
+    try {
+      this.logger.debug(
+        `Sending WhatsApp OTP template to ${formattedPhone}: ${JSON.stringify(body)}`,
+      );
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${this.accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      });
+
+      const data = (await response.json()) as WhatsAppResponse;
+
+      if (!response.ok) {
+        throw new Error(
+          data?.error?.message || `HTTP error! status: ${response.status}`,
+        );
+      }
+
+      const messageId = data?.messages?.[0]?.id;
+      if (!messageId) {
+        throw new Error('No message ID returned from Meta API');
+      }
+
+      this.logger.log(
+        `WhatsApp OTP template sent successfully to ${formattedPhone}, ID: ${messageId}`,
+      );
+      return messageId;
+    } catch (error) {
+      this.logger.error(
+        `Failed to send WhatsApp OTP template to ${formattedPhone}`,
+        error instanceof Error ? error.stack : String(error),
+      );
+      throw error;
+    }
+  }
+
   private formatPhoneNumber(phone: string): string {
     let digits = phone.replace(/\D/g, '');
     if (digits.length === 10) {

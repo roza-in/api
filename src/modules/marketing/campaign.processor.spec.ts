@@ -64,6 +64,9 @@ describe('CampaignProcessor', () => {
       channel: CampaignChannel.WHATSAPP,
       messageTemplate: 'PROMO_CAMPAIGN',
       status: CampaignStatus.DRAFT,
+      business: {
+        name: 'Glow Studio',
+      },
     };
 
     mockPrismaService.campaign.findFirst.mockResolvedValue(campaign);
@@ -78,6 +81,7 @@ describe('CampaignProcessor', () => {
 
     expect(prisma.campaign.findFirst).toHaveBeenCalledWith({
       where: { id: 'campaign-1', businessId: 'biz-1', deletedAt: null },
+      include: { business: true },
     });
     expect(prisma.campaign.update).toHaveBeenFirstCalledWith({
       where: { id: 'campaign-1' },
@@ -98,7 +102,7 @@ describe('CampaignProcessor', () => {
         businessId: 'biz-1',
         customerId: 'cust-1',
         templateId: 'PROMO_CAMPAIGN',
-        variables: { offer: '20% off', customerName: 'Rahul' },
+        variables: { offer: '20% off', customerName: 'Rahul', businessName: 'Glow Studio' },
         preferredChannel: CampaignChannel.WHATSAPP,
         campaignId: 'campaign-1',
       }),
@@ -109,7 +113,7 @@ describe('CampaignProcessor', () => {
         businessId: 'biz-1',
         customerId: 'cust-2',
         templateId: 'PROMO_CAMPAIGN',
-        variables: { offer: '20% off', customerName: 'Rohan' },
+        variables: { offer: '20% off', customerName: 'Rohan', businessName: 'Glow Studio' },
         preferredChannel: CampaignChannel.WHATSAPP,
         campaignId: 'campaign-1',
       }),
@@ -127,6 +131,9 @@ describe('CampaignProcessor', () => {
       channel: CampaignChannel.WHATSAPP,
       messageTemplate: 'PROMO_CAMPAIGN',
       status: CampaignStatus.DRAFT,
+      business: {
+        name: 'Glow Studio',
+      },
     };
 
     mockPrismaService.campaign.findFirst.mockResolvedValue(campaign);

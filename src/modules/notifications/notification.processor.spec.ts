@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotificationProcessor } from './notification.processor';
 import { PrismaService } from '../prisma/prisma.service';
@@ -7,11 +6,13 @@ import { WhatsAppAdapter } from './adapters/whatsapp.adapter';
 import { SmsAdapter } from './adapters/sms.adapter';
 import { EmailAdapter } from './adapters/email.adapter';
 import { TemplateService } from './template.service';
+import { NotificationsService } from './notifications.service';
 import { Job } from 'bullmq';
 
 const mockRedis = {
   get: jest.fn(),
   set: jest.fn(),
+  del: jest.fn(),
 };
 jest.mock('ioredis', () => {
   return jest.fn().mockImplementation(() => mockRedis);
@@ -25,6 +26,9 @@ describe('NotificationProcessor', () => {
       findUnique: jest.fn(),
       update: jest.fn(),
       create: jest.fn(),
+    },
+    appointment: {
+      findMany: jest.fn(),
     },
   };
 
@@ -48,6 +52,10 @@ describe('NotificationProcessor', () => {
     render: jest.fn(),
   };
 
+  const mockNotificationsService = {
+    send: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -58,6 +66,7 @@ describe('NotificationProcessor', () => {
         { provide: SmsAdapter, useValue: mockSmsAdapter },
         { provide: EmailAdapter, useValue: mockEmailAdapter },
         { provide: TemplateService, useValue: mockTemplateService },
+        { provide: NotificationsService, useValue: mockNotificationsService },
       ],
     }).compile();
 
@@ -114,7 +123,7 @@ describe('NotificationProcessor', () => {
       });
     });
 
-    it('should trigger SMS fallback when transactional WhatsApp send fails', async () => {
+    it('should throw error and mark failed when WhatsApp fails without SMS fallback', async () => {
       const mockJob = {
         name: 'send-notification',
         data: {
@@ -142,19 +151,11 @@ describe('NotificationProcessor', () => {
 
       mockTemplateService.render.mockImplementation(
         (templateId, vars, channel) => {
-          if (channel === 'whatsapp') {
-            return {
-              whatsapp: {
-                templateName: 'appointment_confirmation',
-                language: 'en',
-                parameters: ['Rahul'],
-              },
-            };
-          }
           return {
-            sms: {
-              templateId: 'flow_appointment_conf',
-              variables: { customerName: 'Rahul' },
+            whatsapp: {
+              templateName: 'appointment_confirmation',
+              language: 'en',
+              parameters: ['Rahul'],
             },
           };
         },
@@ -163,13 +164,8 @@ describe('NotificationProcessor', () => {
       mockWhatsAppAdapter.sendTemplate.mockRejectedValue(
         new Error('Meta API Down'),
       );
-      mockPrismaService.notification.create.mockResolvedValue({
-        id: 'fallback-notif-uuid',
-        status: 'PENDING',
-      });
-      mockSmsAdapter.sendSms.mockResolvedValue('sms-req-id-123');
 
-      await processor.process(mockJob);
+      await expect(processor.process(mockJob)).rejects.toThrow('Meta API Down');
 
       // Verify original WhatsApp notification updated to failed
       expect(mockPrismaService.notification.update).toHaveBeenCalledWith(
@@ -182,32 +178,8 @@ describe('NotificationProcessor', () => {
         }),
       );
 
-      // Verify SMS fallback created and dispatched
-      expect(mockPrismaService.notification.create).toHaveBeenCalledWith(
-        expect.objectContaining({
-          data: expect.objectContaining({
-            channel: 'SMS',
-            provider: 'msg91',
-          }),
-        }),
-      );
-
-      expect(mockSmsAdapter.sendSms).toHaveBeenCalledWith(
-        '919999999999',
-        'flow_appointment_conf',
-        { customerName: 'Rahul' },
-      );
-
-      // Verify fallback notification updated to sent
-      expect(mockPrismaService.notification.update).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: { id: 'fallback-notif-uuid' },
-          data: expect.objectContaining({
-            status: 'SENT',
-            sentAt: expect.any(Date),
-          }),
-        }),
-      );
+      // Verify SMS fallback is NOT triggered (create not called)
+      expect(mockPrismaService.notification.create).not.toHaveBeenCalled();
     });
 
     it('should send SMS notification successfully', async () => {

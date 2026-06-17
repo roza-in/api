@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AppointmentsService } from './appointments.service';
 import { ConflictService } from './conflict.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { NotFoundException, ConflictException } from '@nestjs/common';
 import { AppointmentStatus } from '../../generated/prisma';
 
@@ -37,6 +38,10 @@ describe('AppointmentsService', () => {
     checkConflict: jest.fn(),
   };
 
+  const mockNotificationsService = {
+    send: jest.fn(),
+  };
+
   const businessId = 'biz-1';
   const userId = 'user-1';
   const appointmentId = 'appt-1';
@@ -53,6 +58,9 @@ describe('AppointmentsService', () => {
     status: AppointmentStatus.CONFIRMED,
     notes: 'Testing notes',
     version: 1,
+    branch: { timezone: 'Asia/Kolkata', address: '123 St' },
+    customer: { name: 'John Doe' },
+    service: { name: 'Haircut' },
   };
 
   beforeEach(async () => {
@@ -72,6 +80,7 @@ describe('AppointmentsService', () => {
         AppointmentsService,
         { provide: PrismaService, useValue: mockPrisma },
         { provide: ConflictService, useValue: mockConflictService },
+        { provide: NotificationsService, useValue: mockNotificationsService },
       ],
     }).compile();
 
@@ -135,6 +144,7 @@ describe('AppointmentsService', () => {
           staff: true,
           customer: true,
           service: true,
+          business: true,
         },
       });
       expect(mockAuditLogCreate).toHaveBeenCalledWith({

@@ -14,6 +14,7 @@ import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { GoogleProfile } from './strategies/google.strategy';
+import { WhatsAppAdapter } from '../notifications/adapters/whatsapp.adapter';
 
 const BCRYPT_ROUNDS = 10;
 const REFRESH_TOKEN_PREFIX = 'auth:refresh:blacklist:';
@@ -32,6 +33,7 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly whatsappAdapter: WhatsAppAdapter,
   ) {
     const redisUrl =
       this.configService.get<string>('REDIS_URL') || 'redis://localhost:6379';
@@ -312,5 +314,79 @@ export class AuthService {
     });
 
     return { accessToken, refreshToken };
+  }
+
+  async sendOtp(phone: string): Promise<{ message: string }> {
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const redisKey = `auth:otp:${phone}`;
+
+    await this.redis.set(redisKey, code, 'EX', 300);
+
+    const templateName =
+      this.configService.get<string>('WHATSAPP_OTP_TEMPLATE_NAME') ||
+      'auth_otp';
+
+    this.logger.log(`Dispatching WhatsApp OTP to ${phone}`);
+    await this.whatsappAdapter.sendOtpTemplate(phone, templateName, code);
+
+    return { message: 'OTP sent successfully' };
+  }
+
+  async loginWithOtp(phone: string, code: string): Promise<TokenPair> {
+    const redisKey = `auth:otp:${phone}`;
+    const cachedCode = await this.redis.get(redisKey);
+
+    if (!cachedCode || cachedCode !== code) {
+      throw new UnauthorizedException('Invalid or expired OTP');
+    }
+
+    await this.redis.del(redisKey);
+
+    let user = await this.prisma.user.findFirst({
+      where: { phone, deletedAt: null },
+    });
+
+    if (!user) {
+      const fallbackEmail = `${phone.replace(/\D/g, '')}@rozx.in`;
+      const existingEmail = await this.prisma.user.findUnique({
+        where: { email: fallbackEmail },
+      });
+      const email = existingEmail
+        ? `${phone.replace(/\D/g, '')}_${Date.now()}@rozx.in`
+        : fallbackEmail;
+
+      user = await this.prisma.user.create({
+        data: {
+          phone,
+          email,
+          passwordHash: '',
+          status: 'ACTIVE',
+          lastLogin: new Date(),
+        },
+      });
+      this.logger.log(`New user created via WhatsApp OTP login: ${user.phone}`);
+    } else {
+      if (user.status !== 'ACTIVE') {
+        throw new UnauthorizedException('Account is suspended or pending');
+      }
+
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: { lastLogin: new Date() },
+      });
+    }
+
+    const membership = await this.prisma.businessMember.findFirst({
+      where: { userId: user.id, deletedAt: null },
+      include: { business: true },
+    });
+
+    return this.generateTokenPair(
+      user.id,
+      user.email,
+      membership?.businessId,
+      membership?.id,
+      membership?.roleId,
+    );
   }
 }

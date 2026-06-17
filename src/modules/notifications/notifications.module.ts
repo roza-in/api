@@ -4,6 +4,7 @@ import { NotificationsService } from './notifications.service';
 import { TemplateService } from './template.service';
 import { ConsentService } from './consent.service';
 import { NotificationProcessor } from './notification.processor';
+import { NotificationsCronScheduler } from './notifications-cron.scheduler';
 import { WhatsAppAdapter } from './adapters/whatsapp.adapter';
 import { SmsAdapter } from './adapters/sms.adapter';
 import { EmailAdapter } from './adapters/email.adapter';
@@ -15,6 +16,7 @@ import { EmailAdapter } from './adapters/email.adapter';
     TemplateService,
     ConsentService,
     NotificationProcessor,
+    NotificationsCronScheduler,
     WhatsAppAdapter,
     SmsAdapter,
     EmailAdapter,

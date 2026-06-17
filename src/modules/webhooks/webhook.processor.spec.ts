@@ -1,8 +1,8 @@
-/* eslint-disable @typescript-eslint/unbound-method, @typescript-eslint/no-unsafe-assignment */
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { CustomersService } from '../customers/customers.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { WebhookProcessor } from './webhook.processor';
 import {
   PaymentStatus,
@@ -24,6 +24,10 @@ describe('WebhookProcessor', () => {
   let processor: WebhookProcessor;
   let prisma: PrismaService;
   let customersService: CustomersService;
+
+  const mockNotificationsService = {
+    send: jest.fn(),
+  };
 
   const mockPrismaService = {
     webhookEvent: {
@@ -87,6 +91,7 @@ describe('WebhookProcessor', () => {
         { provide: PrismaService, useValue: mockPrismaService },
         { provide: CustomersService, useValue: mockCustomersService },
         { provide: ConfigService, useValue: mockConfigService },
+        { provide: NotificationsService, useValue: mockNotificationsService },
       ],
     }).compile();
 

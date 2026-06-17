@@ -134,11 +134,9 @@ describe('NotificationsService', () => {
       expect(mockQueue.add).not.toHaveBeenCalled();
     });
 
-    it('should fall back to SMS channel if WhatsApp consent is denied but SMS consent is granted', async () => {
+    it('should respect preferredChannel if specified and consent is granted', async () => {
       mockRedis.incr.mockResolvedValue(1);
-      mockConsentService.hasConsent
-        .mockResolvedValueOnce(false) // WhatsApp consent denied
-        .mockResolvedValueOnce(true); // SMS consent granted
+      mockConsentService.hasConsent.mockResolvedValue(true);
 
       mockPrismaService.notification.create.mockResolvedValue({
         id: 'notification-uuid-sms',
@@ -151,10 +149,16 @@ describe('NotificationsService', () => {
         customerId: 'customer-uuid',
         templateId: 'APPOINTMENT_CONFIRMATION',
         variables: {},
+        preferredChannel: 'sms',
       });
 
       expect(result).toBeDefined();
-      expect(mockConsentService.hasConsent).toHaveBeenCalledTimes(2);
+      expect(mockConsentService.hasConsent).toHaveBeenCalledWith(
+        'business-uuid',
+        'customer-uuid',
+        'transactional',
+        'sms',
+      );
       expect(mockPrismaService.notification.create).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({

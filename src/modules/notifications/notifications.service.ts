@@ -78,26 +78,12 @@ export class NotificationsService {
     }
 
     // 4. Validate Consent
-    let hasConsent = await this.consentService.hasConsent(
+    const hasConsent = await this.consentService.hasConsent(
       businessId,
       customerId,
       category,
       channel,
     );
-
-    // If no consent for WhatsApp transactional, fall back to SMS automatically
-    if (!hasConsent && channel === 'whatsapp' && category === 'transactional') {
-      this.logger.log(
-        `No WhatsApp consent for customer ${customerId}. Falling back to SMS.`,
-      );
-      channel = 'sms';
-      hasConsent = await this.consentService.hasConsent(
-        businessId,
-        customerId,
-        category,
-        channel,
-      );
-    }
 
     if (!hasConsent) {
       throw new BadRequestException(

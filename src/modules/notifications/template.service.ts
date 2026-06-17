@@ -37,7 +37,7 @@ const TEMPLATES: Record<
   APPOINTMENT_CONFIRMATION: {
     whatsapp: {
       templateName: 'appointment_confirmation',
-      parameterKeys: ['customerName', 'date', 'time', 'serviceName'],
+      parameterKeys: ['customerName', 'date', 'time', 'serviceName', 'businessName'],
     },
     sms: {
       templateId: 'flow_appointment_conf',
@@ -58,6 +58,7 @@ const TEMPLATES: Record<
         'time',
         'serviceName',
         'branchAddress',
+        'businessName',
       ],
     },
     sms: {
@@ -80,6 +81,7 @@ const TEMPLATES: Record<
         'newDate',
         'newTime',
         'serviceName',
+        'businessName',
       ],
     },
     sms: {
@@ -95,7 +97,7 @@ const TEMPLATES: Record<
   APPOINTMENT_CANCELLED: {
     whatsapp: {
       templateName: 'appointment_cancelled',
-      parameterKeys: ['customerName', 'date', 'time', 'serviceName'],
+      parameterKeys: ['customerName', 'date', 'time', 'serviceName', 'businessName'],
     },
     sms: {
       templateId: 'flow_appointment_cancel',
@@ -110,7 +112,7 @@ const TEMPLATES: Record<
   PAYMENT_RECEIPT: {
     whatsapp: {
       templateName: 'payment_receipt',
-      parameterKeys: ['customerName', 'amount', 'invoiceNumber'],
+      parameterKeys: ['customerName', 'amount', 'invoiceNumber', 'businessName'],
     },
     sms: {
       templateId: 'flow_payment_receipt',
@@ -139,7 +141,7 @@ const TEMPLATES: Record<
   PAYMENT_FAILURE: {
     whatsapp: {
       templateName: 'payment_failed',
-      parameterKeys: ['customerName', 'amount'],
+      parameterKeys: ['customerName', 'amount', 'businessName'],
     },
     sms: {
       templateId: 'flow_payment_fail',
@@ -161,7 +163,7 @@ const TEMPLATES: Record<
   PROMO_CAMPAIGN: {
     whatsapp: {
       templateName: 'promo_campaign',
-      parameterKeys: ['customerName', 'offerDetails', 'expiryDate'],
+      parameterKeys: ['customerName', 'offerDetails', 'expiryDate', 'businessName'],
     },
     sms: {
       templateId: 'flow_promo_campaign',
@@ -176,7 +178,7 @@ const TEMPLATES: Record<
   MARKETING_OFFER: {
     whatsapp: {
       templateName: 'marketing_offer',
-      parameterKeys: ['customerName', 'offerDetails', 'expiryDate'],
+      parameterKeys: ['customerName', 'offerDetails', 'expiryDate', 'businessName'],
     },
     sms: {
       templateId: 'flow_marketing_offer',

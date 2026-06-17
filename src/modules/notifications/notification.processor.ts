@@ -9,9 +9,12 @@ import { SmsAdapter } from './adapters/sms.adapter';
 import { EmailAdapter } from './adapters/email.adapter';
 import { TemplateService } from './template.service';
 import { QUEUE_NOTIFICATIONS } from '../queue/queue.constants';
+import { forwardRef, Inject } from '@nestjs/common';
+import { NotificationsService } from './notifications.service';
 import {
   NotificationStatus,
   NotificationChannel,
+  AppointmentStatus,
 } from '../../generated/prisma';
 
 @Processor(QUEUE_NOTIFICATIONS)
@@ -26,6 +29,8 @@ export class NotificationProcessor extends WorkerHost {
     private readonly smsAdapter: SmsAdapter,
     private readonly emailAdapter: EmailAdapter,
     private readonly templateService: TemplateService,
+    @Inject(forwardRef(() => NotificationsService))
+    private readonly notificationsService: NotificationsService,
   ) {
     super();
     const redisUrl = this.configService.getOrThrow<string>('REDIS_URL');
@@ -39,6 +44,8 @@ export class NotificationProcessor extends WorkerHost {
         variables: Record<string, string>;
       };
       await this.processNotification(notificationId, variables);
+    } else if (job.name === 'appointment-reminder-check') {
+      await this.runReminderScan();
     }
   }
 
@@ -150,9 +157,6 @@ export class NotificationProcessor extends WorkerHost {
         `WhatsApp API delivery initialization failure for notification ${notificationId}: ${errMsg}`,
       );
 
-      // Enforce transactional fallback to SMS immediately
-      const isTransactional = this.isTransactionalTemplate(templateId);
-
       // 1. Mark current WhatsApp notification as failed
       await this.prisma.notification.update({
         where: { id: notificationId },
@@ -162,96 +166,7 @@ export class NotificationProcessor extends WorkerHost {
         },
       });
 
-      if (isTransactional) {
-        this.logger.log(
-          `Initiating synchronous SMS fallback for transactional notification ${notificationId}`,
-        );
-        await this.triggerSmsFallback(
-          notificationId,
-          phone,
-          templateId,
-          variables,
-        );
-      } else {
-        throw error; // Re-throw to fail the BullMQ job for non-transactional messages
-      }
-    }
-  }
-
-  private async triggerSmsFallback(
-    originalNotificationId: string,
-    phone: string,
-    templateId: string,
-    variables: Record<string, string>,
-  ) {
-    // 1. Retrieve the original notification to copy properties
-    const origNotification = await this.prisma.notification.findUnique({
-      where: { id: originalNotificationId },
-    });
-
-    if (!origNotification) {
-      return;
-    }
-
-    // 2. Create a new fallback notification log for SMS in the database
-    const fallbackNotification = await this.prisma.notification.create({
-      data: {
-        businessId: origNotification.businessId,
-        customerId: origNotification.customerId,
-        channel: NotificationChannel.SMS,
-        templateId,
-        status: NotificationStatus.PENDING,
-        provider: 'msg91',
-      },
-    });
-
-    try {
-      const renderResult = this.templateService.render(
-        templateId,
-        variables,
-        'sms',
-      );
-      if (!renderResult.sms) {
-        throw new Error(
-          `SMS payload could not be rendered for fallback template ${templateId}`,
-        );
-      }
-
-      const requestId = await this.smsAdapter.sendSms(
-        phone,
-        renderResult.sms.templateId,
-        renderResult.sms.variables,
-      );
-
-      // Cache request ID to local Notification mapping
-      await this.redis.set(
-        `sms:provider:${requestId}`,
-        fallbackNotification.id,
-        'EX',
-        604800,
-      );
-
-      await this.prisma.notification.update({
-        where: { id: fallbackNotification.id },
-        data: {
-          status: NotificationStatus.SENT,
-          sentAt: new Date(),
-        },
-      });
-    } catch (smsError) {
-      const smsErrMsg =
-        smsError instanceof Error ? smsError.message : String(smsError);
-      this.logger.error(
-        `Synchronous SMS fallback failed for customer phone ${phone}: ${smsErrMsg}`,
-      );
-
-      await this.prisma.notification.update({
-        where: { id: fallbackNotification.id },
-        data: {
-          status: NotificationStatus.FAILED,
-          failedAt: new Date(),
-        },
-      });
+      throw error;
     }
   }
 
@@ -352,5 +267,83 @@ export class NotificationProcessor extends WorkerHost {
   private isTransactionalTemplate(templateId: string): boolean {
     const marketingTemplates = ['PROMO_CAMPAIGN', 'MARKETING_OFFER'];
     return !marketingTemplates.includes(templateId);
+  }
+
+  private async runReminderScan() {
+    this.logger.log('Starting upcoming appointment reminder scan...');
+    const now = new Date();
+    const startRange = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+    const endRange = new Date(now.getTime() + 25 * 60 * 60 * 1000);
+
+    const appointments = await this.prisma.appointment.findMany({
+      where: {
+        startTime: {
+          gte: startRange,
+          lte: endRange,
+        },
+        status: {
+          in: [AppointmentStatus.CONFIRMED, AppointmentStatus.RESCHEDULED],
+        },
+        deletedAt: null,
+      },
+      include: {
+        customer: true,
+        service: true,
+        branch: true,
+        business: true,
+      },
+    });
+
+    this.logger.log(`Found ${appointments.length} appointments in 24h-25h window.`);
+
+    for (const appointment of appointments) {
+      const redisKey = `appointment:reminder:sent:${appointment.id}`;
+      const exists = await this.redis.get(redisKey);
+      if (exists) {
+        this.logger.debug(`Reminder already sent for appointment ${appointment.id}, skipping.`);
+        continue;
+      }
+
+      try {
+        const timezone = appointment.branch.timezone || 'Asia/Kolkata';
+        const dateStr = new Intl.DateTimeFormat('en-IN', {
+          timeZone: timezone,
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+        }).format(appointment.startTime).replace(/\//g, '-');
+
+        const timeStr = new Intl.DateTimeFormat('en-IN', {
+          timeZone: timezone,
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true,
+        }).format(appointment.startTime);
+
+        await this.redis.set(redisKey, '1', 'EX', 172800);
+
+        await this.notificationsService.send({
+          businessId: appointment.businessId,
+          customerId: appointment.customerId,
+          templateId: 'APPOINTMENT_REMINDER',
+          variables: {
+            customerName: appointment.customer.name,
+            date: dateStr,
+            time: timeStr,
+            serviceName: appointment.service.name,
+            branchAddress: appointment.branch.address,
+            businessName: appointment.business.name,
+          },
+        });
+
+        this.logger.log(`Reminder queued successfully for appointment ${appointment.id}`);
+      } catch (error) {
+        this.logger.error(
+          `Failed to process reminder for appointment ${appointment.id}`,
+          error instanceof Error ? error.stack : String(error),
+        );
+        await this.redis.del(redisKey);
+      }
+    }
   }
 }
