@@ -213,8 +213,10 @@ jobs:
             # Write environment variables securely
             echo "$APP_ENV" > .env.docker
 
-            # Extract database name from DATABASE_URL
+            # Extract database name, user, and password from DATABASE_URL
             DB_URL=$(grep '^DATABASE_URL=' .env.docker | cut -d '=' -f2- | tr -d '"')
+            DB_USER=$(echo "$DB_URL" | awk -F'://' '{print $2}' | awk -F':' '{print $1}')
+            DB_PASS=$(echo "$DB_URL" | awk -F':' '{print $3}' | awk -F'@' '{print $1}')
             DB_NAME=$(echo "$DB_URL" | awk -F/ '{print $NF}' | cut -d? -f1)
 
             # Write docker-compose configuration
@@ -229,8 +231,8 @@ jobs:
                   - "$DB_PORT:5432"
                 environment:
                   POSTGRES_DB: $DB_NAME
-                  POSTGRES_USER: postgres
-                  POSTGRES_PASSWORD: postgres
+                  POSTGRES_USER: $DB_USER
+                  POSTGRES_PASSWORD: $DB_PASS
                 volumes:
                   - postgres_data:/var/lib/postgresql/data
                 healthcheck:
