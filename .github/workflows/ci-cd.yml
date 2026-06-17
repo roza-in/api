@@ -11,9 +11,8 @@ on:
       - staging
 
 jobs:
-  test-and-build:
+  lint:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -29,6 +28,21 @@ jobs:
 
       - name: Lint Code
         run: npm run lint
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
 
       - name: Run Unit Tests
         run: npm run test
@@ -55,6 +69,21 @@ jobs:
           GOOGLE_CLIENT_ID: "mock"
           GOOGLE_CLIENT_SECRET: "mock"
           GOOGLE_CALLBACK_URL: "mock"
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
 
       - name: Verify Build Compile
         run: npm run build
@@ -83,7 +112,7 @@ jobs:
           GOOGLE_CALLBACK_URL: "mock"
 
   deploy:
-    needs: test-and-build
+    needs: [lint, test, build]
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging')
     runs-on: ubuntu-latest
 
