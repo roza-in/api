@@ -5,16 +5,18 @@ import {
   Body,
   UseGuards,
   Req,
+  Res,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import {
   ApiTags,
   ApiOperation,
   ApiBearerAuth,
   ApiResponse,
 } from '@nestjs/swagger';
-import type { Request } from 'express';
+import type { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -30,7 +32,10 @@ import { GoogleProfile } from './strategies/google.strategy';
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Post('register')
   @ApiOperation({ summary: 'Register a new user account' })
@@ -78,10 +83,20 @@ export class AuthController {
 
   @Get('google/callback')
   @UseGuards(GoogleOAuthGuard)
-  @ApiOperation({ summary: 'Google OAuth callback — returns tokens' })
-  async googleAuthCallback(@Req() req: Request) {
+  @ApiOperation({ summary: 'Google OAuth callback — redirects with tokens' })
+  async googleAuthCallback(@Req() req: Request, @Res() res: Response) {
     const profile = req.user as GoogleProfile;
-    return this.authService.validateGoogleUser(profile);
+    const tokens = await this.authService.validateGoogleUser(profile);
+    
+    const redirectUrl = req.query.state as string;
+    const allowedOrigins = this.configService.get<string>('CORS_ALLOWED_ORIGINS')?.split(',') || [];
+    
+    const isUrlSafe = redirectUrl && allowedOrigins.some((origin) => redirectUrl.startsWith(origin));
+    const finalUrl = isUrlSafe ? redirectUrl : (allowedOrigins[0] || 'http://localhost:3000');
+
+    return res.redirect(
+      `${finalUrl}/auth/callback?accessToken=${tokens.accessToken}&refreshToken=${tokens.refreshToken}`
+    );
   }
 
   @Get('me')
