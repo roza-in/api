@@ -98,7 +98,9 @@ export class AuthController {
 
   @Post('send-otp')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Send an authentication OTP to a phone number via WhatsApp' })
+  @ApiOperation({
+    summary: 'Send an authentication OTP to a phone number via WhatsApp',
+  })
   @ApiResponse({ status: 200, description: 'OTP sent successfully' })
   @ApiResponse({ status: 400, description: 'Invalid phone format' })
   async sendOtp(@Body() dto: SendOtpDto) {

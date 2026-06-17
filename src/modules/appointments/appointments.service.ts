@@ -110,7 +110,9 @@ export class AppointmentsService {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric',
-      }).format(appointment.startTime).replace(/\//g, '-');
+      })
+        .format(appointment.startTime)
+        .replace(/\//g, '-');
 
       const timeStr = new Intl.DateTimeFormat('en-IN', {
         timeZone: timezone,
@@ -357,7 +359,9 @@ export class AppointmentsService {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric',
-      }).format(date).replace(/\//g, '-');
+      })
+        .format(date)
+        .replace(/\//g, '-');
 
     const formatTimeStr = (date: Date) =>
       new Intl.DateTimeFormat('en-IN', {
@@ -389,7 +393,8 @@ export class AppointmentsService {
       }
     } else if (
       updated.status === AppointmentStatus.RESCHEDULED ||
-      new Date(existing.startTime).getTime() !== new Date(updated.startTime).getTime()
+      new Date(existing.startTime).getTime() !==
+        new Date(updated.startTime).getTime()
     ) {
       try {
         await this.notificationsService.send({

@@ -234,11 +234,15 @@ export class WebhookProcessor extends WorkerHost {
             businessName: appointment.business.name,
           },
         });
-        this.logger.log(`Payment receipt notification queued for invoice ${invoiceNumber}`);
+        this.logger.log(
+          `Payment receipt notification queued for invoice ${invoiceNumber}`,
+        );
       } catch (notifyError) {
         this.logger.error(
           `Failed to trigger payment receipt notification for invoice ${invoiceNumber}`,
-          notifyError instanceof Error ? notifyError.stack : String(notifyError),
+          notifyError instanceof Error
+            ? notifyError.stack
+            : String(notifyError),
         );
       }
 
@@ -352,11 +356,15 @@ export class WebhookProcessor extends WorkerHost {
             businessName: appointment.business.name,
           },
         });
-        this.logger.log(`Payment failure notification queued for customer ${appointment.customerId}`);
+        this.logger.log(
+          `Payment failure notification queued for customer ${appointment.customerId}`,
+        );
       } catch (notifyError) {
         this.logger.error(
           `Failed to trigger payment failure notification for customer ${appointment.customerId}`,
-          notifyError instanceof Error ? notifyError.stack : String(notifyError),
+          notifyError instanceof Error
+            ? notifyError.stack
+            : String(notifyError),
         );
       }
     }

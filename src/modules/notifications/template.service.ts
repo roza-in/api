@@ -37,7 +37,13 @@ const TEMPLATES: Record<
   APPOINTMENT_CONFIRMATION: {
     whatsapp: {
       templateName: 'appointment_confirmation',
-      parameterKeys: ['customerName', 'date', 'time', 'serviceName', 'businessName'],
+      parameterKeys: [
+        'customerName',
+        'date',
+        'time',
+        'serviceName',
+        'businessName',
+      ],
     },
     sms: {
       templateId: 'flow_appointment_conf',
@@ -97,7 +103,13 @@ const TEMPLATES: Record<
   APPOINTMENT_CANCELLED: {
     whatsapp: {
       templateName: 'appointment_cancelled',
-      parameterKeys: ['customerName', 'date', 'time', 'serviceName', 'businessName'],
+      parameterKeys: [
+        'customerName',
+        'date',
+        'time',
+        'serviceName',
+        'businessName',
+      ],
     },
     sms: {
       templateId: 'flow_appointment_cancel',
@@ -112,7 +124,12 @@ const TEMPLATES: Record<
   PAYMENT_RECEIPT: {
     whatsapp: {
       templateName: 'payment_receipt',
-      parameterKeys: ['customerName', 'amount', 'invoiceNumber', 'businessName'],
+      parameterKeys: [
+        'customerName',
+        'amount',
+        'invoiceNumber',
+        'businessName',
+      ],
     },
     sms: {
       templateId: 'flow_payment_receipt',
@@ -163,7 +180,12 @@ const TEMPLATES: Record<
   PROMO_CAMPAIGN: {
     whatsapp: {
       templateName: 'promo_campaign',
-      parameterKeys: ['customerName', 'offerDetails', 'expiryDate', 'businessName'],
+      parameterKeys: [
+        'customerName',
+        'offerDetails',
+        'expiryDate',
+        'businessName',
+      ],
     },
     sms: {
       templateId: 'flow_promo_campaign',
@@ -178,7 +200,12 @@ const TEMPLATES: Record<
   MARKETING_OFFER: {
     whatsapp: {
       templateName: 'marketing_offer',
-      parameterKeys: ['customerName', 'offerDetails', 'expiryDate', 'businessName'],
+      parameterKeys: [
+        'customerName',
+        'offerDetails',
+        'expiryDate',
+        'businessName',
+      ],
     },
     sms: {
       templateId: 'flow_marketing_offer',

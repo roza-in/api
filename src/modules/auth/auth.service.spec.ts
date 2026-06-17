@@ -11,7 +11,6 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { WhatsAppAdapter } from '../notifications/adapters/whatsapp.adapter';
 import { UnauthorizedException, ConflictException } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
 
 const mockRedis = {
   get: jest.fn(),
@@ -227,7 +226,9 @@ describe('AuthService', () => {
     });
 
     it('should throw ConflictException if email is already taken', async () => {
-      mockPrismaService.user.findUnique.mockResolvedValue({ id: 'existing-id' });
+      mockPrismaService.user.findUnique.mockResolvedValue({
+        id: 'existing-id',
+      });
 
       await expect(
         service.register({

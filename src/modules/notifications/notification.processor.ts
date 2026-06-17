@@ -294,13 +294,17 @@ export class NotificationProcessor extends WorkerHost {
       },
     });
 
-    this.logger.log(`Found ${appointments.length} appointments in 24h-25h window.`);
+    this.logger.log(
+      `Found ${appointments.length} appointments in 24h-25h window.`,
+    );
 
     for (const appointment of appointments) {
       const redisKey = `appointment:reminder:sent:${appointment.id}`;
       const exists = await this.redis.get(redisKey);
       if (exists) {
-        this.logger.debug(`Reminder already sent for appointment ${appointment.id}, skipping.`);
+        this.logger.debug(
+          `Reminder already sent for appointment ${appointment.id}, skipping.`,
+        );
         continue;
       }
 
@@ -311,7 +315,9 @@ export class NotificationProcessor extends WorkerHost {
           day: '2-digit',
           month: '2-digit',
           year: 'numeric',
-        }).format(appointment.startTime).replace(/\//g, '-');
+        })
+          .format(appointment.startTime)
+          .replace(/\//g, '-');
 
         const timeStr = new Intl.DateTimeFormat('en-IN', {
           timeZone: timezone,
@@ -336,7 +342,9 @@ export class NotificationProcessor extends WorkerHost {
           },
         });
 
-        this.logger.log(`Reminder queued successfully for appointment ${appointment.id}`);
+        this.logger.log(
+          `Reminder queued successfully for appointment ${appointment.id}`,
+        );
       } catch (error) {
         this.logger.error(
           `Failed to process reminder for appointment ${appointment.id}`,

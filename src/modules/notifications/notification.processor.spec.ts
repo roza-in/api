@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotificationProcessor } from './notification.processor';
 import { PrismaService } from '../prisma/prisma.service';
@@ -149,17 +150,15 @@ describe('NotificationProcessor', () => {
         },
       );
 
-      mockTemplateService.render.mockImplementation(
-        (templateId, vars, channel) => {
-          return {
-            whatsapp: {
-              templateName: 'appointment_confirmation',
-              language: 'en',
-              parameters: ['Rahul'],
-            },
-          };
-        },
-      );
+      mockTemplateService.render.mockImplementation(() => {
+        return {
+          whatsapp: {
+            templateName: 'appointment_confirmation',
+            language: 'en',
+            parameters: ['Rahul'],
+          },
+        };
+      });
 
       mockWhatsAppAdapter.sendTemplate.mockRejectedValue(
         new Error('Meta API Down'),
