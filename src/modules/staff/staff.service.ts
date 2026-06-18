@@ -12,6 +12,7 @@ import { EntitlementsService } from '../permissions/entitlements.service';
 import { CreateStaffDto } from './dto/create-staff.dto';
 import { UpdateStaffDto } from './dto/update-staff.dto';
 import { CreateLeaveDto } from './dto/create-leave.dto';
+import { SYSTEM_ROLE_IDS } from '../../common/constants/roles.constants';
 import type { Prisma } from '../../generated/prisma';
 
 @Injectable()
@@ -57,12 +58,31 @@ export class StaffService {
       }
     }
 
+    // Validate roleId if provided, default to PROFESSIONAL system role
+    let targetRoleId: string = SYSTEM_ROLE_IDS.PROFESSIONAL;
+    if (dto.roleId) {
+      const role = await this.prisma.role.findFirst({
+        where: {
+          id: dto.roleId,
+          OR: [
+            { businessId },
+            { isSystem: true },
+          ],
+        },
+      });
+      if (!role) {
+        throw new BadRequestException('Role does not exist');
+      }
+      targetRoleId = dto.roleId;
+    }
+
     // 4. Create staff record and map services atomically
     const staff = await this.prisma.$transaction(async (tx) => {
       const created = await tx.staff.create({
         data: {
           businessId,
           branchId: dto.branchId,
+          roleId: targetRoleId,
           name: dto.name,
           phone: dto.phone,
           email: dto.email,
@@ -169,6 +189,22 @@ export class StaffService {
       }
     }
 
+    // If changing roleId, verify it exists
+    if (dto.roleId) {
+      const role = await this.prisma.role.findFirst({
+        where: {
+          id: dto.roleId,
+          OR: [
+            { businessId },
+            { isSystem: true },
+          ],
+        },
+      });
+      if (!role) {
+        throw new BadRequestException('Role does not exist');
+      }
+    }
+
     const { version, serviceIds, ...updateData } = dto;
 
     const updated = await this.prisma.$transaction(async (tx) => {
@@ -266,14 +302,7 @@ export class StaffService {
       });
     }
 
-    // 2. Find or create BusinessMember link with STAFF role
-    const staffRole = await this.prisma.role.findFirst({
-      where: { name: 'STAFF', isSystem: true },
-    });
-    if (!staffRole) {
-      throw new BadRequestException('System role STAFF not seeded in database');
-    }
-
+    // 2. Find or create BusinessMember link with staff's pre-assigned roleId
     let member = await this.prisma.businessMember.findUnique({
       where: { userId: user.id },
     });
@@ -287,7 +316,7 @@ export class StaffService {
         data: {
           userId: user.id,
           businessId,
-          roleId: staffRole.id,
+          roleId: staff.roleId,
         },
       });
     }

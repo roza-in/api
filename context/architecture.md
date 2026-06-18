@@ -319,7 +319,7 @@ User ↔ BusinessMember ↔ Business
 
 - **User**: Authentication identity (email, password, OAuth, MFA).
 - **BusinessMember**: Links a User to a Business with a specific Role. A User can be a member of exactly one business (enforces Option B).
-- **Role**: Can be system-defined (Owner, Manager, Reception, Staff) or business-custom.
+- **Role**: Can be system-defined (Owner, Manager, Reception, Professional) or business-custom.
 - **Permission**: Granular action (e.g. `appointment:create`, `payment:refund`).
 - **Staff**: Operational profile linked to BusinessMember (schedule, skills, salary). Not all BusinessMembers are Staff.
 
@@ -328,7 +328,7 @@ User ↔ BusinessMember ↔ Business
 | Owner      | Business-wide      | Full access to all features                     |
 | Manager    | Branch-level       | Staff, appointments, customers, reports         |
 | Reception  | Branch-level       | Appointments, check-in, payments                |
-| Staff      | Own appointments   | View own schedule, mark complete                |
+| Professional | Own appointments | View own schedule, mark complete                |
 | Rozx Admin | Platform-wide      | MRR, ARR, business management, system health    |
 
 ---

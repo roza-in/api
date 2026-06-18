@@ -211,6 +211,7 @@ exports.Prisma.StaffScalarFieldEnum = {
   businessId: 'businessId',
   branchId: 'branchId',
   memberId: 'memberId',
+  roleId: 'roleId',
   name: 'name',
   phone: 'phone',
   email: 'email',

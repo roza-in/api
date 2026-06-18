@@ -18,6 +18,10 @@ export class CreateStaffDto {
   @IsNotEmpty()
   branchId: string;
 
+  @IsUUID()
+  @IsOptional()
+  roleId?: string;
+
   @IsString()
   @IsNotEmpty()
   name: string;

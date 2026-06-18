@@ -242,13 +242,13 @@ describe('StaffService', () => {
       name: 'John Doe',
       email: 'john@example.com',
       phone: '+919876543210',
+      roleId: 'role-uuid',
     };
 
     it('should create user and business member if missing, then link staff and queue invite', async () => {
       staffFindFirst.mockResolvedValue(mockStaff);
       userFindUnique.mockResolvedValue(null);
       userCreate.mockResolvedValue({ id: 'user-uuid' });
-      roleFindFirst.mockResolvedValue({ id: 'role-uuid' });
       businessMemberFindUnique.mockResolvedValue(null);
       businessMemberCreate.mockResolvedValue({ id: 'member-uuid' });
       staffUpdate.mockResolvedValue({});
@@ -292,7 +292,6 @@ describe('StaffService', () => {
     it('should throw BadRequestException if user is already a member of a different business', async () => {
       staffFindFirst.mockResolvedValue(mockStaff);
       userFindUnique.mockResolvedValue({ id: 'user-uuid' });
-      roleFindFirst.mockResolvedValue({ id: 'role-uuid' });
       businessMemberFindUnique.mockResolvedValue({
         id: 'member-uuid',
         businessId: 'different-business-uuid',

@@ -99,7 +99,7 @@ export class AppointmentsController {
   }
 
   @Get()
-  @Roles(Role.OWNER, Role.MANAGER, Role.RECEPTION, Role.STAFF)
+  @Roles(Role.OWNER, Role.MANAGER, Role.RECEPTION, Role.PROFESSIONAL)
   async findAll(
     @CurrentUser() user: UserPayload,
     @Query() query: PaginationDto,

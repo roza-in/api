@@ -106,7 +106,7 @@ Role-based access control with tenant isolation.
 
 **Tasks:**
 
-- Define roles enum: `OWNER`, `MANAGER`, `RECEPTION`, `STAFF`, `ROZX_ADMIN`
+- Define roles enum: `OWNER`, `MANAGER`, `RECEPTION`, `PROFESSIONAL`, `ROZX_ADMIN`
 - Create `RolesGuard` — checks user role against required roles
 - Create `@Roles()` decorator
 - Create `SubscriptionGuard` — checks business entitlements
@@ -115,7 +115,7 @@ Role-based access control with tenant isolation.
   - Owner: full access
   - Manager: branch-level management
   - Reception: appointments, check-in, payments
-  - Staff: own schedule only
+  - Professional: own schedule only
 
 **Must Verify:**
 - RBAC, entitlements, tenant isolation

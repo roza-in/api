@@ -191,8 +191,8 @@ async function main() {
     },
     {
       id: '00000000-0000-0000-0000-000000000004',
-      name: 'STAFF',
-      description: 'Individual staff — view own schedule only',
+      name: 'PROFESSIONAL',
+      description: 'Individual professional — view own schedule only',
       isSystem: true,
     },
     {
@@ -223,7 +223,7 @@ async function main() {
       'service:read',
       'staff:read',
     ],
-    STAFF: [
+    PROFESSIONAL: [
       'appointment:read',
       'customer:read',
       'service:read',

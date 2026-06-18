@@ -4488,11 +4488,13 @@ export namespace Prisma {
   export type RoleCountOutputType = {
     permissions: number
     members: number
+    staff: number
   }
 
   export type RoleCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     permissions?: boolean | RoleCountOutputTypeCountPermissionsArgs
     members?: boolean | RoleCountOutputTypeCountMembersArgs
+    staff?: boolean | RoleCountOutputTypeCountStaffArgs
   }
 
   // Custom InputTypes
@@ -4518,6 +4520,13 @@ export namespace Prisma {
    */
   export type RoleCountOutputTypeCountMembersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: BusinessMemberWhereInput
+  }
+
+  /**
+   * RoleCountOutputType without action
+   */
+  export type RoleCountOutputTypeCountStaffArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: StaffWhereInput
   }
 
 
@@ -6651,6 +6660,7 @@ export namespace Prisma {
     business?: boolean | Role$businessArgs<ExtArgs>
     permissions?: boolean | Role$permissionsArgs<ExtArgs>
     members?: boolean | Role$membersArgs<ExtArgs>
+    staff?: boolean | Role$staffArgs<ExtArgs>
     _count?: boolean | RoleCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["role"]>
 
@@ -6694,6 +6704,7 @@ export namespace Prisma {
     business?: boolean | Role$businessArgs<ExtArgs>
     permissions?: boolean | Role$permissionsArgs<ExtArgs>
     members?: boolean | Role$membersArgs<ExtArgs>
+    staff?: boolean | Role$staffArgs<ExtArgs>
     _count?: boolean | RoleCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type RoleIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -6709,6 +6720,7 @@ export namespace Prisma {
       business: Prisma.$BusinessPayload<ExtArgs> | null
       permissions: Prisma.$RolePermissionPayload<ExtArgs>[]
       members: Prisma.$BusinessMemberPayload<ExtArgs>[]
+      staff: Prisma.$StaffPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -7116,6 +7128,7 @@ export namespace Prisma {
     business<T extends Role$businessArgs<ExtArgs> = {}>(args?: Subset<T, Role$businessArgs<ExtArgs>>): Prisma__BusinessClient<$Result.GetResult<Prisma.$BusinessPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     permissions<T extends Role$permissionsArgs<ExtArgs> = {}>(args?: Subset<T, Role$permissionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RolePermissionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     members<T extends Role$membersArgs<ExtArgs> = {}>(args?: Subset<T, Role$membersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BusinessMemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    staff<T extends Role$staffArgs<ExtArgs> = {}>(args?: Subset<T, Role$staffArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StaffPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -7618,6 +7631,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: BusinessMemberScalarFieldEnum | BusinessMemberScalarFieldEnum[]
+  }
+
+  /**
+   * Role.staff
+   */
+  export type Role$staffArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Staff
+     */
+    select?: StaffSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Staff
+     */
+    omit?: StaffOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StaffInclude<ExtArgs> | null
+    where?: StaffWhereInput
+    orderBy?: StaffOrderByWithRelationInput | StaffOrderByWithRelationInput[]
+    cursor?: StaffWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: StaffScalarFieldEnum | StaffScalarFieldEnum[]
   }
 
   /**
@@ -14143,6 +14180,7 @@ export namespace Prisma {
     businessId: string | null
     branchId: string | null
     memberId: string | null
+    roleId: string | null
     name: string | null
     phone: string | null
     email: string | null
@@ -14162,6 +14200,7 @@ export namespace Prisma {
     businessId: string | null
     branchId: string | null
     memberId: string | null
+    roleId: string | null
     name: string | null
     phone: string | null
     email: string | null
@@ -14181,6 +14220,7 @@ export namespace Prisma {
     businessId: number
     branchId: number
     memberId: number
+    roleId: number
     name: number
     phone: number
     email: number
@@ -14216,6 +14256,7 @@ export namespace Prisma {
     businessId?: true
     branchId?: true
     memberId?: true
+    roleId?: true
     name?: true
     phone?: true
     email?: true
@@ -14235,6 +14276,7 @@ export namespace Prisma {
     businessId?: true
     branchId?: true
     memberId?: true
+    roleId?: true
     name?: true
     phone?: true
     email?: true
@@ -14254,6 +14296,7 @@ export namespace Prisma {
     businessId?: true
     branchId?: true
     memberId?: true
+    roleId?: true
     name?: true
     phone?: true
     email?: true
@@ -14362,6 +14405,7 @@ export namespace Prisma {
     businessId: string
     branchId: string
     memberId: string | null
+    roleId: string
     name: string
     phone: string
     email: string
@@ -14402,6 +14446,7 @@ export namespace Prisma {
     businessId?: boolean
     branchId?: boolean
     memberId?: boolean
+    roleId?: boolean
     name?: boolean
     phone?: boolean
     email?: boolean
@@ -14419,6 +14464,7 @@ export namespace Prisma {
     business?: boolean | BusinessDefaultArgs<ExtArgs>
     branch?: boolean | BranchDefaultArgs<ExtArgs>
     member?: boolean | Staff$memberArgs<ExtArgs>
+    role?: boolean | RoleDefaultArgs<ExtArgs>
     services?: boolean | Staff$servicesArgs<ExtArgs>
     appointments?: boolean | Staff$appointmentsArgs<ExtArgs>
     leaves?: boolean | Staff$leavesArgs<ExtArgs>
@@ -14430,6 +14476,7 @@ export namespace Prisma {
     businessId?: boolean
     branchId?: boolean
     memberId?: boolean
+    roleId?: boolean
     name?: boolean
     phone?: boolean
     email?: boolean
@@ -14447,6 +14494,7 @@ export namespace Prisma {
     business?: boolean | BusinessDefaultArgs<ExtArgs>
     branch?: boolean | BranchDefaultArgs<ExtArgs>
     member?: boolean | Staff$memberArgs<ExtArgs>
+    role?: boolean | RoleDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["staff"]>
 
   export type StaffSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -14454,6 +14502,7 @@ export namespace Prisma {
     businessId?: boolean
     branchId?: boolean
     memberId?: boolean
+    roleId?: boolean
     name?: boolean
     phone?: boolean
     email?: boolean
@@ -14471,6 +14520,7 @@ export namespace Prisma {
     business?: boolean | BusinessDefaultArgs<ExtArgs>
     branch?: boolean | BranchDefaultArgs<ExtArgs>
     member?: boolean | Staff$memberArgs<ExtArgs>
+    role?: boolean | RoleDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["staff"]>
 
   export type StaffSelectScalar = {
@@ -14478,6 +14528,7 @@ export namespace Prisma {
     businessId?: boolean
     branchId?: boolean
     memberId?: boolean
+    roleId?: boolean
     name?: boolean
     phone?: boolean
     email?: boolean
@@ -14494,11 +14545,12 @@ export namespace Prisma {
     deletedAt?: boolean
   }
 
-  export type StaffOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "businessId" | "branchId" | "memberId" | "name" | "phone" | "email" | "skills" | "salary" | "commission" | "workingHours" | "isActive" | "version" | "createdBy" | "updatedBy" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["staff"]>
+  export type StaffOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "businessId" | "branchId" | "memberId" | "roleId" | "name" | "phone" | "email" | "skills" | "salary" | "commission" | "workingHours" | "isActive" | "version" | "createdBy" | "updatedBy" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["staff"]>
   export type StaffInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     business?: boolean | BusinessDefaultArgs<ExtArgs>
     branch?: boolean | BranchDefaultArgs<ExtArgs>
     member?: boolean | Staff$memberArgs<ExtArgs>
+    role?: boolean | RoleDefaultArgs<ExtArgs>
     services?: boolean | Staff$servicesArgs<ExtArgs>
     appointments?: boolean | Staff$appointmentsArgs<ExtArgs>
     leaves?: boolean | Staff$leavesArgs<ExtArgs>
@@ -14508,11 +14560,13 @@ export namespace Prisma {
     business?: boolean | BusinessDefaultArgs<ExtArgs>
     branch?: boolean | BranchDefaultArgs<ExtArgs>
     member?: boolean | Staff$memberArgs<ExtArgs>
+    role?: boolean | RoleDefaultArgs<ExtArgs>
   }
   export type StaffIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     business?: boolean | BusinessDefaultArgs<ExtArgs>
     branch?: boolean | BranchDefaultArgs<ExtArgs>
     member?: boolean | Staff$memberArgs<ExtArgs>
+    role?: boolean | RoleDefaultArgs<ExtArgs>
   }
 
   export type $StaffPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -14521,6 +14575,7 @@ export namespace Prisma {
       business: Prisma.$BusinessPayload<ExtArgs>
       branch: Prisma.$BranchPayload<ExtArgs>
       member: Prisma.$BusinessMemberPayload<ExtArgs> | null
+      role: Prisma.$RolePayload<ExtArgs>
       services: Prisma.$StaffServicePayload<ExtArgs>[]
       appointments: Prisma.$AppointmentPayload<ExtArgs>[]
       leaves: Prisma.$LeavePayload<ExtArgs>[]
@@ -14530,6 +14585,7 @@ export namespace Prisma {
       businessId: string
       branchId: string
       memberId: string | null
+      roleId: string
       name: string
       phone: string
       email: string
@@ -14941,6 +14997,7 @@ export namespace Prisma {
     business<T extends BusinessDefaultArgs<ExtArgs> = {}>(args?: Subset<T, BusinessDefaultArgs<ExtArgs>>): Prisma__BusinessClient<$Result.GetResult<Prisma.$BusinessPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     branch<T extends BranchDefaultArgs<ExtArgs> = {}>(args?: Subset<T, BranchDefaultArgs<ExtArgs>>): Prisma__BranchClient<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     member<T extends Staff$memberArgs<ExtArgs> = {}>(args?: Subset<T, Staff$memberArgs<ExtArgs>>): Prisma__BusinessMemberClient<$Result.GetResult<Prisma.$BusinessMemberPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    role<T extends RoleDefaultArgs<ExtArgs> = {}>(args?: Subset<T, RoleDefaultArgs<ExtArgs>>): Prisma__RoleClient<$Result.GetResult<Prisma.$RolePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     services<T extends Staff$servicesArgs<ExtArgs> = {}>(args?: Subset<T, Staff$servicesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StaffServicePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     appointments<T extends Staff$appointmentsArgs<ExtArgs> = {}>(args?: Subset<T, Staff$appointmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AppointmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     leaves<T extends Staff$leavesArgs<ExtArgs> = {}>(args?: Subset<T, Staff$leavesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LeavePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -14977,6 +15034,7 @@ export namespace Prisma {
     readonly businessId: FieldRef<"Staff", 'String'>
     readonly branchId: FieldRef<"Staff", 'String'>
     readonly memberId: FieldRef<"Staff", 'String'>
+    readonly roleId: FieldRef<"Staff", 'String'>
     readonly name: FieldRef<"Staff", 'String'>
     readonly phone: FieldRef<"Staff", 'String'>
     readonly email: FieldRef<"Staff", 'String'>
@@ -51132,6 +51190,7 @@ export namespace Prisma {
     businessId: 'businessId',
     branchId: 'branchId',
     memberId: 'memberId',
+    roleId: 'roleId',
     name: 'name',
     phone: 'phone',
     email: 'email',
@@ -52165,6 +52224,7 @@ export namespace Prisma {
     business?: XOR<BusinessNullableScalarRelationFilter, BusinessWhereInput> | null
     permissions?: RolePermissionListRelationFilter
     members?: BusinessMemberListRelationFilter
+    staff?: StaffListRelationFilter
   }
 
   export type RoleOrderByWithRelationInput = {
@@ -52179,6 +52239,7 @@ export namespace Prisma {
     business?: BusinessOrderByWithRelationInput
     permissions?: RolePermissionOrderByRelationAggregateInput
     members?: BusinessMemberOrderByRelationAggregateInput
+    staff?: StaffOrderByRelationAggregateInput
   }
 
   export type RoleWhereUniqueInput = Prisma.AtLeast<{
@@ -52196,6 +52257,7 @@ export namespace Prisma {
     business?: XOR<BusinessNullableScalarRelationFilter, BusinessWhereInput> | null
     permissions?: RolePermissionListRelationFilter
     members?: BusinessMemberListRelationFilter
+    staff?: StaffListRelationFilter
   }, "id">
 
   export type RoleOrderByWithAggregationInput = {
@@ -52707,6 +52769,7 @@ export namespace Prisma {
     businessId?: UuidFilter<"Staff"> | string
     branchId?: UuidFilter<"Staff"> | string
     memberId?: UuidNullableFilter<"Staff"> | string | null
+    roleId?: UuidFilter<"Staff"> | string
     name?: StringFilter<"Staff"> | string
     phone?: StringFilter<"Staff"> | string
     email?: StringFilter<"Staff"> | string
@@ -52724,6 +52787,7 @@ export namespace Prisma {
     business?: XOR<BusinessScalarRelationFilter, BusinessWhereInput>
     branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
     member?: XOR<BusinessMemberNullableScalarRelationFilter, BusinessMemberWhereInput> | null
+    role?: XOR<RoleScalarRelationFilter, RoleWhereInput>
     services?: StaffServiceListRelationFilter
     appointments?: AppointmentListRelationFilter
     leaves?: LeaveListRelationFilter
@@ -52734,6 +52798,7 @@ export namespace Prisma {
     businessId?: SortOrder
     branchId?: SortOrder
     memberId?: SortOrderInput | SortOrder
+    roleId?: SortOrder
     name?: SortOrder
     phone?: SortOrder
     email?: SortOrder
@@ -52751,6 +52816,7 @@ export namespace Prisma {
     business?: BusinessOrderByWithRelationInput
     branch?: BranchOrderByWithRelationInput
     member?: BusinessMemberOrderByWithRelationInput
+    role?: RoleOrderByWithRelationInput
     services?: StaffServiceOrderByRelationAggregateInput
     appointments?: AppointmentOrderByRelationAggregateInput
     leaves?: LeaveOrderByRelationAggregateInput
@@ -52764,6 +52830,7 @@ export namespace Prisma {
     businessId?: UuidFilter<"Staff"> | string
     branchId?: UuidFilter<"Staff"> | string
     memberId?: UuidNullableFilter<"Staff"> | string | null
+    roleId?: UuidFilter<"Staff"> | string
     name?: StringFilter<"Staff"> | string
     phone?: StringFilter<"Staff"> | string
     email?: StringFilter<"Staff"> | string
@@ -52781,6 +52848,7 @@ export namespace Prisma {
     business?: XOR<BusinessScalarRelationFilter, BusinessWhereInput>
     branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
     member?: XOR<BusinessMemberNullableScalarRelationFilter, BusinessMemberWhereInput> | null
+    role?: XOR<RoleScalarRelationFilter, RoleWhereInput>
     services?: StaffServiceListRelationFilter
     appointments?: AppointmentListRelationFilter
     leaves?: LeaveListRelationFilter
@@ -52791,6 +52859,7 @@ export namespace Prisma {
     businessId?: SortOrder
     branchId?: SortOrder
     memberId?: SortOrderInput | SortOrder
+    roleId?: SortOrder
     name?: SortOrder
     phone?: SortOrder
     email?: SortOrder
@@ -52820,6 +52889,7 @@ export namespace Prisma {
     businessId?: UuidWithAggregatesFilter<"Staff"> | string
     branchId?: UuidWithAggregatesFilter<"Staff"> | string
     memberId?: UuidNullableWithAggregatesFilter<"Staff"> | string | null
+    roleId?: UuidWithAggregatesFilter<"Staff"> | string
     name?: StringWithAggregatesFilter<"Staff"> | string
     phone?: StringWithAggregatesFilter<"Staff"> | string
     email?: StringWithAggregatesFilter<"Staff"> | string
@@ -55652,6 +55722,7 @@ export namespace Prisma {
     business?: BusinessCreateNestedOneWithoutRolesInput
     permissions?: RolePermissionCreateNestedManyWithoutRoleInput
     members?: BusinessMemberCreateNestedManyWithoutRoleInput
+    staff?: StaffCreateNestedManyWithoutRoleInput
   }
 
   export type RoleUncheckedCreateInput = {
@@ -55665,6 +55736,7 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     permissions?: RolePermissionUncheckedCreateNestedManyWithoutRoleInput
     members?: BusinessMemberUncheckedCreateNestedManyWithoutRoleInput
+    staff?: StaffUncheckedCreateNestedManyWithoutRoleInput
   }
 
   export type RoleUpdateInput = {
@@ -55678,6 +55750,7 @@ export namespace Prisma {
     business?: BusinessUpdateOneWithoutRolesNestedInput
     permissions?: RolePermissionUpdateManyWithoutRoleNestedInput
     members?: BusinessMemberUpdateManyWithoutRoleNestedInput
+    staff?: StaffUpdateManyWithoutRoleNestedInput
   }
 
   export type RoleUncheckedUpdateInput = {
@@ -55691,6 +55764,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     permissions?: RolePermissionUncheckedUpdateManyWithoutRoleNestedInput
     members?: BusinessMemberUncheckedUpdateManyWithoutRoleNestedInput
+    staff?: StaffUncheckedUpdateManyWithoutRoleNestedInput
   }
 
   export type RoleCreateManyInput = {
@@ -56279,6 +56353,7 @@ export namespace Prisma {
     business: BusinessCreateNestedOneWithoutStaffInput
     branch: BranchCreateNestedOneWithoutStaffInput
     member?: BusinessMemberCreateNestedOneWithoutStaffInput
+    role?: RoleCreateNestedOneWithoutStaffInput
     services?: StaffServiceCreateNestedManyWithoutStaffInput
     appointments?: AppointmentCreateNestedManyWithoutStaffInput
     leaves?: LeaveCreateNestedManyWithoutStaffInput
@@ -56289,6 +56364,7 @@ export namespace Prisma {
     businessId: string
     branchId: string
     memberId?: string | null
+    roleId?: string
     name: string
     phone: string
     email: string
@@ -56327,6 +56403,7 @@ export namespace Prisma {
     business?: BusinessUpdateOneRequiredWithoutStaffNestedInput
     branch?: BranchUpdateOneRequiredWithoutStaffNestedInput
     member?: BusinessMemberUpdateOneWithoutStaffNestedInput
+    role?: RoleUpdateOneRequiredWithoutStaffNestedInput
     services?: StaffServiceUpdateManyWithoutStaffNestedInput
     appointments?: AppointmentUpdateManyWithoutStaffNestedInput
     leaves?: LeaveUpdateManyWithoutStaffNestedInput
@@ -56337,6 +56414,7 @@ export namespace Prisma {
     businessId?: StringFieldUpdateOperationsInput | string
     branchId?: StringFieldUpdateOperationsInput | string
     memberId?: NullableStringFieldUpdateOperationsInput | string | null
+    roleId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
@@ -56361,6 +56439,7 @@ export namespace Prisma {
     businessId: string
     branchId: string
     memberId?: string | null
+    roleId?: string
     name: string
     phone: string
     email: string
@@ -56400,6 +56479,7 @@ export namespace Prisma {
     businessId?: StringFieldUpdateOperationsInput | string
     branchId?: StringFieldUpdateOperationsInput | string
     memberId?: NullableStringFieldUpdateOperationsInput | string | null
+    roleId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
@@ -59637,11 +59717,21 @@ export namespace Prisma {
     none?: BusinessMemberWhereInput
   }
 
+  export type StaffListRelationFilter = {
+    every?: StaffWhereInput
+    some?: StaffWhereInput
+    none?: StaffWhereInput
+  }
+
   export type RolePermissionOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
   export type BusinessMemberOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type StaffOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -59797,12 +59887,6 @@ export namespace Prisma {
     none?: ServiceCategoryWhereInput
   }
 
-  export type StaffListRelationFilter = {
-    every?: StaffWhereInput
-    some?: StaffWhereInput
-    none?: StaffWhereInput
-  }
-
   export type CustomerListRelationFilter = {
     every?: CustomerWhereInput
     some?: CustomerWhereInput
@@ -59936,10 +60020,6 @@ export namespace Prisma {
   }
 
   export type ServiceCategoryOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
-  export type StaffOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -60302,6 +60382,7 @@ export namespace Prisma {
     businessId?: SortOrder
     branchId?: SortOrder
     memberId?: SortOrder
+    roleId?: SortOrder
     name?: SortOrder
     phone?: SortOrder
     email?: SortOrder
@@ -60329,6 +60410,7 @@ export namespace Prisma {
     businessId?: SortOrder
     branchId?: SortOrder
     memberId?: SortOrder
+    roleId?: SortOrder
     name?: SortOrder
     phone?: SortOrder
     email?: SortOrder
@@ -60348,6 +60430,7 @@ export namespace Prisma {
     businessId?: SortOrder
     branchId?: SortOrder
     memberId?: SortOrder
+    roleId?: SortOrder
     name?: SortOrder
     phone?: SortOrder
     email?: SortOrder
@@ -62373,6 +62456,13 @@ export namespace Prisma {
     connect?: BusinessMemberWhereUniqueInput | BusinessMemberWhereUniqueInput[]
   }
 
+  export type StaffCreateNestedManyWithoutRoleInput = {
+    create?: XOR<StaffCreateWithoutRoleInput, StaffUncheckedCreateWithoutRoleInput> | StaffCreateWithoutRoleInput[] | StaffUncheckedCreateWithoutRoleInput[]
+    connectOrCreate?: StaffCreateOrConnectWithoutRoleInput | StaffCreateOrConnectWithoutRoleInput[]
+    createMany?: StaffCreateManyRoleInputEnvelope
+    connect?: StaffWhereUniqueInput | StaffWhereUniqueInput[]
+  }
+
   export type RolePermissionUncheckedCreateNestedManyWithoutRoleInput = {
     create?: XOR<RolePermissionCreateWithoutRoleInput, RolePermissionUncheckedCreateWithoutRoleInput> | RolePermissionCreateWithoutRoleInput[] | RolePermissionUncheckedCreateWithoutRoleInput[]
     connectOrCreate?: RolePermissionCreateOrConnectWithoutRoleInput | RolePermissionCreateOrConnectWithoutRoleInput[]
@@ -62385,6 +62475,13 @@ export namespace Prisma {
     connectOrCreate?: BusinessMemberCreateOrConnectWithoutRoleInput | BusinessMemberCreateOrConnectWithoutRoleInput[]
     createMany?: BusinessMemberCreateManyRoleInputEnvelope
     connect?: BusinessMemberWhereUniqueInput | BusinessMemberWhereUniqueInput[]
+  }
+
+  export type StaffUncheckedCreateNestedManyWithoutRoleInput = {
+    create?: XOR<StaffCreateWithoutRoleInput, StaffUncheckedCreateWithoutRoleInput> | StaffCreateWithoutRoleInput[] | StaffUncheckedCreateWithoutRoleInput[]
+    connectOrCreate?: StaffCreateOrConnectWithoutRoleInput | StaffCreateOrConnectWithoutRoleInput[]
+    createMany?: StaffCreateManyRoleInputEnvelope
+    connect?: StaffWhereUniqueInput | StaffWhereUniqueInput[]
   }
 
   export type BoolFieldUpdateOperationsInput = {
@@ -62429,6 +62526,20 @@ export namespace Prisma {
     deleteMany?: BusinessMemberScalarWhereInput | BusinessMemberScalarWhereInput[]
   }
 
+  export type StaffUpdateManyWithoutRoleNestedInput = {
+    create?: XOR<StaffCreateWithoutRoleInput, StaffUncheckedCreateWithoutRoleInput> | StaffCreateWithoutRoleInput[] | StaffUncheckedCreateWithoutRoleInput[]
+    connectOrCreate?: StaffCreateOrConnectWithoutRoleInput | StaffCreateOrConnectWithoutRoleInput[]
+    upsert?: StaffUpsertWithWhereUniqueWithoutRoleInput | StaffUpsertWithWhereUniqueWithoutRoleInput[]
+    createMany?: StaffCreateManyRoleInputEnvelope
+    set?: StaffWhereUniqueInput | StaffWhereUniqueInput[]
+    disconnect?: StaffWhereUniqueInput | StaffWhereUniqueInput[]
+    delete?: StaffWhereUniqueInput | StaffWhereUniqueInput[]
+    connect?: StaffWhereUniqueInput | StaffWhereUniqueInput[]
+    update?: StaffUpdateWithWhereUniqueWithoutRoleInput | StaffUpdateWithWhereUniqueWithoutRoleInput[]
+    updateMany?: StaffUpdateManyWithWhereWithoutRoleInput | StaffUpdateManyWithWhereWithoutRoleInput[]
+    deleteMany?: StaffScalarWhereInput | StaffScalarWhereInput[]
+  }
+
   export type RolePermissionUncheckedUpdateManyWithoutRoleNestedInput = {
     create?: XOR<RolePermissionCreateWithoutRoleInput, RolePermissionUncheckedCreateWithoutRoleInput> | RolePermissionCreateWithoutRoleInput[] | RolePermissionUncheckedCreateWithoutRoleInput[]
     connectOrCreate?: RolePermissionCreateOrConnectWithoutRoleInput | RolePermissionCreateOrConnectWithoutRoleInput[]
@@ -62455,6 +62566,20 @@ export namespace Prisma {
     update?: BusinessMemberUpdateWithWhereUniqueWithoutRoleInput | BusinessMemberUpdateWithWhereUniqueWithoutRoleInput[]
     updateMany?: BusinessMemberUpdateManyWithWhereWithoutRoleInput | BusinessMemberUpdateManyWithWhereWithoutRoleInput[]
     deleteMany?: BusinessMemberScalarWhereInput | BusinessMemberScalarWhereInput[]
+  }
+
+  export type StaffUncheckedUpdateManyWithoutRoleNestedInput = {
+    create?: XOR<StaffCreateWithoutRoleInput, StaffUncheckedCreateWithoutRoleInput> | StaffCreateWithoutRoleInput[] | StaffUncheckedCreateWithoutRoleInput[]
+    connectOrCreate?: StaffCreateOrConnectWithoutRoleInput | StaffCreateOrConnectWithoutRoleInput[]
+    upsert?: StaffUpsertWithWhereUniqueWithoutRoleInput | StaffUpsertWithWhereUniqueWithoutRoleInput[]
+    createMany?: StaffCreateManyRoleInputEnvelope
+    set?: StaffWhereUniqueInput | StaffWhereUniqueInput[]
+    disconnect?: StaffWhereUniqueInput | StaffWhereUniqueInput[]
+    delete?: StaffWhereUniqueInput | StaffWhereUniqueInput[]
+    connect?: StaffWhereUniqueInput | StaffWhereUniqueInput[]
+    update?: StaffUpdateWithWhereUniqueWithoutRoleInput | StaffUpdateWithWhereUniqueWithoutRoleInput[]
+    updateMany?: StaffUpdateManyWithWhereWithoutRoleInput | StaffUpdateManyWithWhereWithoutRoleInput[]
+    deleteMany?: StaffScalarWhereInput | StaffScalarWhereInput[]
   }
 
   export type RolePermissionCreateNestedManyWithoutPermissionInput = {
@@ -63835,6 +63960,12 @@ export namespace Prisma {
     connect?: BusinessMemberWhereUniqueInput
   }
 
+  export type RoleCreateNestedOneWithoutStaffInput = {
+    create?: XOR<RoleCreateWithoutStaffInput, RoleUncheckedCreateWithoutStaffInput>
+    connectOrCreate?: RoleCreateOrConnectWithoutStaffInput
+    connect?: RoleWhereUniqueInput
+  }
+
   export type StaffServiceCreateNestedManyWithoutStaffInput = {
     create?: XOR<StaffServiceCreateWithoutStaffInput, StaffServiceUncheckedCreateWithoutStaffInput> | StaffServiceCreateWithoutStaffInput[] | StaffServiceUncheckedCreateWithoutStaffInput[]
     connectOrCreate?: StaffServiceCreateOrConnectWithoutStaffInput | StaffServiceCreateOrConnectWithoutStaffInput[]
@@ -63914,6 +64045,14 @@ export namespace Prisma {
     delete?: BusinessMemberWhereInput | boolean
     connect?: BusinessMemberWhereUniqueInput
     update?: XOR<XOR<BusinessMemberUpdateToOneWithWhereWithoutStaffInput, BusinessMemberUpdateWithoutStaffInput>, BusinessMemberUncheckedUpdateWithoutStaffInput>
+  }
+
+  export type RoleUpdateOneRequiredWithoutStaffNestedInput = {
+    create?: XOR<RoleCreateWithoutStaffInput, RoleUncheckedCreateWithoutStaffInput>
+    connectOrCreate?: RoleCreateOrConnectWithoutStaffInput
+    upsert?: RoleUpsertWithoutStaffInput
+    connect?: RoleWhereUniqueInput
+    update?: XOR<XOR<RoleUpdateToOneWithWhereWithoutStaffInput, RoleUpdateWithoutStaffInput>, RoleUncheckedUpdateWithoutStaffInput>
   }
 
   export type StaffServiceUpdateManyWithoutStaffNestedInput = {
@@ -66372,6 +66511,64 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type StaffCreateWithoutRoleInput = {
+    id?: string
+    name: string
+    phone: string
+    email: string
+    skills?: StaffCreateskillsInput | string[]
+    salary?: Decimal | DecimalJsLike | number | string | null
+    commission?: Decimal | DecimalJsLike | number | string | null
+    workingHours: JsonNullValueInput | InputJsonValue
+    isActive?: boolean
+    version?: number
+    createdBy?: string | null
+    updatedBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    deletedAt?: Date | string | null
+    business: BusinessCreateNestedOneWithoutStaffInput
+    branch: BranchCreateNestedOneWithoutStaffInput
+    member?: BusinessMemberCreateNestedOneWithoutStaffInput
+    services?: StaffServiceCreateNestedManyWithoutStaffInput
+    appointments?: AppointmentCreateNestedManyWithoutStaffInput
+    leaves?: LeaveCreateNestedManyWithoutStaffInput
+  }
+
+  export type StaffUncheckedCreateWithoutRoleInput = {
+    id?: string
+    businessId: string
+    branchId: string
+    memberId?: string | null
+    name: string
+    phone: string
+    email: string
+    skills?: StaffCreateskillsInput | string[]
+    salary?: Decimal | DecimalJsLike | number | string | null
+    commission?: Decimal | DecimalJsLike | number | string | null
+    workingHours: JsonNullValueInput | InputJsonValue
+    isActive?: boolean
+    version?: number
+    createdBy?: string | null
+    updatedBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    deletedAt?: Date | string | null
+    services?: StaffServiceUncheckedCreateNestedManyWithoutStaffInput
+    appointments?: AppointmentUncheckedCreateNestedManyWithoutStaffInput
+    leaves?: LeaveUncheckedCreateNestedManyWithoutStaffInput
+  }
+
+  export type StaffCreateOrConnectWithoutRoleInput = {
+    where: StaffWhereUniqueInput
+    create: XOR<StaffCreateWithoutRoleInput, StaffUncheckedCreateWithoutRoleInput>
+  }
+
+  export type StaffCreateManyRoleInputEnvelope = {
+    data: StaffCreateManyRoleInput | StaffCreateManyRoleInput[]
+    skipDuplicates?: boolean
+  }
+
   export type BusinessUpsertWithoutRolesInput = {
     update: XOR<BusinessUpdateWithoutRolesInput, BusinessUncheckedUpdateWithoutRolesInput>
     create: XOR<BusinessCreateWithoutRolesInput, BusinessUncheckedCreateWithoutRolesInput>
@@ -66526,6 +66723,47 @@ export namespace Prisma {
     deletedAt?: DateTimeNullableFilter<"BusinessMember"> | Date | string | null
   }
 
+  export type StaffUpsertWithWhereUniqueWithoutRoleInput = {
+    where: StaffWhereUniqueInput
+    update: XOR<StaffUpdateWithoutRoleInput, StaffUncheckedUpdateWithoutRoleInput>
+    create: XOR<StaffCreateWithoutRoleInput, StaffUncheckedCreateWithoutRoleInput>
+  }
+
+  export type StaffUpdateWithWhereUniqueWithoutRoleInput = {
+    where: StaffWhereUniqueInput
+    data: XOR<StaffUpdateWithoutRoleInput, StaffUncheckedUpdateWithoutRoleInput>
+  }
+
+  export type StaffUpdateManyWithWhereWithoutRoleInput = {
+    where: StaffScalarWhereInput
+    data: XOR<StaffUpdateManyMutationInput, StaffUncheckedUpdateManyWithoutRoleInput>
+  }
+
+  export type StaffScalarWhereInput = {
+    AND?: StaffScalarWhereInput | StaffScalarWhereInput[]
+    OR?: StaffScalarWhereInput[]
+    NOT?: StaffScalarWhereInput | StaffScalarWhereInput[]
+    id?: UuidFilter<"Staff"> | string
+    businessId?: UuidFilter<"Staff"> | string
+    branchId?: UuidFilter<"Staff"> | string
+    memberId?: UuidNullableFilter<"Staff"> | string | null
+    roleId?: UuidFilter<"Staff"> | string
+    name?: StringFilter<"Staff"> | string
+    phone?: StringFilter<"Staff"> | string
+    email?: StringFilter<"Staff"> | string
+    skills?: StringNullableListFilter<"Staff">
+    salary?: DecimalNullableFilter<"Staff"> | Decimal | DecimalJsLike | number | string | null
+    commission?: DecimalNullableFilter<"Staff"> | Decimal | DecimalJsLike | number | string | null
+    workingHours?: JsonFilter<"Staff">
+    isActive?: BoolFilter<"Staff"> | boolean
+    version?: IntFilter<"Staff"> | number
+    createdBy?: UuidNullableFilter<"Staff"> | string | null
+    updatedBy?: UuidNullableFilter<"Staff"> | string | null
+    createdAt?: DateTimeFilter<"Staff"> | Date | string
+    updatedAt?: DateTimeFilter<"Staff"> | Date | string
+    deletedAt?: DateTimeNullableFilter<"Staff"> | Date | string | null
+  }
+
   export type RolePermissionCreateWithoutPermissionInput = {
     role: RoleCreateNestedOneWithoutPermissionsInput
   }
@@ -66570,6 +66808,7 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     business?: BusinessCreateNestedOneWithoutRolesInput
     members?: BusinessMemberCreateNestedManyWithoutRoleInput
+    staff?: StaffCreateNestedManyWithoutRoleInput
   }
 
   export type RoleUncheckedCreateWithoutPermissionsInput = {
@@ -66582,6 +66821,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     deletedAt?: Date | string | null
     members?: BusinessMemberUncheckedCreateNestedManyWithoutRoleInput
+    staff?: StaffUncheckedCreateNestedManyWithoutRoleInput
   }
 
   export type RoleCreateOrConnectWithoutPermissionsInput = {
@@ -66631,6 +66871,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     business?: BusinessUpdateOneWithoutRolesNestedInput
     members?: BusinessMemberUpdateManyWithoutRoleNestedInput
+    staff?: StaffUpdateManyWithoutRoleNestedInput
   }
 
   export type RoleUncheckedUpdateWithoutPermissionsInput = {
@@ -66643,6 +66884,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     members?: BusinessMemberUncheckedUpdateManyWithoutRoleNestedInput
+    staff?: StaffUncheckedUpdateManyWithoutRoleNestedInput
   }
 
   export type PermissionUpsertWithoutRolesInput = {
@@ -66758,6 +67000,7 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     permissions?: RolePermissionCreateNestedManyWithoutRoleInput
     members?: BusinessMemberCreateNestedManyWithoutRoleInput
+    staff?: StaffCreateNestedManyWithoutRoleInput
   }
 
   export type RoleUncheckedCreateWithoutBusinessInput = {
@@ -66770,6 +67013,7 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     permissions?: RolePermissionUncheckedCreateNestedManyWithoutRoleInput
     members?: BusinessMemberUncheckedCreateNestedManyWithoutRoleInput
+    staff?: StaffUncheckedCreateNestedManyWithoutRoleInput
   }
 
   export type RoleCreateOrConnectWithoutBusinessInput = {
@@ -66886,6 +67130,7 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     branch: BranchCreateNestedOneWithoutStaffInput
     member?: BusinessMemberCreateNestedOneWithoutStaffInput
+    role?: RoleCreateNestedOneWithoutStaffInput
     services?: StaffServiceCreateNestedManyWithoutStaffInput
     appointments?: AppointmentCreateNestedManyWithoutStaffInput
     leaves?: LeaveCreateNestedManyWithoutStaffInput
@@ -66895,6 +67140,7 @@ export namespace Prisma {
     id?: string
     branchId: string
     memberId?: string | null
+    roleId?: string
     name: string
     phone: string
     email: string
@@ -67861,30 +68107,6 @@ export namespace Prisma {
     data: XOR<StaffUpdateManyMutationInput, StaffUncheckedUpdateManyWithoutBusinessInput>
   }
 
-  export type StaffScalarWhereInput = {
-    AND?: StaffScalarWhereInput | StaffScalarWhereInput[]
-    OR?: StaffScalarWhereInput[]
-    NOT?: StaffScalarWhereInput | StaffScalarWhereInput[]
-    id?: UuidFilter<"Staff"> | string
-    businessId?: UuidFilter<"Staff"> | string
-    branchId?: UuidFilter<"Staff"> | string
-    memberId?: UuidNullableFilter<"Staff"> | string | null
-    name?: StringFilter<"Staff"> | string
-    phone?: StringFilter<"Staff"> | string
-    email?: StringFilter<"Staff"> | string
-    skills?: StringNullableListFilter<"Staff">
-    salary?: DecimalNullableFilter<"Staff"> | Decimal | DecimalJsLike | number | string | null
-    commission?: DecimalNullableFilter<"Staff"> | Decimal | DecimalJsLike | number | string | null
-    workingHours?: JsonFilter<"Staff">
-    isActive?: BoolFilter<"Staff"> | boolean
-    version?: IntFilter<"Staff"> | number
-    createdBy?: UuidNullableFilter<"Staff"> | string | null
-    updatedBy?: UuidNullableFilter<"Staff"> | string | null
-    createdAt?: DateTimeFilter<"Staff"> | Date | string
-    updatedAt?: DateTimeFilter<"Staff"> | Date | string
-    deletedAt?: DateTimeNullableFilter<"Staff"> | Date | string | null
-  }
-
   export type CustomerUpsertWithWhereUniqueWithoutBusinessInput = {
     where: CustomerWhereUniqueInput
     update: XOR<CustomerUpdateWithoutBusinessInput, CustomerUncheckedUpdateWithoutBusinessInput>
@@ -68669,6 +68891,7 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     business: BusinessCreateNestedOneWithoutStaffInput
     member?: BusinessMemberCreateNestedOneWithoutStaffInput
+    role?: RoleCreateNestedOneWithoutStaffInput
     services?: StaffServiceCreateNestedManyWithoutStaffInput
     appointments?: AppointmentCreateNestedManyWithoutStaffInput
     leaves?: LeaveCreateNestedManyWithoutStaffInput
@@ -68678,6 +68901,7 @@ export namespace Prisma {
     id?: string
     businessId: string
     memberId?: string | null
+    roleId?: string
     name: string
     phone: string
     email: string
@@ -69030,6 +69254,7 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     business?: BusinessCreateNestedOneWithoutRolesInput
     permissions?: RolePermissionCreateNestedManyWithoutRoleInput
+    staff?: StaffCreateNestedManyWithoutRoleInput
   }
 
   export type RoleUncheckedCreateWithoutMembersInput = {
@@ -69042,6 +69267,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     deletedAt?: Date | string | null
     permissions?: RolePermissionUncheckedCreateNestedManyWithoutRoleInput
+    staff?: StaffUncheckedCreateNestedManyWithoutRoleInput
   }
 
   export type RoleCreateOrConnectWithoutMembersInput = {
@@ -69067,6 +69293,7 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     business: BusinessCreateNestedOneWithoutStaffInput
     branch: BranchCreateNestedOneWithoutStaffInput
+    role?: RoleCreateNestedOneWithoutStaffInput
     services?: StaffServiceCreateNestedManyWithoutStaffInput
     appointments?: AppointmentCreateNestedManyWithoutStaffInput
     leaves?: LeaveCreateNestedManyWithoutStaffInput
@@ -69076,6 +69303,7 @@ export namespace Prisma {
     id?: string
     businessId: string
     branchId: string
+    roleId?: string
     name: string
     phone: string
     email: string
@@ -69268,6 +69496,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     business?: BusinessUpdateOneWithoutRolesNestedInput
     permissions?: RolePermissionUpdateManyWithoutRoleNestedInput
+    staff?: StaffUpdateManyWithoutRoleNestedInput
   }
 
   export type RoleUncheckedUpdateWithoutMembersInput = {
@@ -69280,6 +69509,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     permissions?: RolePermissionUncheckedUpdateManyWithoutRoleNestedInput
+    staff?: StaffUncheckedUpdateManyWithoutRoleNestedInput
   }
 
   export type StaffUpsertWithWhereUniqueWithoutMemberInput = {
@@ -69457,6 +69687,37 @@ export namespace Prisma {
   export type BusinessMemberCreateOrConnectWithoutStaffInput = {
     where: BusinessMemberWhereUniqueInput
     create: XOR<BusinessMemberCreateWithoutStaffInput, BusinessMemberUncheckedCreateWithoutStaffInput>
+  }
+
+  export type RoleCreateWithoutStaffInput = {
+    id?: string
+    name: string
+    description?: string | null
+    isSystem?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    deletedAt?: Date | string | null
+    business?: BusinessCreateNestedOneWithoutRolesInput
+    permissions?: RolePermissionCreateNestedManyWithoutRoleInput
+    members?: BusinessMemberCreateNestedManyWithoutRoleInput
+  }
+
+  export type RoleUncheckedCreateWithoutStaffInput = {
+    id?: string
+    name: string
+    description?: string | null
+    businessId?: string | null
+    isSystem?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    deletedAt?: Date | string | null
+    permissions?: RolePermissionUncheckedCreateNestedManyWithoutRoleInput
+    members?: BusinessMemberUncheckedCreateNestedManyWithoutRoleInput
+  }
+
+  export type RoleCreateOrConnectWithoutStaffInput = {
+    where: RoleWhereUniqueInput
+    create: XOR<RoleCreateWithoutStaffInput, RoleUncheckedCreateWithoutStaffInput>
   }
 
   export type StaffServiceCreateWithoutStaffInput = {
@@ -69742,6 +70003,43 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type RoleUpsertWithoutStaffInput = {
+    update: XOR<RoleUpdateWithoutStaffInput, RoleUncheckedUpdateWithoutStaffInput>
+    create: XOR<RoleCreateWithoutStaffInput, RoleUncheckedCreateWithoutStaffInput>
+    where?: RoleWhereInput
+  }
+
+  export type RoleUpdateToOneWithWhereWithoutStaffInput = {
+    where?: RoleWhereInput
+    data: XOR<RoleUpdateWithoutStaffInput, RoleUncheckedUpdateWithoutStaffInput>
+  }
+
+  export type RoleUpdateWithoutStaffInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isSystem?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    business?: BusinessUpdateOneWithoutRolesNestedInput
+    permissions?: RolePermissionUpdateManyWithoutRoleNestedInput
+    members?: BusinessMemberUpdateManyWithoutRoleNestedInput
+  }
+
+  export type RoleUncheckedUpdateWithoutStaffInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    businessId?: NullableStringFieldUpdateOperationsInput | string | null
+    isSystem?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    permissions?: RolePermissionUncheckedUpdateManyWithoutRoleNestedInput
+    members?: BusinessMemberUncheckedUpdateManyWithoutRoleNestedInput
   }
 
   export type StaffServiceUpsertWithWhereUniqueWithoutStaffInput = {
@@ -70573,6 +70871,7 @@ export namespace Prisma {
     business: BusinessCreateNestedOneWithoutStaffInput
     branch: BranchCreateNestedOneWithoutStaffInput
     member?: BusinessMemberCreateNestedOneWithoutStaffInput
+    role?: RoleCreateNestedOneWithoutStaffInput
     appointments?: AppointmentCreateNestedManyWithoutStaffInput
     leaves?: LeaveCreateNestedManyWithoutStaffInput
   }
@@ -70582,6 +70881,7 @@ export namespace Prisma {
     businessId: string
     branchId: string
     memberId?: string | null
+    roleId?: string
     name: string
     phone: string
     email: string
@@ -70678,6 +70978,7 @@ export namespace Prisma {
     business?: BusinessUpdateOneRequiredWithoutStaffNestedInput
     branch?: BranchUpdateOneRequiredWithoutStaffNestedInput
     member?: BusinessMemberUpdateOneWithoutStaffNestedInput
+    role?: RoleUpdateOneRequiredWithoutStaffNestedInput
     appointments?: AppointmentUpdateManyWithoutStaffNestedInput
     leaves?: LeaveUpdateManyWithoutStaffNestedInput
   }
@@ -70687,6 +70988,7 @@ export namespace Prisma {
     businessId?: StringFieldUpdateOperationsInput | string
     branchId?: StringFieldUpdateOperationsInput | string
     memberId?: NullableStringFieldUpdateOperationsInput | string | null
+    roleId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
@@ -71379,6 +71681,7 @@ export namespace Prisma {
     business: BusinessCreateNestedOneWithoutStaffInput
     branch: BranchCreateNestedOneWithoutStaffInput
     member?: BusinessMemberCreateNestedOneWithoutStaffInput
+    role?: RoleCreateNestedOneWithoutStaffInput
     services?: StaffServiceCreateNestedManyWithoutStaffInput
     leaves?: LeaveCreateNestedManyWithoutStaffInput
   }
@@ -71388,6 +71691,7 @@ export namespace Prisma {
     businessId: string
     branchId: string
     memberId?: string | null
+    roleId?: string
     name: string
     phone: string
     email: string
@@ -71751,6 +72055,7 @@ export namespace Prisma {
     business?: BusinessUpdateOneRequiredWithoutStaffNestedInput
     branch?: BranchUpdateOneRequiredWithoutStaffNestedInput
     member?: BusinessMemberUpdateOneWithoutStaffNestedInput
+    role?: RoleUpdateOneRequiredWithoutStaffNestedInput
     services?: StaffServiceUpdateManyWithoutStaffNestedInput
     leaves?: LeaveUpdateManyWithoutStaffNestedInput
   }
@@ -71760,6 +72065,7 @@ export namespace Prisma {
     businessId?: StringFieldUpdateOperationsInput | string
     branchId?: StringFieldUpdateOperationsInput | string
     memberId?: NullableStringFieldUpdateOperationsInput | string | null
+    roleId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
@@ -75126,6 +75432,7 @@ export namespace Prisma {
     business: BusinessCreateNestedOneWithoutStaffInput
     branch: BranchCreateNestedOneWithoutStaffInput
     member?: BusinessMemberCreateNestedOneWithoutStaffInput
+    role?: RoleCreateNestedOneWithoutStaffInput
     services?: StaffServiceCreateNestedManyWithoutStaffInput
     appointments?: AppointmentCreateNestedManyWithoutStaffInput
   }
@@ -75135,6 +75442,7 @@ export namespace Prisma {
     businessId: string
     branchId: string
     memberId?: string | null
+    roleId?: string
     name: string
     phone: string
     email: string
@@ -75289,6 +75597,7 @@ export namespace Prisma {
     business?: BusinessUpdateOneRequiredWithoutStaffNestedInput
     branch?: BranchUpdateOneRequiredWithoutStaffNestedInput
     member?: BusinessMemberUpdateOneWithoutStaffNestedInput
+    role?: RoleUpdateOneRequiredWithoutStaffNestedInput
     services?: StaffServiceUpdateManyWithoutStaffNestedInput
     appointments?: AppointmentUpdateManyWithoutStaffNestedInput
   }
@@ -75298,6 +75607,7 @@ export namespace Prisma {
     businessId?: StringFieldUpdateOperationsInput | string
     branchId?: StringFieldUpdateOperationsInput | string
     memberId?: NullableStringFieldUpdateOperationsInput | string | null
+    roleId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
@@ -77361,6 +77671,27 @@ export namespace Prisma {
     deletedAt?: Date | string | null
   }
 
+  export type StaffCreateManyRoleInput = {
+    id?: string
+    businessId: string
+    branchId: string
+    memberId?: string | null
+    name: string
+    phone: string
+    email: string
+    skills?: StaffCreateskillsInput | string[]
+    salary?: Decimal | DecimalJsLike | number | string | null
+    commission?: Decimal | DecimalJsLike | number | string | null
+    workingHours: JsonNullValueInput | InputJsonValue
+    isActive?: boolean
+    version?: number
+    createdBy?: string | null
+    updatedBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    deletedAt?: Date | string | null
+  }
+
   export type RolePermissionUpdateWithoutRoleInput = {
     permission?: PermissionUpdateOneRequiredWithoutRolesNestedInput
   }
@@ -77397,6 +77728,75 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     businessId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type StaffUpdateWithoutRoleInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    skills?: StaffUpdateskillsInput | string[]
+    salary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    commission?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    workingHours?: JsonNullValueInput | InputJsonValue
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    version?: IntFieldUpdateOperationsInput | number
+    createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    business?: BusinessUpdateOneRequiredWithoutStaffNestedInput
+    branch?: BranchUpdateOneRequiredWithoutStaffNestedInput
+    member?: BusinessMemberUpdateOneWithoutStaffNestedInput
+    services?: StaffServiceUpdateManyWithoutStaffNestedInput
+    appointments?: AppointmentUpdateManyWithoutStaffNestedInput
+    leaves?: LeaveUpdateManyWithoutStaffNestedInput
+  }
+
+  export type StaffUncheckedUpdateWithoutRoleInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    businessId?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    memberId?: NullableStringFieldUpdateOperationsInput | string | null
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    skills?: StaffUpdateskillsInput | string[]
+    salary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    commission?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    workingHours?: JsonNullValueInput | InputJsonValue
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    version?: IntFieldUpdateOperationsInput | number
+    createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    services?: StaffServiceUncheckedUpdateManyWithoutStaffNestedInput
+    appointments?: AppointmentUncheckedUpdateManyWithoutStaffNestedInput
+    leaves?: LeaveUncheckedUpdateManyWithoutStaffNestedInput
+  }
+
+  export type StaffUncheckedUpdateManyWithoutRoleInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    businessId?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    memberId?: NullableStringFieldUpdateOperationsInput | string | null
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    skills?: StaffUpdateskillsInput | string[]
+    salary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    commission?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    workingHours?: JsonNullValueInput | InputJsonValue
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    version?: IntFieldUpdateOperationsInput | number
+    createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -77486,6 +77886,7 @@ export namespace Prisma {
     id?: string
     branchId: string
     memberId?: string | null
+    roleId?: string
     name: string
     phone: string
     email: string
@@ -77864,6 +78265,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     permissions?: RolePermissionUpdateManyWithoutRoleNestedInput
     members?: BusinessMemberUpdateManyWithoutRoleNestedInput
+    staff?: StaffUpdateManyWithoutRoleNestedInput
   }
 
   export type RoleUncheckedUpdateWithoutBusinessInput = {
@@ -77876,6 +78278,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     permissions?: RolePermissionUncheckedUpdateManyWithoutRoleNestedInput
     members?: BusinessMemberUncheckedUpdateManyWithoutRoleNestedInput
+    staff?: StaffUncheckedUpdateManyWithoutRoleNestedInput
   }
 
   export type RoleUncheckedUpdateManyWithoutBusinessInput = {
@@ -78001,6 +78404,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     branch?: BranchUpdateOneRequiredWithoutStaffNestedInput
     member?: BusinessMemberUpdateOneWithoutStaffNestedInput
+    role?: RoleUpdateOneRequiredWithoutStaffNestedInput
     services?: StaffServiceUpdateManyWithoutStaffNestedInput
     appointments?: AppointmentUpdateManyWithoutStaffNestedInput
     leaves?: LeaveUpdateManyWithoutStaffNestedInput
@@ -78010,6 +78414,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     branchId?: StringFieldUpdateOperationsInput | string
     memberId?: NullableStringFieldUpdateOperationsInput | string | null
+    roleId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
@@ -78033,6 +78438,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     branchId?: StringFieldUpdateOperationsInput | string
     memberId?: NullableStringFieldUpdateOperationsInput | string | null
+    roleId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
@@ -78894,6 +79300,7 @@ export namespace Prisma {
     id?: string
     businessId: string
     memberId?: string | null
+    roleId?: string
     name: string
     phone: string
     email: string
@@ -78946,6 +79353,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     business?: BusinessUpdateOneRequiredWithoutStaffNestedInput
     member?: BusinessMemberUpdateOneWithoutStaffNestedInput
+    role?: RoleUpdateOneRequiredWithoutStaffNestedInput
     services?: StaffServiceUpdateManyWithoutStaffNestedInput
     appointments?: AppointmentUpdateManyWithoutStaffNestedInput
     leaves?: LeaveUpdateManyWithoutStaffNestedInput
@@ -78955,6 +79363,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     businessId?: StringFieldUpdateOperationsInput | string
     memberId?: NullableStringFieldUpdateOperationsInput | string | null
+    roleId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
@@ -78978,6 +79387,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     businessId?: StringFieldUpdateOperationsInput | string
     memberId?: NullableStringFieldUpdateOperationsInput | string | null
+    roleId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
@@ -79056,6 +79466,7 @@ export namespace Prisma {
     id?: string
     businessId: string
     branchId: string
+    roleId?: string
     name: string
     phone: string
     email: string
@@ -79090,6 +79501,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     business?: BusinessUpdateOneRequiredWithoutStaffNestedInput
     branch?: BranchUpdateOneRequiredWithoutStaffNestedInput
+    role?: RoleUpdateOneRequiredWithoutStaffNestedInput
     services?: StaffServiceUpdateManyWithoutStaffNestedInput
     appointments?: AppointmentUpdateManyWithoutStaffNestedInput
     leaves?: LeaveUpdateManyWithoutStaffNestedInput
@@ -79099,6 +79511,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     businessId?: StringFieldUpdateOperationsInput | string
     branchId?: StringFieldUpdateOperationsInput | string
+    roleId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
@@ -79122,6 +79535,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     businessId?: StringFieldUpdateOperationsInput | string
     branchId?: StringFieldUpdateOperationsInput | string
+    roleId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string

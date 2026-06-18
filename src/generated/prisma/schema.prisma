@@ -165,6 +165,7 @@ model Role {
   business    Business?        @relation(fields: [businessId], references: [id])
   permissions RolePermission[]
   members     BusinessMember[]
+  staff       Staff[]
 
   @@index([businessId])
   @@map("roles")
@@ -293,6 +294,7 @@ model Staff {
   businessId   String    @db.Uuid
   branchId     String    @db.Uuid
   memberId     String?   @db.Uuid // Nullable if the staff does not log in
+  roleId       String    @default("00000000-0000-0000-0000-000000000004") @db.Uuid
   name         String
   phone        String
   email        String
@@ -311,6 +313,7 @@ model Staff {
   business     Business        @relation(fields: [businessId], references: [id])
   branch       Branch          @relation(fields: [branchId], references: [id])
   member       BusinessMember? @relation(fields: [memberId], references: [id])
+  role         Role            @relation(fields: [roleId], references: [id])
   services     StaffService[]
   appointments Appointment[]
   leaves       Leave[]

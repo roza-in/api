@@ -82,7 +82,7 @@ describe('RolesGuard', () => {
 
   it('should throw ForbiddenException if user resolved role does not match required roles', async () => {
     mockReflector.getAllAndOverride.mockReturnValue([Role.OWNER]);
-    mockPermissionsService.getRoleName.mockResolvedValue('STAFF');
+    mockPermissionsService.getRoleName.mockResolvedValue('PROFESSIONAL');
     const context = createMockContext({ user: { roleId: 'role-uuid' } });
 
     await expect(guard.canActivate(context)).rejects.toThrow(
