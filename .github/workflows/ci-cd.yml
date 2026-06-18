@@ -261,7 +261,7 @@ jobs:
                 depends_on:
                   postgres:
                     condition: service_healthy
-                command: npx prisma migrate deploy
+                command: sh -c "npx prisma migrate deploy && npx prisma db seed"
 
               api:
                 image: $DOCKER_USERNAME/rozx-api:$GITHUB_SHA

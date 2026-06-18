@@ -6,7 +6,9 @@ import { Pool } from 'pg';
 
 const isLocal =
   process.env.DATABASE_URL?.includes('localhost') ||
-  process.env.DATABASE_URL?.includes('127.0.0.1');
+  process.env.DATABASE_URL?.includes('127.0.0.1') ||
+  process.env.DATABASE_URL?.includes('postgres') ||
+  process.env.DATABASE_URL?.includes('db');
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
