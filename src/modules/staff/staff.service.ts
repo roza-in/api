@@ -87,9 +87,7 @@ export class StaffService {
           phone: dto.phone,
           email: dto.email,
           skills: dto.skills || [],
-          salary: dto.salary
-            ? new Intl.NumberFormat().format(dto.salary)
-            : null,
+          salary: dto.salary ?? null,
           commission: dto.commission,
           workingHours: (dto.workingHours || {}) as Prisma.InputJsonValue,
           createdBy: userId,
