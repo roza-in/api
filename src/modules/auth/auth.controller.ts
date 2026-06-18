@@ -95,7 +95,7 @@ export class AuthController {
     const finalUrl = isUrlSafe ? redirectUrl : (allowedOrigins[0] || 'http://localhost:3000');
 
     return res.redirect(
-      `${finalUrl}/auth/callback?accessToken=${tokens.accessToken}&refreshToken=${tokens.refreshToken}`
+      `${finalUrl}/callback?accessToken=${tokens.accessToken}&refreshToken=${tokens.refreshToken}`
     );
   }
 
