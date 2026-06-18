@@ -318,7 +318,7 @@ User ↔ BusinessMember ↔ Business
 ```
 
 - **User**: Authentication identity (email, password, OAuth, MFA).
-- **BusinessMember**: Links a User to a Business with a specific Role. A User can be a member of multiple businesses.
+- **BusinessMember**: Links a User to a Business with a specific Role. A User can be a member of exactly one business (enforces Option B).
 - **Role**: Can be system-defined (Owner, Manager, Reception, Staff) or business-custom.
 - **Permission**: Granular action (e.g. `appointment:create`, `payment:refund`).
 - **Staff**: Operational profile linked to BusinessMember (schedule, skills, salary). Not all BusinessMembers are Staff.

@@ -30,7 +30,24 @@ export class BusinessService {
     email: string,
     dto: CreateBusinessDto,
   ) {
-    const slug = await this.generateUniqueSlug(dto.slug || dto.name);
+    // Option B: Enforce strict single-business membership limit
+    const existingMembership = await this.prisma.businessMember.findFirst({
+      where: { userId, deletedAt: null },
+    });
+    if (existingMembership) {
+      throw new BadRequestException('User is already a member of a business');
+    }
+
+    let slug: string;
+    if (dto.slug) {
+      const isAvailable = await this.isSlugAvailable(dto.slug);
+      if (!isAvailable) {
+        throw new ConflictException('Slug is already taken');
+      }
+      slug = this.slugify(dto.slug);
+    } else {
+      slug = await this.generateUniqueSlug(dto.name);
+    }
 
     // Find the free trial plan
     const trialPlan = await this.prisma.subscriptionPlan.findUnique({
@@ -187,6 +204,17 @@ export class BusinessService {
     this.logger.log(`Business ${businessId} soft-deleted by user ${userId}`);
 
     return { message: 'Business deleted successfully' };
+  }
+
+  async isSlugAvailable(slug: string): Promise<boolean> {
+    const formatted = this.slugify(slug);
+    if (formatted.length < 3) {
+      return false;
+    }
+    const existing = await this.prisma.business.findUnique({
+      where: { slug: formatted },
+    });
+    return !existing;
   }
 
   private async generateUniqueSlug(input: string): Promise<string> {

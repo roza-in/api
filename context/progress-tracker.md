@@ -117,6 +117,7 @@ Update this file after every completed feature. Any AI agent reading this should
 - **WhatsApp-Only OTP Authentication & SMS Adapter Bypass**: Replaced MSG91 SMS OTP and fallbacks with WhatsApp Cloud API using Meta's copy-code authentication template structure, utilizing a unique database-compatible email format (`phone@rozx.in`) for phone-only signups to avoid breaking downstream business logic.
 - **Hourly Reminder Scanning Scheduler**: Configured a BullMQ-backed repeatable cron job (`appointment-reminder-check`) running hourly, scanning and sending appointment notifications 24 hours prior to booking start times.
 - **WhatsApp OTP Utility-First Design**: Configured the OTP dispatch payload in the `WhatsAppAdapter` to omit button components completely. This makes the default `auth_otp` template directly compatible with the buttonless Utility category without requiring any extra environment variables (like `WHATSAPP_OTP_HAS_BUTTONS`) or complex payload switches.
+- **Strict Single Business Membership Constraint (Option B)**: Enforced a strict 1-to-1 relationship between User and BusinessMember at both the database level (swapping compound unique constraint on `[userId, businessId]` for a unique index on `[userId]`) and the application layer (validating during business registration and staff invitation to throw `BadRequestException` on existing membership).
 
 ---
 

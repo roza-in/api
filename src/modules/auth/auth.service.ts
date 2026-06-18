@@ -244,8 +244,7 @@ export class AuthService {
         status: true,
         lastLogin: true,
         createdAt: true,
-        memberships: {
-          where: { deletedAt: null },
+        membership: {
           select: {
             id: true,
             businessId: true,

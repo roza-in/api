@@ -9,6 +9,7 @@ import {
   HttpCode,
   HttpStatus,
   BadRequestException,
+  Param,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -27,6 +28,19 @@ import type { UserPayload } from '../../common/interfaces/user-payload.interface
 @Controller('businesses')
 export class BusinessController {
   constructor(private readonly businessService: BusinessService) {}
+
+  @Get('check-slug/:slug')
+  @ApiOperation({
+    summary: 'Check if a business slug is available',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Slug availability status returned',
+  })
+  async checkSlug(@Param('slug') slug: string) {
+    const isAvailable = await this.businessService.isSlugAvailable(slug);
+    return { available: isAvailable };
+  }
 
   @Post()
   @UseGuards(JwtAuthGuard)

@@ -148,7 +148,7 @@ model User {
   updatedAt     DateTime        @updatedAt @db.Timestamptz
   deletedAt     DateTime?       @db.Timestamptz
 
-  memberships   BusinessMember[]
+  membership    BusinessMember?
 
   @@map("users")
 }
@@ -283,7 +283,7 @@ model BusinessMember {
   role      Role      @relation(fields: [roleId], references: [id])
   staff     Staff[]
 
-  @@unique([userId, businessId])
+  @@unique([userId])
   @@index([businessId])
   @@index([userId])
   @@map("business_members")

@@ -4482,37 +4482,6 @@ export namespace Prisma {
 
 
   /**
-   * Count Type UserCountOutputType
-   */
-
-  export type UserCountOutputType = {
-    memberships: number
-  }
-
-  export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    memberships?: boolean | UserCountOutputTypeCountMembershipsArgs
-  }
-
-  // Custom InputTypes
-  /**
-   * UserCountOutputType without action
-   */
-  export type UserCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the UserCountOutputType
-     */
-    select?: UserCountOutputTypeSelect<ExtArgs> | null
-  }
-
-  /**
-   * UserCountOutputType without action
-   */
-  export type UserCountOutputTypeCountMembershipsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: BusinessMemberWhereInput
-  }
-
-
-  /**
    * Count Type RoleCountOutputType
    */
 
@@ -5552,8 +5521,7 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     deletedAt?: boolean
-    memberships?: boolean | User$membershipsArgs<ExtArgs>
-    _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
+    membership?: boolean | User$membershipArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -5603,8 +5571,7 @@ export namespace Prisma {
 
   export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "phone" | "passwordHash" | "oauthProvider" | "oauthId" | "mfaSecret" | "lastLogin" | "status" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    memberships?: boolean | User$membershipsArgs<ExtArgs>
-    _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
+    membership?: boolean | User$membershipArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
   export type UserIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -5612,7 +5579,7 @@ export namespace Prisma {
   export type $UserPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "User"
     objects: {
-      memberships: Prisma.$BusinessMemberPayload<ExtArgs>[]
+      membership: Prisma.$BusinessMemberPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -6021,7 +5988,7 @@ export namespace Prisma {
    */
   export interface Prisma__UserClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    memberships<T extends User$membershipsArgs<ExtArgs> = {}>(args?: Subset<T, User$membershipsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BusinessMemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    membership<T extends User$membershipArgs<ExtArgs> = {}>(args?: Subset<T, User$membershipArgs<ExtArgs>>): Prisma__BusinessMemberClient<$Result.GetResult<Prisma.$BusinessMemberPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6456,9 +6423,9 @@ export namespace Prisma {
   }
 
   /**
-   * User.memberships
+   * User.membership
    */
-  export type User$membershipsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type User$membershipArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the BusinessMember
      */
@@ -6472,11 +6439,6 @@ export namespace Prisma {
      */
     include?: BusinessMemberInclude<ExtArgs> | null
     where?: BusinessMemberWhereInput
-    orderBy?: BusinessMemberOrderByWithRelationInput | BusinessMemberOrderByWithRelationInput[]
-    cursor?: BusinessMemberWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: BusinessMemberScalarFieldEnum | BusinessMemberScalarFieldEnum[]
   }
 
   /**
@@ -52114,7 +52076,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     deletedAt?: DateTimeNullableFilter<"User"> | Date | string | null
-    memberships?: BusinessMemberListRelationFilter
+    membership?: XOR<BusinessMemberNullableScalarRelationFilter, BusinessMemberWhereInput> | null
   }
 
   export type UserOrderByWithRelationInput = {
@@ -52130,7 +52092,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     deletedAt?: SortOrderInput | SortOrder
-    memberships?: BusinessMemberOrderByRelationAggregateInput
+    membership?: BusinessMemberOrderByWithRelationInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -52149,7 +52111,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     deletedAt?: DateTimeNullableFilter<"User"> | Date | string | null
-    memberships?: BusinessMemberListRelationFilter
+    membership?: XOR<BusinessMemberNullableScalarRelationFilter, BusinessMemberWhereInput> | null
   }, "id" | "email" | "phone">
 
   export type UserOrderByWithAggregationInput = {
@@ -52696,11 +52658,10 @@ export namespace Prisma {
 
   export type BusinessMemberWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    userId_businessId?: BusinessMemberUserIdBusinessIdCompoundUniqueInput
+    userId?: string
     AND?: BusinessMemberWhereInput | BusinessMemberWhereInput[]
     OR?: BusinessMemberWhereInput[]
     NOT?: BusinessMemberWhereInput | BusinessMemberWhereInput[]
-    userId?: UuidFilter<"BusinessMember"> | string
     businessId?: UuidFilter<"BusinessMember"> | string
     roleId?: UuidFilter<"BusinessMember"> | string
     createdAt?: DateTimeFilter<"BusinessMember"> | Date | string
@@ -52710,7 +52671,7 @@ export namespace Prisma {
     business?: XOR<BusinessScalarRelationFilter, BusinessWhereInput>
     role?: XOR<RoleScalarRelationFilter, RoleWhereInput>
     staff?: StaffListRelationFilter
-  }, "id" | "userId_businessId">
+  }, "id" | "userId">
 
   export type BusinessMemberOrderByWithAggregationInput = {
     id?: SortOrder
@@ -55584,7 +55545,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
-    memberships?: BusinessMemberCreateNestedManyWithoutUserInput
+    membership?: BusinessMemberCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -55600,7 +55561,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
-    memberships?: BusinessMemberUncheckedCreateNestedManyWithoutUserInput
+    membership?: BusinessMemberUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -55616,7 +55577,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberships?: BusinessMemberUpdateManyWithoutUserNestedInput
+    membership?: BusinessMemberUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -55632,7 +55593,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    memberships?: BusinessMemberUncheckedUpdateManyWithoutUserNestedInput
+    membership?: BusinessMemberUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -56233,7 +56194,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
-    user: UserCreateNestedOneWithoutMembershipsInput
+    user: UserCreateNestedOneWithoutMembershipInput
     business: BusinessCreateNestedOneWithoutMembersInput
     role: RoleCreateNestedOneWithoutMembersInput
     staff?: StaffCreateNestedManyWithoutMemberInput
@@ -56255,7 +56216,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    user?: UserUpdateOneRequiredWithoutMembershipsNestedInput
+    user?: UserUpdateOneRequiredWithoutMembershipNestedInput
     business?: BusinessUpdateOneRequiredWithoutMembersNestedInput
     role?: RoleUpdateOneRequiredWithoutMembersNestedInput
     staff?: StaffUpdateManyWithoutMemberNestedInput
@@ -59498,19 +59459,14 @@ export namespace Prisma {
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
-  export type BusinessMemberListRelationFilter = {
-    every?: BusinessMemberWhereInput
-    some?: BusinessMemberWhereInput
-    none?: BusinessMemberWhereInput
+  export type BusinessMemberNullableScalarRelationFilter = {
+    is?: BusinessMemberWhereInput | null
+    isNot?: BusinessMemberWhereInput | null
   }
 
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
-  }
-
-  export type BusinessMemberOrderByRelationAggregateInput = {
-    _count?: SortOrder
   }
 
   export type UserCountOrderByAggregateInput = {
@@ -59675,7 +59631,17 @@ export namespace Prisma {
     none?: RolePermissionWhereInput
   }
 
+  export type BusinessMemberListRelationFilter = {
+    every?: BusinessMemberWhereInput
+    some?: BusinessMemberWhereInput
+    none?: BusinessMemberWhereInput
+  }
+
   export type RolePermissionOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type BusinessMemberOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -60267,11 +60233,6 @@ export namespace Prisma {
     isNot?: UserWhereInput
   }
 
-  export type BusinessMemberUserIdBusinessIdCompoundUniqueInput = {
-    userId: string
-    businessId: string
-  }
-
   export type BusinessMemberCountOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
@@ -60324,11 +60285,6 @@ export namespace Prisma {
   export type BranchScalarRelationFilter = {
     is?: BranchWhereInput
     isNot?: BranchWhereInput
-  }
-
-  export type BusinessMemberNullableScalarRelationFilter = {
-    is?: BusinessMemberWhereInput | null
-    isNot?: BusinessMemberWhereInput | null
   }
 
   export type StaffServiceListRelationFilter = {
@@ -62345,18 +62301,16 @@ export namespace Prisma {
     _max?: NestedEnumSystemStatusTypeFilter<$PrismaModel>
   }
 
-  export type BusinessMemberCreateNestedManyWithoutUserInput = {
-    create?: XOR<BusinessMemberCreateWithoutUserInput, BusinessMemberUncheckedCreateWithoutUserInput> | BusinessMemberCreateWithoutUserInput[] | BusinessMemberUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: BusinessMemberCreateOrConnectWithoutUserInput | BusinessMemberCreateOrConnectWithoutUserInput[]
-    createMany?: BusinessMemberCreateManyUserInputEnvelope
-    connect?: BusinessMemberWhereUniqueInput | BusinessMemberWhereUniqueInput[]
+  export type BusinessMemberCreateNestedOneWithoutUserInput = {
+    create?: XOR<BusinessMemberCreateWithoutUserInput, BusinessMemberUncheckedCreateWithoutUserInput>
+    connectOrCreate?: BusinessMemberCreateOrConnectWithoutUserInput
+    connect?: BusinessMemberWhereUniqueInput
   }
 
-  export type BusinessMemberUncheckedCreateNestedManyWithoutUserInput = {
-    create?: XOR<BusinessMemberCreateWithoutUserInput, BusinessMemberUncheckedCreateWithoutUserInput> | BusinessMemberCreateWithoutUserInput[] | BusinessMemberUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: BusinessMemberCreateOrConnectWithoutUserInput | BusinessMemberCreateOrConnectWithoutUserInput[]
-    createMany?: BusinessMemberCreateManyUserInputEnvelope
-    connect?: BusinessMemberWhereUniqueInput | BusinessMemberWhereUniqueInput[]
+  export type BusinessMemberUncheckedCreateNestedOneWithoutUserInput = {
+    create?: XOR<BusinessMemberCreateWithoutUserInput, BusinessMemberUncheckedCreateWithoutUserInput>
+    connectOrCreate?: BusinessMemberCreateOrConnectWithoutUserInput
+    connect?: BusinessMemberWhereUniqueInput
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -62379,32 +62333,24 @@ export namespace Prisma {
     set?: Date | string
   }
 
-  export type BusinessMemberUpdateManyWithoutUserNestedInput = {
-    create?: XOR<BusinessMemberCreateWithoutUserInput, BusinessMemberUncheckedCreateWithoutUserInput> | BusinessMemberCreateWithoutUserInput[] | BusinessMemberUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: BusinessMemberCreateOrConnectWithoutUserInput | BusinessMemberCreateOrConnectWithoutUserInput[]
-    upsert?: BusinessMemberUpsertWithWhereUniqueWithoutUserInput | BusinessMemberUpsertWithWhereUniqueWithoutUserInput[]
-    createMany?: BusinessMemberCreateManyUserInputEnvelope
-    set?: BusinessMemberWhereUniqueInput | BusinessMemberWhereUniqueInput[]
-    disconnect?: BusinessMemberWhereUniqueInput | BusinessMemberWhereUniqueInput[]
-    delete?: BusinessMemberWhereUniqueInput | BusinessMemberWhereUniqueInput[]
-    connect?: BusinessMemberWhereUniqueInput | BusinessMemberWhereUniqueInput[]
-    update?: BusinessMemberUpdateWithWhereUniqueWithoutUserInput | BusinessMemberUpdateWithWhereUniqueWithoutUserInput[]
-    updateMany?: BusinessMemberUpdateManyWithWhereWithoutUserInput | BusinessMemberUpdateManyWithWhereWithoutUserInput[]
-    deleteMany?: BusinessMemberScalarWhereInput | BusinessMemberScalarWhereInput[]
+  export type BusinessMemberUpdateOneWithoutUserNestedInput = {
+    create?: XOR<BusinessMemberCreateWithoutUserInput, BusinessMemberUncheckedCreateWithoutUserInput>
+    connectOrCreate?: BusinessMemberCreateOrConnectWithoutUserInput
+    upsert?: BusinessMemberUpsertWithoutUserInput
+    disconnect?: BusinessMemberWhereInput | boolean
+    delete?: BusinessMemberWhereInput | boolean
+    connect?: BusinessMemberWhereUniqueInput
+    update?: XOR<XOR<BusinessMemberUpdateToOneWithWhereWithoutUserInput, BusinessMemberUpdateWithoutUserInput>, BusinessMemberUncheckedUpdateWithoutUserInput>
   }
 
-  export type BusinessMemberUncheckedUpdateManyWithoutUserNestedInput = {
-    create?: XOR<BusinessMemberCreateWithoutUserInput, BusinessMemberUncheckedCreateWithoutUserInput> | BusinessMemberCreateWithoutUserInput[] | BusinessMemberUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: BusinessMemberCreateOrConnectWithoutUserInput | BusinessMemberCreateOrConnectWithoutUserInput[]
-    upsert?: BusinessMemberUpsertWithWhereUniqueWithoutUserInput | BusinessMemberUpsertWithWhereUniqueWithoutUserInput[]
-    createMany?: BusinessMemberCreateManyUserInputEnvelope
-    set?: BusinessMemberWhereUniqueInput | BusinessMemberWhereUniqueInput[]
-    disconnect?: BusinessMemberWhereUniqueInput | BusinessMemberWhereUniqueInput[]
-    delete?: BusinessMemberWhereUniqueInput | BusinessMemberWhereUniqueInput[]
-    connect?: BusinessMemberWhereUniqueInput | BusinessMemberWhereUniqueInput[]
-    update?: BusinessMemberUpdateWithWhereUniqueWithoutUserInput | BusinessMemberUpdateWithWhereUniqueWithoutUserInput[]
-    updateMany?: BusinessMemberUpdateManyWithWhereWithoutUserInput | BusinessMemberUpdateManyWithWhereWithoutUserInput[]
-    deleteMany?: BusinessMemberScalarWhereInput | BusinessMemberScalarWhereInput[]
+  export type BusinessMemberUncheckedUpdateOneWithoutUserNestedInput = {
+    create?: XOR<BusinessMemberCreateWithoutUserInput, BusinessMemberUncheckedCreateWithoutUserInput>
+    connectOrCreate?: BusinessMemberCreateOrConnectWithoutUserInput
+    upsert?: BusinessMemberUpsertWithoutUserInput
+    disconnect?: BusinessMemberWhereInput | boolean
+    delete?: BusinessMemberWhereInput | boolean
+    connect?: BusinessMemberWhereUniqueInput
+    update?: XOR<XOR<BusinessMemberUpdateToOneWithWhereWithoutUserInput, BusinessMemberUpdateWithoutUserInput>, BusinessMemberUncheckedUpdateWithoutUserInput>
   }
 
   export type BusinessCreateNestedOneWithoutRolesInput = {
@@ -63783,9 +63729,9 @@ export namespace Prisma {
     deleteMany?: AppointmentScalarWhereInput | AppointmentScalarWhereInput[]
   }
 
-  export type UserCreateNestedOneWithoutMembershipsInput = {
-    create?: XOR<UserCreateWithoutMembershipsInput, UserUncheckedCreateWithoutMembershipsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutMembershipsInput
+  export type UserCreateNestedOneWithoutMembershipInput = {
+    create?: XOR<UserCreateWithoutMembershipInput, UserUncheckedCreateWithoutMembershipInput>
+    connectOrCreate?: UserCreateOrConnectWithoutMembershipInput
     connect?: UserWhereUniqueInput
   }
 
@@ -63815,12 +63761,12 @@ export namespace Prisma {
     connect?: StaffWhereUniqueInput | StaffWhereUniqueInput[]
   }
 
-  export type UserUpdateOneRequiredWithoutMembershipsNestedInput = {
-    create?: XOR<UserCreateWithoutMembershipsInput, UserUncheckedCreateWithoutMembershipsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutMembershipsInput
-    upsert?: UserUpsertWithoutMembershipsInput
+  export type UserUpdateOneRequiredWithoutMembershipNestedInput = {
+    create?: XOR<UserCreateWithoutMembershipInput, UserUncheckedCreateWithoutMembershipInput>
+    connectOrCreate?: UserCreateOrConnectWithoutMembershipInput
+    upsert?: UserUpsertWithoutMembershipInput
     connect?: UserWhereUniqueInput
-    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutMembershipsInput, UserUpdateWithoutMembershipsInput>, UserUncheckedUpdateWithoutMembershipsInput>
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutMembershipInput, UserUpdateWithoutMembershipInput>, UserUncheckedUpdateWithoutMembershipInput>
   }
 
   export type BusinessUpdateOneRequiredWithoutMembersNestedInput = {
@@ -66252,38 +66198,35 @@ export namespace Prisma {
     create: XOR<BusinessMemberCreateWithoutUserInput, BusinessMemberUncheckedCreateWithoutUserInput>
   }
 
-  export type BusinessMemberCreateManyUserInputEnvelope = {
-    data: BusinessMemberCreateManyUserInput | BusinessMemberCreateManyUserInput[]
-    skipDuplicates?: boolean
-  }
-
-  export type BusinessMemberUpsertWithWhereUniqueWithoutUserInput = {
-    where: BusinessMemberWhereUniqueInput
+  export type BusinessMemberUpsertWithoutUserInput = {
     update: XOR<BusinessMemberUpdateWithoutUserInput, BusinessMemberUncheckedUpdateWithoutUserInput>
     create: XOR<BusinessMemberCreateWithoutUserInput, BusinessMemberUncheckedCreateWithoutUserInput>
+    where?: BusinessMemberWhereInput
   }
 
-  export type BusinessMemberUpdateWithWhereUniqueWithoutUserInput = {
-    where: BusinessMemberWhereUniqueInput
+  export type BusinessMemberUpdateToOneWithWhereWithoutUserInput = {
+    where?: BusinessMemberWhereInput
     data: XOR<BusinessMemberUpdateWithoutUserInput, BusinessMemberUncheckedUpdateWithoutUserInput>
   }
 
-  export type BusinessMemberUpdateManyWithWhereWithoutUserInput = {
-    where: BusinessMemberScalarWhereInput
-    data: XOR<BusinessMemberUpdateManyMutationInput, BusinessMemberUncheckedUpdateManyWithoutUserInput>
+  export type BusinessMemberUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    business?: BusinessUpdateOneRequiredWithoutMembersNestedInput
+    role?: RoleUpdateOneRequiredWithoutMembersNestedInput
+    staff?: StaffUpdateManyWithoutMemberNestedInput
   }
 
-  export type BusinessMemberScalarWhereInput = {
-    AND?: BusinessMemberScalarWhereInput | BusinessMemberScalarWhereInput[]
-    OR?: BusinessMemberScalarWhereInput[]
-    NOT?: BusinessMemberScalarWhereInput | BusinessMemberScalarWhereInput[]
-    id?: UuidFilter<"BusinessMember"> | string
-    userId?: UuidFilter<"BusinessMember"> | string
-    businessId?: UuidFilter<"BusinessMember"> | string
-    roleId?: UuidFilter<"BusinessMember"> | string
-    createdAt?: DateTimeFilter<"BusinessMember"> | Date | string
-    updatedAt?: DateTimeFilter<"BusinessMember"> | Date | string
-    deletedAt?: DateTimeNullableFilter<"BusinessMember"> | Date | string | null
+  export type BusinessMemberUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    businessId?: StringFieldUpdateOperationsInput | string
+    roleId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    staff?: StaffUncheckedUpdateManyWithoutMemberNestedInput
   }
 
   export type BusinessCreateWithoutRolesInput = {
@@ -66404,7 +66347,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
-    user: UserCreateNestedOneWithoutMembershipsInput
+    user: UserCreateNestedOneWithoutMembershipInput
     business: BusinessCreateNestedOneWithoutMembersInput
     staff?: StaffCreateNestedManyWithoutMemberInput
   }
@@ -66568,6 +66511,19 @@ export namespace Prisma {
   export type BusinessMemberUpdateManyWithWhereWithoutRoleInput = {
     where: BusinessMemberScalarWhereInput
     data: XOR<BusinessMemberUpdateManyMutationInput, BusinessMemberUncheckedUpdateManyWithoutRoleInput>
+  }
+
+  export type BusinessMemberScalarWhereInput = {
+    AND?: BusinessMemberScalarWhereInput | BusinessMemberScalarWhereInput[]
+    OR?: BusinessMemberScalarWhereInput[]
+    NOT?: BusinessMemberScalarWhereInput | BusinessMemberScalarWhereInput[]
+    id?: UuidFilter<"BusinessMember"> | string
+    userId?: UuidFilter<"BusinessMember"> | string
+    businessId?: UuidFilter<"BusinessMember"> | string
+    roleId?: UuidFilter<"BusinessMember"> | string
+    createdAt?: DateTimeFilter<"BusinessMember"> | Date | string
+    updatedAt?: DateTimeFilter<"BusinessMember"> | Date | string
+    deletedAt?: DateTimeNullableFilter<"BusinessMember"> | Date | string | null
   }
 
   export type RolePermissionCreateWithoutPermissionInput = {
@@ -66767,7 +66723,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
-    user: UserCreateNestedOneWithoutMembershipsInput
+    user: UserCreateNestedOneWithoutMembershipInput
     role: RoleCreateNestedOneWithoutMembersInput
     staff?: StaffCreateNestedManyWithoutMemberInput
   }
@@ -68934,7 +68890,7 @@ export namespace Prisma {
     data: XOR<AppointmentUpdateManyMutationInput, AppointmentUncheckedUpdateManyWithoutBranchInput>
   }
 
-  export type UserCreateWithoutMembershipsInput = {
+  export type UserCreateWithoutMembershipInput = {
     id?: string
     email: string
     phone?: string | null
@@ -68949,7 +68905,7 @@ export namespace Prisma {
     deletedAt?: Date | string | null
   }
 
-  export type UserUncheckedCreateWithoutMembershipsInput = {
+  export type UserUncheckedCreateWithoutMembershipInput = {
     id?: string
     email: string
     phone?: string | null
@@ -68964,9 +68920,9 @@ export namespace Prisma {
     deletedAt?: Date | string | null
   }
 
-  export type UserCreateOrConnectWithoutMembershipsInput = {
+  export type UserCreateOrConnectWithoutMembershipInput = {
     where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutMembershipsInput, UserUncheckedCreateWithoutMembershipsInput>
+    create: XOR<UserCreateWithoutMembershipInput, UserUncheckedCreateWithoutMembershipInput>
   }
 
   export type BusinessCreateWithoutMembersInput = {
@@ -69149,18 +69105,18 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type UserUpsertWithoutMembershipsInput = {
-    update: XOR<UserUpdateWithoutMembershipsInput, UserUncheckedUpdateWithoutMembershipsInput>
-    create: XOR<UserCreateWithoutMembershipsInput, UserUncheckedCreateWithoutMembershipsInput>
+  export type UserUpsertWithoutMembershipInput = {
+    update: XOR<UserUpdateWithoutMembershipInput, UserUncheckedUpdateWithoutMembershipInput>
+    create: XOR<UserCreateWithoutMembershipInput, UserUncheckedCreateWithoutMembershipInput>
     where?: UserWhereInput
   }
 
-  export type UserUpdateToOneWithWhereWithoutMembershipsInput = {
+  export type UserUpdateToOneWithWhereWithoutMembershipInput = {
     where?: UserWhereInput
-    data: XOR<UserUpdateWithoutMembershipsInput, UserUncheckedUpdateWithoutMembershipsInput>
+    data: XOR<UserUpdateWithoutMembershipInput, UserUncheckedUpdateWithoutMembershipInput>
   }
 
-  export type UserUpdateWithoutMembershipsInput = {
+  export type UserUpdateWithoutMembershipInput = {
     id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -69175,7 +69131,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
-  export type UserUncheckedUpdateWithoutMembershipsInput = {
+  export type UserUncheckedUpdateWithoutMembershipInput = {
     id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -69483,7 +69439,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
-    user: UserCreateNestedOneWithoutMembershipsInput
+    user: UserCreateNestedOneWithoutMembershipInput
     business: BusinessCreateNestedOneWithoutMembersInput
     role: RoleCreateNestedOneWithoutMembersInput
   }
@@ -69773,7 +69729,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    user?: UserUpdateOneRequiredWithoutMembershipsNestedInput
+    user?: UserUpdateOneRequiredWithoutMembershipNestedInput
     business?: BusinessUpdateOneRequiredWithoutMembersNestedInput
     role?: RoleUpdateOneRequiredWithoutMembersNestedInput
   }
@@ -77392,44 +77348,6 @@ export namespace Prisma {
     versions?: WebsiteVersionUncheckedUpdateManyWithoutWebsiteNestedInput
   }
 
-  export type BusinessMemberCreateManyUserInput = {
-    id?: string
-    businessId: string
-    roleId: string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    deletedAt?: Date | string | null
-  }
-
-  export type BusinessMemberUpdateWithoutUserInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    business?: BusinessUpdateOneRequiredWithoutMembersNestedInput
-    role?: RoleUpdateOneRequiredWithoutMembersNestedInput
-    staff?: StaffUpdateManyWithoutMemberNestedInput
-  }
-
-  export type BusinessMemberUncheckedUpdateWithoutUserInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    businessId?: StringFieldUpdateOperationsInput | string
-    roleId?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    staff?: StaffUncheckedUpdateManyWithoutMemberNestedInput
-  }
-
-  export type BusinessMemberUncheckedUpdateManyWithoutUserInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    businessId?: StringFieldUpdateOperationsInput | string
-    roleId?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  }
-
   export type RolePermissionCreateManyRoleInput = {
     permissionId: string
   }
@@ -77460,7 +77378,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    user?: UserUpdateOneRequiredWithoutMembershipsNestedInput
+    user?: UserUpdateOneRequiredWithoutMembershipNestedInput
     business?: BusinessUpdateOneRequiredWithoutMembersNestedInput
     staff?: StaffUpdateManyWithoutMemberNestedInput
   }
@@ -77912,7 +77830,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    user?: UserUpdateOneRequiredWithoutMembershipsNestedInput
+    user?: UserUpdateOneRequiredWithoutMembershipNestedInput
     role?: RoleUpdateOneRequiredWithoutMembersNestedInput
     staff?: StaffUpdateManyWithoutMemberNestedInput
   }

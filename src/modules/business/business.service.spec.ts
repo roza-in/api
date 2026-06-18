@@ -24,6 +24,7 @@ describe('BusinessService', () => {
   const businessUpdateMany = jest.fn();
   const branchCreate = jest.fn();
   const memberCreate = jest.fn();
+  const memberFindFirst = jest.fn();
   const subscriptionCreate = jest.fn();
   const generateTokenPair = jest.fn();
 
@@ -43,6 +44,7 @@ describe('BusinessService', () => {
     },
     businessMember: {
       create: memberCreate,
+      findFirst: memberFindFirst,
     },
     subscription: {
       create: subscriptionCreate,
@@ -95,6 +97,7 @@ describe('BusinessService', () => {
     };
 
     it('should throw BadRequestException if trial plan does not exist', async () => {
+      memberFindFirst.mockResolvedValue(null);
       planFindUnique.mockResolvedValue(null);
 
       await expect(
@@ -102,7 +105,16 @@ describe('BusinessService', () => {
       ).rejects.toThrow(BadRequestException);
     });
 
+    it('should throw BadRequestException if user is already a member of a business', async () => {
+      memberFindFirst.mockResolvedValue({ id: 'existing-member-uuid' });
+
+      await expect(
+        service.registerBusiness(userId, email, createDto),
+      ).rejects.toThrow(BadRequestException);
+    });
+
     it('should register business and return new token pair', async () => {
+      memberFindFirst.mockResolvedValue(null);
       const mockPlan = { id: 'plan-uuid', slug: 'free-trial' };
       planFindUnique.mockResolvedValue(mockPlan);
       businessFindUnique.mockResolvedValue(null); // Slug is free
@@ -171,6 +183,7 @@ describe('BusinessService', () => {
     });
 
     it('should resolve slug collision by appending numeric suffix', async () => {
+      memberFindFirst.mockResolvedValue(null);
       const mockPlan = { id: 'plan-uuid', slug: 'free-trial' };
       planFindUnique.mockResolvedValue(mockPlan);
 
@@ -207,6 +220,45 @@ describe('BusinessService', () => {
           }) as unknown,
         }),
       );
+    });
+
+    it('should throw ConflictException if custom slug is already taken (strict mode)', async () => {
+      memberFindFirst.mockResolvedValue(null);
+      const mockPlan = { id: 'plan-uuid', slug: 'free-trial' };
+      planFindUnique.mockResolvedValue(mockPlan);
+      businessFindUnique.mockResolvedValue({ id: 'existing-biz' }); // slug is taken
+
+      await expect(
+        service.registerBusiness(userId, email, {
+          ...createDto,
+          slug: 'glow-studio',
+        }),
+      ).rejects.toThrow(ConflictException);
+    });
+  });
+
+  describe('isSlugAvailable', () => {
+    it('should return false if slug is less than 3 characters', async () => {
+      const result = await service.isSlugAvailable('ab');
+      expect(result).toBe(false);
+    });
+
+    it('should return false if slug is already taken', async () => {
+      businessFindUnique.mockResolvedValue({ id: 'existing-biz' });
+      const result = await service.isSlugAvailable('glow-studio');
+      expect(result).toBe(false);
+      expect(businessFindUnique).toHaveBeenCalledWith({
+        where: { slug: 'glow-studio' },
+      });
+    });
+
+    it('should return true if slug is available', async () => {
+      businessFindUnique.mockResolvedValue(null);
+      const result = await service.isSlugAvailable('fresh-slug');
+      expect(result).toBe(true);
+      expect(businessFindUnique).toHaveBeenCalledWith({
+        where: { slug: 'fresh-slug' },
+      });
     });
   });
 

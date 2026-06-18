@@ -275,10 +275,14 @@ export class StaffService {
     }
 
     let member = await this.prisma.businessMember.findUnique({
-      where: { userId_businessId: { userId: user.id, businessId } },
+      where: { userId: user.id },
     });
 
-    if (!member) {
+    if (member) {
+      if (member.businessId !== businessId) {
+        throw new BadRequestException('User is already a member of another business');
+      }
+    } else {
       member = await this.prisma.businessMember.create({
         data: {
           userId: user.id,

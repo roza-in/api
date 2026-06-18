@@ -264,6 +264,9 @@ describe('StaffService', () => {
           status: 'PENDING',
         },
       });
+      expect(businessMemberFindUnique).toHaveBeenCalledWith({
+        where: { userId: 'user-uuid' },
+      });
       expect(businessMemberCreate).toHaveBeenCalledWith({
         data: {
           userId: 'user-uuid',
@@ -284,6 +287,20 @@ describe('StaffService', () => {
         email: 'john@example.com',
         phone: '+919876543210',
       });
+    });
+
+    it('should throw BadRequestException if user is already a member of a different business', async () => {
+      staffFindFirst.mockResolvedValue(mockStaff);
+      userFindUnique.mockResolvedValue({ id: 'user-uuid' });
+      roleFindFirst.mockResolvedValue({ id: 'role-uuid' });
+      businessMemberFindUnique.mockResolvedValue({
+        id: 'member-uuid',
+        businessId: 'different-business-uuid',
+      });
+
+      await expect(
+        service.inviteStaff(businessId, userId, staffId),
+      ).rejects.toThrow(BadRequestException);
     });
   });
 
