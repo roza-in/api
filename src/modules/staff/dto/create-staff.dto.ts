@@ -18,7 +18,9 @@ export class CreateStaffDto {
   @IsNotEmpty()
   branchId: string;
 
-  @IsUUID()
+  @Matches(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/, {
+    message: 'roleId must be a valid UUID',
+  })
   @IsOptional()
   roleId?: string;
 
