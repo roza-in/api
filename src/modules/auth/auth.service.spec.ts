@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 jest.mock('uuid', () => ({ v4: () => 'mock-uuid' }));
+const mockBcryptCompare = jest.fn();
 jest.mock('bcrypt', () => ({
   hash: jest.fn().mockResolvedValue('hashedPassword'),
-  compare: jest.fn(),
+  compare: (raw: string, hash: string) => mockBcryptCompare(raw, hash),
 }));
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
@@ -10,7 +11,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { WhatsAppAdapter } from '../notifications/adapters/whatsapp.adapter';
-import { UnauthorizedException, ConflictException } from '@nestjs/common';
+import { EmailAdapter } from '../notifications/adapters/email.adapter';
+import { UnauthorizedException, ConflictException, NotFoundException } from '@nestjs/common';
 
 const mockRedis = {
   get: jest.fn(),
@@ -57,6 +59,10 @@ describe('AuthService', () => {
     sendOtpTemplate: jest.fn().mockResolvedValue('mock-msg-id'),
   };
 
+  const mockEmailAdapter = {
+    sendEmail: jest.fn().mockResolvedValue('mock-message-id'),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -65,6 +71,7 @@ describe('AuthService', () => {
         { provide: JwtService, useValue: mockJwtService },
         { provide: ConfigService, useValue: mockConfigService },
         { provide: WhatsAppAdapter, useValue: mockWhatsAppAdapter },
+        { provide: EmailAdapter, useValue: mockEmailAdapter },
       ],
     }).compile();
 
@@ -73,6 +80,7 @@ describe('AuthService', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
+    mockBcryptCompare.mockReset();
   });
 
   describe('sendOtp', () => {
@@ -239,4 +247,176 @@ describe('AuthService', () => {
       ).rejects.toThrow(ConflictException);
     });
   });
+
+  describe('sendForgotPasswordOtp', () => {
+    it('should generate code, store in Redis, and send email successfully', async () => {
+      mockPrismaService.user.findFirst.mockResolvedValue({
+        id: 'user-uuid',
+        email: 'test@example.com',
+      });
+      mockRedis.set.mockResolvedValue('OK');
+
+      const result = await service.sendForgotPasswordOtp('test@example.com');
+
+      expect(result).toEqual({ message: 'Password reset code sent successfully' });
+      expect(mockRedis.set).toHaveBeenCalledWith(
+        'auth:reset-password:email:test@example.com',
+        expect.stringMatching(/^\d{6}$/),
+        'EX',
+        600,
+      );
+      expect(mockEmailAdapter.sendEmail).toHaveBeenCalledWith(
+        'test@example.com',
+        'Rozx - Password Reset Request',
+        expect.stringContaining('Rozx Partner Portal'),
+      );
+    });
+
+    it('should throw NotFoundException if email is not found', async () => {
+      mockPrismaService.user.findFirst.mockResolvedValue(null);
+
+      await expect(
+        service.sendForgotPasswordOtp('nonexistent@example.com'),
+      ).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('resetPassword', () => {
+    it('should reset password successfully if code matches', async () => {
+      mockRedis.get.mockResolvedValue('123456');
+      mockPrismaService.user.findFirst.mockResolvedValue({
+        id: 'user-uuid',
+        email: 'test@example.com',
+      });
+      mockPrismaService.user.update.mockResolvedValue({
+        id: 'user-uuid',
+      });
+
+      const result = await service.resetPassword('test@example.com', '123456', 'newpass123');
+
+      expect(result).toEqual({ message: 'Password reset successfully' });
+      expect(mockRedis.del).toHaveBeenCalledWith('auth:reset-password:email:test@example.com');
+      expect(mockPrismaService.user.update).toHaveBeenCalledWith({
+        where: { id: 'user-uuid' },
+        data: {
+          passwordHash: 'hashedPassword',
+          updatedAt: expect.any(Date),
+        },
+      });
+    });
+
+    it('should throw UnauthorizedException if code is invalid/expired', async () => {
+      mockRedis.get.mockResolvedValue(null);
+
+      await expect(
+        service.resetPassword('test@example.com', '123456', 'newpass123'),
+      ).rejects.toThrow(UnauthorizedException);
+    });
+
+    it('should throw NotFoundException if user does not exist', async () => {
+      mockRedis.get.mockResolvedValue('123456');
+      mockPrismaService.user.findFirst.mockResolvedValue(null);
+
+      await expect(
+        service.resetPassword('test@example.com', '123456', 'newpass123'),
+      ).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('changePassword', () => {
+    it('should change password successfully', async () => {
+      mockPrismaService.user.findUnique.mockResolvedValue({
+        id: 'user-uuid',
+        passwordHash: 'oldHashedPassword',
+      });
+      mockBcryptCompare.mockResolvedValue(true);
+      mockPrismaService.user.update.mockResolvedValue({
+        id: 'user-uuid',
+      });
+
+      const result = await service.changePassword('user-uuid', {
+        oldPassword: 'oldpass123',
+        newPassword: 'newpass123',
+      });
+
+      expect(result).toEqual({ message: 'Password changed successfully' });
+      expect(mockBcryptCompare).toHaveBeenCalledWith('oldpass123', 'oldHashedPassword');
+      expect(mockPrismaService.user.update).toHaveBeenCalledWith({
+        where: { id: 'user-uuid' },
+        data: {
+          passwordHash: 'hashedPassword',
+          updatedAt: expect.any(Date),
+        },
+      });
+    });
+
+    it('should throw NotFoundException if user is not found', async () => {
+      mockPrismaService.user.findUnique.mockResolvedValue(null);
+
+      await expect(
+        service.changePassword('nonexistent-uuid', {
+          oldPassword: 'oldpass123',
+          newPassword: 'newpass123',
+        }),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw UnauthorizedException if old password does not match', async () => {
+      mockPrismaService.user.findUnique.mockResolvedValue({
+        id: 'user-uuid',
+        passwordHash: 'oldHashedPassword',
+      });
+      mockBcryptCompare.mockResolvedValue(false);
+
+      await expect(
+        service.changePassword('user-uuid', {
+          oldPassword: 'wrongoldpass',
+          newPassword: 'newpass123',
+        }),
+      ).rejects.toThrow(UnauthorizedException);
+    });
+  });
+
+  describe('linkPhone', () => {
+    it('should link phone number successfully', async () => {
+      mockRedis.get.mockResolvedValue('123456');
+      mockPrismaService.user.findFirst.mockResolvedValue(null); // No other user has this phone
+      mockPrismaService.user.update.mockResolvedValue({
+        id: 'user-uuid',
+      });
+
+      const result = await service.linkPhone('user-uuid', '+919876543210', '123456');
+
+      expect(result).toEqual({ message: 'Phone number linked successfully' });
+      expect(mockRedis.del).toHaveBeenCalledWith('auth:otp:+919876543210');
+      expect(mockPrismaService.user.update).toHaveBeenCalledWith({
+        where: { id: 'user-uuid' },
+        data: {
+          phone: '+919876543210',
+          updatedAt: expect.any(Date),
+        },
+      });
+    });
+
+    it('should throw UnauthorizedException if OTP is invalid/expired', async () => {
+      mockRedis.get.mockResolvedValue(null);
+
+      await expect(
+        service.linkPhone('user-uuid', '+919876543210', '123456'),
+      ).rejects.toThrow(UnauthorizedException);
+    });
+
+    it('should throw ConflictException if phone is already linked to another user', async () => {
+      mockRedis.get.mockResolvedValue('123456');
+      mockPrismaService.user.findFirst.mockResolvedValue({
+        id: 'another-user-uuid',
+        phone: '+919876543210',
+      });
+
+      await expect(
+        service.linkPhone('user-uuid', '+919876543210', '123456'),
+      ).rejects.toThrow(ConflictException);
+    });
+  });
 });
+

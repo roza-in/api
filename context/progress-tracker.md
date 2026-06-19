@@ -6,9 +6,9 @@ Update this file after every completed feature. Any AI agent reading this should
 
 ## Current Status
 
-**Phase:** Completed — Phase 9 — Production Hardening
-**Last completed:** 24 Monitoring & Observability
-**Next:** Production Ready (All 24 Features Completed)
+**Phase:** Completed — Phase 10 — Settings & Auth Extensions
+**Last completed:** 26 Settings Dashboard (Backend)
+**Next:** Production Ready (All 26 Features Completed)
 
 ---
 
@@ -64,6 +64,11 @@ Update this file after every completed feature. Any AI agent reading this should
 
 - [x] 23 Audit & Compliance
 - [x] 24 Monitoring & Observability
+
+### Phase 10 — Settings & Auth Extensions
+
+- [x] 25 Security & Auth Extensions
+- [x] 26 Settings Dashboard (Backend)
 
 ---
 
@@ -121,6 +126,9 @@ Update this file after every completed feature. Any AI agent reading this should
 - **Staff Role Renaming & Role Selection**: Renamed system role `STAFF` to `PROFESSIONAL` in the database and code, added a `roleId` column to the `Staff` table (defaulting to the `PROFESSIONAL` system role), and integrated a role selection dropdown in the creation/editing forms. Implemented client-side mapping using `getRoleNameFromId` to cleanly map `roleId` system UUIDs to lowercase string roles in components (such as appointment creation, detail modals, and service assignment lists), avoiding backend changes to historical API schemas and ensuring type safety with 0 compiler errors.
 - **Manual Migration for Staff RoleId**: Created a manual SQL database migration (`20260618231000_add_role_to_staff`) to add the missing `roleId` column and its foreign key constraint referencing the `roles` table on the `staff` table, resolving the runtime database crash on staging deployment.
 - **System Role UUIDs Validation Compatibility**: Replaced the `@IsUUID()` decorator in `CreateStaffDto` with a regex-based `@Matches()` validation. This permits custom system role UUIDs (such as the default `PROFESSIONAL` role UUID ending in `0004` which uses version 0 and is rejected by standard v1-v5 spec checks) while maintaining strict format verification.
+- **Auth Extensions & Verification Tests**: Injected and mocked `EmailAdapter` in `auth.service.spec.ts`, adding comprehensive unit tests for `sendForgotPasswordOtp`, `resetPassword`, `changePassword`, and `linkPhone` to ensure 100% test coverage and resolve CI/CD build issues.
+- **Forgot Password email template**: Set up a custom HTML template for email OTP password recovery dispatching via SES, utilizing a 6-digit verification code with 10-minute validity.
+- **Phone Number Linkage Uniqueness**: Implemented `linkPhone` to prevent multiple user accounts from linking the same WhatsApp phone number.
 
 ---
 
