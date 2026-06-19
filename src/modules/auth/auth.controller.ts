@@ -23,6 +23,10 @@ import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { SendOtpDto } from './dto/send-otp.dto';
 import { LoginOtpDto } from './dto/login-otp.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { LinkPhoneDto } from './dto/link-phone.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { GoogleOAuthGuard } from './guards/google-oauth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -134,5 +138,51 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Invalid or expired OTP' })
   async loginOtp(@Body() dto: LoginOtpDto) {
     return this.authService.loginWithOtp(dto.phone, dto.code);
+  }
+
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Send password reset OTP via Email' })
+  @ApiResponse({ status: 200, description: 'Reset code sent successfully' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async forgotPassword(@Body() dto: ForgotPasswordDto) {
+    return this.authService.sendForgotPasswordOtp(dto.email);
+  }
+
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Reset password using Email OTP' })
+  @ApiResponse({ status: 200, description: 'Password reset successfully' })
+  @ApiResponse({ status: 401, description: 'Invalid or expired OTP' })
+  async resetPassword(@Body() dto: ResetPasswordDto) {
+    return this.authService.resetPassword(dto.email, dto.code, dto.newPassword);
+  }
+
+  @Post('change-password')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Change password for currently authenticated user' })
+  @ApiResponse({ status: 200, description: 'Password changed successfully' })
+  @ApiResponse({ status: 401, description: 'Incorrect old password' })
+  async changePassword(
+    @CurrentUser() user: UserPayload,
+    @Body() dto: ChangePasswordDto,
+  ) {
+    return this.authService.changePassword(user.userId, dto);
+  }
+
+  @Post('link-phone')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Link WhatsApp phone number to current user profile',
+  })
+  @ApiResponse({ status: 200, description: 'Phone number linked successfully' })
+  @ApiResponse({ status: 401, description: 'Invalid or expired OTP' })
+  @ApiResponse({ status: 409, description: 'Phone number already in use' })
+  async linkPhone(@CurrentUser() user: UserPayload, @Body() dto: LinkPhoneDto) {
+    return this.authService.linkPhone(user.userId, dto.phone, dto.code);
   }
 }

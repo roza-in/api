@@ -2,6 +2,7 @@ import {
   Injectable,
   UnauthorizedException,
   ConflictException,
+  NotFoundException,
   Logger,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -15,6 +16,8 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { GoogleProfile } from './strategies/google.strategy';
 import { WhatsAppAdapter } from '../notifications/adapters/whatsapp.adapter';
+import { EmailAdapter } from '../notifications/adapters/email.adapter';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 const BCRYPT_ROUNDS = 10;
 const REFRESH_TOKEN_PREFIX = 'auth:refresh:blacklist:';
@@ -34,6 +37,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly whatsappAdapter: WhatsAppAdapter,
+    private readonly emailAdapter: EmailAdapter,
   ) {
     const redisUrl =
       this.configService.get<string>('REDIS_URL') || 'redis://localhost:6379';
@@ -387,5 +391,162 @@ export class AuthService {
       membership?.id,
       membership?.roleId,
     );
+  }
+
+  async sendForgotPasswordOtp(email: string): Promise<{ message: string }> {
+    const user = await this.prisma.user.findFirst({
+      where: { email, deletedAt: null },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User with this email not found');
+    }
+
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const redisKey = `auth:reset-password:email:${email}`;
+
+    await this.redis.set(redisKey, code, 'EX', 600); // 10 minutes expiry
+
+    const subject = 'Rozx - Password Reset Request';
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 12px;">
+        <h2 style="color: #10b981; text-align: center;">Rozx Partner Portal</h2>
+        <p>Hello,</p>
+        <p>We received a request to reset the password for your Rozx account. Use the verification code below to complete the reset process. This code is valid for 10 minutes.</p>
+        <div style="text-align: center; margin: 30px 0;">
+          <span style="font-family: monospace; font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #111827; background: #f3f4f6; padding: 10px 20px; border-radius: 8px; border: 1px solid #d1d5db;">
+            ${code}
+          </span>
+        </div>
+        <p>If you did not request a password reset, please ignore this email or contact support if you have concerns.</p>
+        <p style="color: #6b7280; font-size: 12px; margin-top: 40px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
+          This is an automated email. Please do not reply to this message.<br>
+          © 2026 Rozx Technologies. All rights reserved.
+        </p>
+      </div>
+    `;
+
+    this.logger.log(`Dispatching email OTP to ${email}`);
+    await this.emailAdapter.sendEmail(email, subject, html);
+
+    return { message: 'Password reset code sent successfully' };
+  }
+
+  async resetPassword(
+    email: string,
+    code: string,
+    newPassword: string,
+  ): Promise<{ message: string }> {
+    const redisKey = `auth:reset-password:email:${email}`;
+    const cachedCode = await this.redis.get(redisKey);
+
+    if (!cachedCode || cachedCode !== code) {
+      throw new UnauthorizedException('Invalid or expired reset code');
+    }
+
+    await this.redis.del(redisKey);
+
+    const user = await this.prisma.user.findFirst({
+      where: { email, deletedAt: null },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User with this email not found');
+    }
+
+    const passwordHash = await bcrypt.hash(newPassword, BCRYPT_ROUNDS);
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        passwordHash,
+        updatedAt: new Date(),
+      },
+    });
+
+    this.logger.log(`Password reset successfully for user: ${email}`);
+
+    return { message: 'Password reset successfully' };
+  }
+
+  async changePassword(
+    userId: string,
+    dto: ChangePasswordDto,
+  ): Promise<{ message: string }> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (user.passwordHash) {
+      const isPasswordValid = await bcrypt.compare(
+        dto.oldPassword,
+        user.passwordHash,
+      );
+
+      if (!isPasswordValid) {
+        throw new UnauthorizedException('Incorrect old password');
+      }
+    }
+
+    const passwordHash = await bcrypt.hash(dto.newPassword, BCRYPT_ROUNDS);
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        passwordHash,
+        updatedAt: new Date(),
+      },
+    });
+
+    this.logger.log(`Password changed successfully for user ID: ${userId}`);
+
+    return { message: 'Password changed successfully' };
+  }
+
+  async linkPhone(
+    userId: string,
+    phone: string,
+    code: string,
+  ): Promise<{ message: string }> {
+    const redisKey = `auth:otp:${phone}`;
+    const cachedCode = await this.redis.get(redisKey);
+
+    if (!cachedCode || cachedCode !== code) {
+      throw new UnauthorizedException('Invalid or expired OTP');
+    }
+
+    const existingUserWithPhone = await this.prisma.user.findFirst({
+      where: {
+        phone,
+        id: { not: userId },
+        deletedAt: null,
+      },
+    });
+
+    if (existingUserWithPhone) {
+      throw new ConflictException(
+        'This phone number is already linked to another account',
+      );
+    }
+
+    await this.redis.del(redisKey);
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        phone,
+        updatedAt: new Date(),
+      },
+    });
+
+    this.logger.log(
+      `Phone number ${phone} successfully linked to user ID ${userId}`,
+    );
+
+    return { message: 'Phone number linked successfully' };
   }
 }
