@@ -3,7 +3,8 @@ jest.mock('uuid', () => ({ v4: () => 'mock-uuid' }));
 const mockBcryptCompare = jest.fn();
 jest.mock('bcrypt', () => ({
   hash: jest.fn().mockResolvedValue('hashedPassword'),
-  compare: (raw: string, hash: string) => mockBcryptCompare(raw, hash),
+  compare: (raw: string, hash: string): Promise<boolean> =>
+    mockBcryptCompare(raw, hash) as Promise<boolean>,
 }));
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
@@ -12,7 +13,11 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { WhatsAppAdapter } from '../notifications/adapters/whatsapp.adapter';
 import { EmailAdapter } from '../notifications/adapters/email.adapter';
-import { UnauthorizedException, ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  UnauthorizedException,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 
 const mockRedis = {
   get: jest.fn(),
@@ -258,7 +263,9 @@ describe('AuthService', () => {
 
       const result = await service.sendForgotPasswordOtp('test@example.com');
 
-      expect(result).toEqual({ message: 'Password reset code sent successfully' });
+      expect(result).toEqual({
+        message: 'Password reset code sent successfully',
+      });
       expect(mockRedis.set).toHaveBeenCalledWith(
         'auth:reset-password:email:test@example.com',
         expect.stringMatching(/^\d{6}$/),
@@ -292,10 +299,16 @@ describe('AuthService', () => {
         id: 'user-uuid',
       });
 
-      const result = await service.resetPassword('test@example.com', '123456', 'newpass123');
+      const result = await service.resetPassword(
+        'test@example.com',
+        '123456',
+        'newpass123',
+      );
 
       expect(result).toEqual({ message: 'Password reset successfully' });
-      expect(mockRedis.del).toHaveBeenCalledWith('auth:reset-password:email:test@example.com');
+      expect(mockRedis.del).toHaveBeenCalledWith(
+        'auth:reset-password:email:test@example.com',
+      );
       expect(mockPrismaService.user.update).toHaveBeenCalledWith({
         where: { id: 'user-uuid' },
         data: {
@@ -340,7 +353,10 @@ describe('AuthService', () => {
       });
 
       expect(result).toEqual({ message: 'Password changed successfully' });
-      expect(mockBcryptCompare).toHaveBeenCalledWith('oldpass123', 'oldHashedPassword');
+      expect(mockBcryptCompare).toHaveBeenCalledWith(
+        'oldpass123',
+        'oldHashedPassword',
+      );
       expect(mockPrismaService.user.update).toHaveBeenCalledWith({
         where: { id: 'user-uuid' },
         data: {
@@ -385,7 +401,11 @@ describe('AuthService', () => {
         id: 'user-uuid',
       });
 
-      const result = await service.linkPhone('user-uuid', '+919876543210', '123456');
+      const result = await service.linkPhone(
+        'user-uuid',
+        '+919876543210',
+        '123456',
+      );
 
       expect(result).toEqual({ message: 'Phone number linked successfully' });
       expect(mockRedis.del).toHaveBeenCalledWith('auth:otp:+919876543210');
@@ -419,4 +439,3 @@ describe('AuthService', () => {
     });
   });
 });
-
