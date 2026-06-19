@@ -87,15 +87,20 @@ export class AuthController {
   async googleAuthCallback(@Req() req: Request, @Res() res: Response) {
     const profile = req.user as GoogleProfile;
     const tokens = await this.authService.validateGoogleUser(profile);
-    
+
     const redirectUrl = req.query.state as string;
-    const allowedOrigins = this.configService.get<string>('CORS_ALLOWED_ORIGINS')?.split(',') || [];
-    
-    const isUrlSafe = redirectUrl && allowedOrigins.some((origin) => redirectUrl.startsWith(origin));
-    const finalUrl = isUrlSafe ? redirectUrl : (allowedOrigins[0] || 'http://localhost:3000');
+    const allowedOrigins =
+      this.configService.get<string>('CORS_ALLOWED_ORIGINS')?.split(',') || [];
+
+    const isUrlSafe =
+      redirectUrl &&
+      allowedOrigins.some((origin) => redirectUrl.startsWith(origin));
+    const finalUrl = isUrlSafe
+      ? redirectUrl
+      : allowedOrigins[0] || 'http://localhost:3000';
 
     return res.redirect(
-      `${finalUrl}/callback?accessToken=${tokens.accessToken}&refreshToken=${tokens.refreshToken}`
+      `${finalUrl}/callback?accessToken=${tokens.accessToken}&refreshToken=${tokens.refreshToken}`,
     );
   }
 

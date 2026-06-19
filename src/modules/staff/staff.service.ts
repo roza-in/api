@@ -64,10 +64,7 @@ export class StaffService {
       const role = await this.prisma.role.findFirst({
         where: {
           id: dto.roleId,
-          OR: [
-            { businessId },
-            { isSystem: true },
-          ],
+          OR: [{ businessId }, { isSystem: true }],
         },
       });
       if (!role) {
@@ -192,10 +189,7 @@ export class StaffService {
       const role = await this.prisma.role.findFirst({
         where: {
           id: dto.roleId,
-          OR: [
-            { businessId },
-            { isSystem: true },
-          ],
+          OR: [{ businessId }, { isSystem: true }],
         },
       });
       if (!role) {
@@ -307,7 +301,9 @@ export class StaffService {
 
     if (member) {
       if (member.businessId !== businessId) {
-        throw new BadRequestException('User is already a member of another business');
+        throw new BadRequestException(
+          'User is already a member of another business',
+        );
       }
     } else {
       member = await this.prisma.businessMember.create({

@@ -6,7 +6,7 @@ import { Request } from 'express';
 export class GoogleOAuthGuard extends AuthGuard('google') {
   getAuthenticateOptions(context: ExecutionContext) {
     const req = context.switchToHttp().getRequest<Request>();
-    
+
     // Passport requires session support to verify state during the callback.
     // Since we are building a stateless API, we only pass state during the
     // initial authorization request. During the callback (when 'code' is present),
@@ -14,7 +14,7 @@ export class GoogleOAuthGuard extends AuthGuard('google') {
     if (req.query.code) {
       return {};
     }
-    
+
     return {
       state: req.query.state as string,
     };
