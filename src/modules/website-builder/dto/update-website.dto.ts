@@ -12,7 +12,10 @@ export class UpdateWebsiteDto {
     example: '00000000-0000-0000-0000-000000000012',
     required: false,
   })
-  @IsUUID()
+  @Matches(
+    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
+    { message: 'themeId must be a valid UUID' },
+  )
   @IsOptional()
   themeId?: string;
 

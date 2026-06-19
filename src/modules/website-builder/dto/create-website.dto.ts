@@ -12,7 +12,10 @@ export class CreateWebsiteDto {
     example: '00000000-0000-0000-0000-000000000011',
     description: 'Selected system or custom theme ID',
   })
-  @IsUUID()
+  @Matches(
+    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
+    { message: 'themeId must be a valid UUID' },
+  )
   @IsNotEmpty()
   themeId: string;
 
