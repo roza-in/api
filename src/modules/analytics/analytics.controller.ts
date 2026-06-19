@@ -87,17 +87,19 @@ export class AnalyticsController {
     );
   }
 
-  @Get('staff')
+  @Get('professional')
   @UseGuards(JwtAuthGuard, TenantGuard, RolesGuard)
   @Roles(Role.OWNER, Role.MANAGER, Role.RECEPTION, Role.PROFESSIONAL)
-  @ApiOperation({ summary: 'Retrieve personal Staff performance dashboard' })
-  @ApiResponse({ status: 200, description: 'Staff dashboard metrics' })
-  async getStaffDashboard(
+  @ApiOperation({
+    summary: 'Retrieve personal Professional performance dashboard',
+  })
+  @ApiResponse({ status: 200, description: 'Professional dashboard metrics' })
+  async getProfessionalDashboard(
     @CurrentUser() user: UserPayload,
     @Query() query: DashboardQueryDto,
   ): Promise<Record<string, unknown>> {
     const bypassCache = query.refresh === true;
-    return this.analyticsService.getStaffDashboard(
+    return this.analyticsService.getProfessionalDashboard(
       user.businessId!,
       user.memberId!,
       query,

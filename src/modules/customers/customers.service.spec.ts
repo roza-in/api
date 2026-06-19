@@ -173,6 +173,11 @@ describe('CustomersService', () => {
             include: { service: true, staff: true },
             orderBy: { startTime: 'desc' },
           },
+          dataDeletionRequests: {
+            where: { status: 'PENDING' },
+            orderBy: { createdAt: 'desc' },
+            take: 1,
+          },
         },
       });
     });

@@ -692,9 +692,9 @@ export class AnalyticsService {
   }
 
   /**
-   * Staff Dashboard Metrics - Cached for 5 minutes.
+   * Professional Dashboard Metrics - Cached for 5 minutes.
    */
-  async getStaffDashboard(
+  async getProfessionalDashboard(
     businessId: string,
     memberId: string,
     query: DashboardQueryDto,
@@ -705,11 +705,13 @@ export class AnalyticsService {
     });
 
     if (!staff) {
-      throw new ForbiddenException('User is not linked to a staff profile');
+      throw new ForbiddenException(
+        'User is not linked to a professional profile',
+      );
     }
 
     const { start, end } = this.parseDates(query);
-    const cacheKey = `analytics:staff:${businessId}:${staff.id}:${start.toISOString()}:${end.toISOString()}`;
+    const cacheKey = `analytics:professional:${businessId}:${staff.id}:${start.toISOString()}:${end.toISOString()}`;
 
     if (!bypassCache) {
       const cached = await this.redis.get(cacheKey);

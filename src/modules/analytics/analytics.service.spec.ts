@@ -386,11 +386,11 @@ describe('AnalyticsService', () => {
     });
   });
 
-  describe('getStaffDashboard', () => {
+  describe('getProfessionalDashboard', () => {
     it('should throw ForbiddenException if user has no staff link', async () => {
       staffFindFirst.mockResolvedValue(null);
       await expect(
-        service.getStaffDashboard(businessId, 'member-1', {}),
+        service.getProfessionalDashboard(businessId, 'member-1', {}),
       ).rejects.toThrow(ForbiddenException);
     });
 
@@ -405,7 +405,7 @@ describe('AnalyticsService', () => {
       leaveFindMany.mockResolvedValue([]);
       paymentAggregate.mockResolvedValue({ _sum: { amount: 300 } });
 
-      const result = await service.getStaffDashboard(
+      const result = await service.getProfessionalDashboard(
         businessId,
         'member-1',
         {},
