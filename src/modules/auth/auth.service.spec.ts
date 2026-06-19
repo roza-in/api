@@ -231,6 +231,7 @@ describe('AuthService', () => {
       expect(mockPrismaService.user.create).toHaveBeenCalledWith({
         data: {
           email: 'test@example.com',
+          name: 'John Doe',
           passwordHash: 'hashedPassword',
           status: 'ACTIVE',
           lastLogin: expect.any(Date),

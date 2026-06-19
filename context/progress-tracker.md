@@ -129,6 +129,7 @@ Update this file after every completed feature. Any AI agent reading this should
 - **Auth Extensions & Verification Tests**: Injected and mocked `EmailAdapter` in `auth.service.spec.ts`, adding comprehensive unit tests for `sendForgotPasswordOtp`, `resetPassword`, `changePassword`, and `linkPhone` to ensure 100% test coverage and resolve CI/CD build issues.
 - **Forgot Password email template**: Set up a custom HTML template for email OTP password recovery dispatching via SES, utilizing a 6-digit verification code with 10-minute validity.
 - **Phone Number Linkage Uniqueness**: Implemented `linkPhone` to prevent multiple user accounts from linking the same WhatsApp phone number.
+- **User Name Storage (Option 1)**: Added a nullable `name` column to the `User` model in the database schema. Updated user email registration and Google OAuth callback authentication to capture and store names, returning the field in `/auth/me` to enable correct name display on the dashboard sidebar and eliminate the email prefix fallback.
 
 ---
 

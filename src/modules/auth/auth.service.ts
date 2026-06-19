@@ -61,6 +61,7 @@ export class AuthService {
     const user = await this.prisma.user.create({
       data: {
         email: dto.email,
+        name: dto.name,
         passwordHash,
         status: 'ACTIVE',
         lastLogin: new Date(),
@@ -195,6 +196,7 @@ export class AuthService {
       user = await this.prisma.user.create({
         data: {
           email: profile.email,
+          name: profile.name,
           passwordHash: '', // No password for OAuth users
           oauthProvider: 'google',
           oauthId: profile.googleId,
@@ -210,6 +212,7 @@ export class AuthService {
         await this.prisma.user.update({
           where: { id: user.id },
           data: {
+            name: user.name || profile.name,
             oauthProvider: 'google',
             oauthId: profile.googleId,
             lastLogin: new Date(),
@@ -243,6 +246,7 @@ export class AuthService {
       where: { id: userId },
       select: {
         id: true,
+        name: true,
         email: true,
         oauthProvider: true,
         status: true,
