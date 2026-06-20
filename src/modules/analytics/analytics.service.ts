@@ -474,15 +474,15 @@ export class AnalyticsService {
       }),
     ]);
 
-    const monthlyRevenueGrowth =
+    const monthlyRevenueGrowth: number | null =
       prevRevenue.net > 0
         ? ((currentRevenue.net - prevRevenue.net) / prevRevenue.net) * 100
-        : 0;
+        : null;
 
-    const customerGrowth =
+    const customerGrowth: number | null =
       prevTotalCust > 0
         ? ((currentNewCust - prevNewCust) / prevTotalCust) * 100
-        : 0;
+        : null;
 
     // todayRevenueGrowth: null when yesterday had no revenue (new business / no history)
     const todayRevenueGrowth: number | null =
@@ -656,6 +656,7 @@ export class AnalyticsService {
           staffMetrics.activeStaffCount > 0
             ? appointmentMetrics.completed / staffMetrics.activeStaffCount
             : 0,
+        list: staffMetrics.staffList,
       },
       growth: growthMetrics,
       recentActivity,
