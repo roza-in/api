@@ -217,6 +217,13 @@ const TEMPLATES: Record<
         '<p>Hi {{customerName}},</p><p>We have a special offer for you: <strong>{{offerDetails}}</strong>.</p><p>Book now! Expiry: {{expiryDate}}.</p>',
     },
   },
+  STAFF_INVITATION: {
+    email: {
+      subjectTemplate: 'Invitation to join {{businessName}} on Rozx',
+      htmlTemplate:
+        '<div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 12px;"><h2 style="color: #10b981; text-align: center;">Welcome to Rozx</h2><p>Hello {{staffName}},</p><p>You have been invited by <strong>{{businessName}}</strong> to join their team on the Rozx Partner Portal.</p><p>Click the button below to set up your password and activate your account. This invitation is valid for 24 hours.</p><div style="text-align: center; margin: 30px 0;"><a href="{{inviteUrl}}" style="background-color: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Accept Invitation & Set Password</a></div><p style="color: #6b7280; font-size: 12px;">If the button above does not work, copy and paste this link into your browser:</p><p style="color: #10b981; font-size: 12px; word-break: break-all;"><a href="{{inviteUrl}}">{{inviteUrl}}</a></p><p style="color: #6b7280; font-size: 12px; margin-top: 40px; border-top: 1px solid #e5e7eb; padding-top: 20px;">This is an automated invitation. Please do not reply to this message.<br>© 2026 Rozx Technologies. All rights reserved.</p></div>',
+    },
+  },
 };
 
 @Injectable()

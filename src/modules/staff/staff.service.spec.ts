@@ -4,6 +4,20 @@ import { PrismaService } from '../prisma/prisma.service';
 import { EntitlementsService } from '../permissions/entitlements.service';
 import { getQueueToken } from '@nestjs/bullmq';
 import { BadRequestException, ConflictException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+
+const mockRedis = {
+  get: jest.fn(),
+  set: jest.fn(),
+  del: jest.fn(),
+};
+
+jest.mock('ioredis', () => {
+  return jest.fn().mockImplementation(() => mockRedis);
+});
+
+jest.mock('uuid', () => ({ v4: () => 'mock-uuid' }));
+
 
 describe('StaffService', () => {
   let service: StaffService;
@@ -83,6 +97,13 @@ describe('StaffService', () => {
     add: jest.fn(),
   };
 
+  const mockConfigService = {
+    get: jest.fn((key: string) => {
+      if (key === 'REDIS_URL') return 'redis://localhost:6379';
+      return null;
+    }),
+  };
+
   beforeEach(async () => {
     // Transaction wrapper mock passing mockPrisma
     mockPrisma.$transaction.mockImplementation(
@@ -95,6 +116,7 @@ describe('StaffService', () => {
         { provide: PrismaService, useValue: mockPrisma },
         { provide: EntitlementsService, useValue: mockEntitlements },
         { provide: getQueueToken('notifications'), useValue: mockQueue },
+        { provide: ConfigService, useValue: mockConfigService },
       ],
     }).compile();
 
@@ -252,11 +274,18 @@ describe('StaffService', () => {
       businessMemberFindUnique.mockResolvedValue(null);
       businessMemberCreate.mockResolvedValue({ id: 'member-uuid' });
       staffUpdate.mockResolvedValue({});
+      mockRedis.set.mockResolvedValue('OK');
       mockQueue.add.mockResolvedValue({});
 
       const result = await service.inviteStaff(businessId, userId, staffId);
 
       expect(result).toEqual({ message: 'Staff invitation sent successfully' });
+      expect(mockRedis.set).toHaveBeenCalledWith(
+        'auth:invite:token:mock-uuid',
+        'user-uuid',
+        'EX',
+        86400,
+      );
       expect(userCreate).toHaveBeenCalledWith({
         data: {
           email: 'john@example.com',
@@ -286,6 +315,7 @@ describe('StaffService', () => {
         businessId,
         email: 'john@example.com',
         phone: '+919876543210',
+        token: 'mock-uuid',
       });
     });
 

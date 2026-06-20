@@ -27,6 +27,8 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { LinkPhoneDto } from './dto/link-phone.dto';
+import { CompleteInviteDto } from './dto/complete-invite.dto';
+
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { GoogleOAuthGuard } from './guards/google-oauth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -184,5 +186,14 @@ export class AuthController {
   @ApiResponse({ status: 409, description: 'Phone number already in use' })
   async linkPhone(@CurrentUser() user: UserPayload, @Body() dto: LinkPhoneDto) {
     return this.authService.linkPhone(user.userId, dto.phone, dto.code);
+  }
+
+  @Post('complete-invite')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Complete staff invitation and set password' })
+  @ApiResponse({ status: 200, description: 'Account activated, tokens returned' })
+  @ApiResponse({ status: 401, description: 'Invalid or expired invitation token' })
+  async completeInvite(@Body() dto: CompleteInviteDto) {
+    return this.authService.completeInvite(dto.token, dto.password);
   }
 }

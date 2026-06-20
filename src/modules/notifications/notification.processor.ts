@@ -46,6 +46,76 @@ export class NotificationProcessor extends WorkerHost {
       await this.processNotification(notificationId, variables);
     } else if (job.name === 'appointment-reminder-check') {
       await this.runReminderScan();
+    } else if (job.name === 'staff-invite') {
+      const data = job.data as {
+        staffId: string;
+        businessId: string;
+        email: string;
+        phone: string;
+        token: string;
+      };
+      await this.processStaffInvite(data);
+    }
+  }
+
+  private async processStaffInvite(data: {
+    staffId: string;
+    businessId: string;
+    email: string;
+    phone: string;
+    token: string;
+  }) {
+    try {
+      const [staff, business] = await Promise.all([
+        this.prisma.staff.findFirst({
+          where: { id: data.staffId, businessId: data.businessId, deletedAt: null },
+        }),
+        this.prisma.business.findUnique({
+          where: { id: data.businessId },
+        }),
+      ]);
+
+      if (!staff) {
+        throw new Error(`Staff member ${data.staffId} not found`);
+      }
+      if (!business) {
+        throw new Error(`Business ${data.businessId} not found`);
+      }
+
+      const allowedOrigins =
+        this.configService.get<string>('CORS_ALLOWED_ORIGINS')?.split(',') || [];
+      const frontendUrl = allowedOrigins[0] || 'http://localhost:3000';
+      const inviteUrl = `${frontendUrl}/complete-invite?token=${data.token}`;
+
+      const renderResult = this.templateService.render(
+        'STAFF_INVITATION',
+        {
+          staffName: staff.name,
+          businessName: business.name,
+          inviteUrl,
+        },
+        'email',
+      );
+
+      if (!renderResult.email) {
+        throw new Error('Email template failed to render');
+      }
+
+      await this.emailAdapter.sendEmail(
+        data.email,
+        renderResult.email.subject,
+        renderResult.email.html,
+      );
+
+      this.logger.log(
+        `Staff invitation email sent successfully to ${data.email} for business ${business.name}`,
+      );
+    } catch (error) {
+      this.logger.error(
+        `Failed to process staff invitation email for ${data.email}`,
+        error instanceof Error ? error.stack : String(error),
+      );
+      throw error;
     }
   }
 

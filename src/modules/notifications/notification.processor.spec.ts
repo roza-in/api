@@ -31,10 +31,20 @@ describe('NotificationProcessor', () => {
     appointment: {
       findMany: jest.fn(),
     },
+    staff: {
+      findFirst: jest.fn(),
+    },
+    business: {
+      findUnique: jest.fn(),
+    },
   };
 
   const mockConfigService = {
     getOrThrow: jest.fn().mockReturnValue('redis://localhost:6379'),
+    get: jest.fn((key: string) => {
+      if (key === 'CORS_ALLOWED_ORIGINS') return 'https://app.staging.rozx.in';
+      return null;
+    }),
   };
 
   const mockWhatsAppAdapter = {
@@ -265,6 +275,60 @@ describe('NotificationProcessor', () => {
           sentAt: expect.any(Date),
         },
       });
+    });
+
+    it('should process staff invitation job successfully', async () => {
+      const mockJob = {
+        name: 'staff-invite',
+        data: {
+          staffId: 'staff-uuid',
+          businessId: 'business-uuid',
+          email: 'staff@example.com',
+          phone: '919999999999',
+          token: 'invite-token',
+        },
+      } as unknown as Job;
+
+      mockPrismaService.staff.findFirst.mockResolvedValue({
+        id: 'staff-uuid',
+        name: 'John Staff',
+      });
+      mockPrismaService.business.findUnique.mockResolvedValue({
+        id: 'business-uuid',
+        name: 'Rozx Salon',
+      });
+
+      mockTemplateService.render.mockReturnValue({
+        email: {
+          subject: 'Invitation to join Rozx Salon on Rozx',
+          html: '<p>Welcome John Staff</p>',
+        },
+      });
+
+      mockEmailAdapter.sendEmail.mockResolvedValue('ses-msg-123');
+
+      await processor.process(mockJob);
+
+      expect(mockPrismaService.staff.findFirst).toHaveBeenCalledWith({
+        where: { id: 'staff-uuid', businessId: 'business-uuid', deletedAt: null },
+      });
+      expect(mockPrismaService.business.findUnique).toHaveBeenCalledWith({
+        where: { id: 'business-uuid' },
+      });
+      expect(mockTemplateService.render).toHaveBeenCalledWith(
+        'STAFF_INVITATION',
+        {
+          staffName: 'John Staff',
+          businessName: 'Rozx Salon',
+          inviteUrl: 'https://app.staging.rozx.in/complete-invite?token=invite-token',
+        },
+        'email',
+      );
+      expect(mockEmailAdapter.sendEmail).toHaveBeenCalledWith(
+        'staff@example.com',
+        'Invitation to join Rozx Salon on Rozx',
+        '<p>Welcome John Staff</p>',
+      );
     });
   });
 });

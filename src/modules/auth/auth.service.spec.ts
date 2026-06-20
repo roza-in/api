@@ -439,4 +439,45 @@ describe('AuthService', () => {
       ).rejects.toThrow(ConflictException);
     });
   });
+
+  describe('completeInvite', () => {
+    it('should complete invite, set password, and return tokens', async () => {
+      mockRedis.get.mockResolvedValue('user-uuid');
+      mockPrismaService.user.update.mockResolvedValue({
+        id: 'user-uuid',
+        email: 'test@example.com',
+        status: 'ACTIVE',
+      });
+      mockPrismaService.businessMember.findFirst.mockResolvedValue({
+        id: 'member-uuid',
+        businessId: 'business-uuid',
+        roleId: 'role-uuid',
+      });
+
+      const result = await service.completeInvite('mock-token', 'new-password-123');
+
+      expect(result).toEqual({
+        accessToken: 'mock-jwt-token',
+        refreshToken: 'mock-jwt-token',
+      });
+      expect(mockRedis.get).toHaveBeenCalledWith('auth:invite:token:mock-token');
+      expect(mockRedis.del).toHaveBeenCalledWith('auth:invite:token:mock-token');
+      expect(mockPrismaService.user.update).toHaveBeenCalledWith({
+        where: { id: 'user-uuid' },
+        data: {
+          passwordHash: 'hashedPassword',
+          status: 'ACTIVE',
+          updatedAt: expect.any(Date),
+        },
+      });
+    });
+
+    it('should throw UnauthorizedException if token is missing/expired', async () => {
+      mockRedis.get.mockResolvedValue(null);
+
+      await expect(
+        service.completeInvite('expired-token', 'new-password-123'),
+      ).rejects.toThrow(UnauthorizedException);
+    });
+  });
 });

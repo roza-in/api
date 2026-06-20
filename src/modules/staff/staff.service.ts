@@ -14,16 +14,26 @@ import { UpdateStaffDto } from './dto/update-staff.dto';
 import { CreateLeaveDto } from './dto/create-leave.dto';
 import { SYSTEM_ROLE_IDS } from '../../common/constants/roles.constants';
 import type { Prisma } from '../../generated/prisma';
+import { ConfigService } from '@nestjs/config';
+import Redis from 'ioredis';
+import { v4 as uuidv4 } from 'uuid';
+
 
 @Injectable()
 export class StaffService {
   private readonly logger = new Logger(StaffService.name);
+  private readonly redis: Redis;
 
   constructor(
     private readonly prisma: PrismaService,
     private readonly entitlementsService: EntitlementsService,
     @InjectQueue('notifications') private readonly notificationQueue: Queue,
-  ) {}
+    private readonly configService: ConfigService,
+  ) {
+    const redisUrl =
+      this.configService.get<string>('REDIS_URL') || 'redis://localhost:6379';
+    this.redis = new Redis(redisUrl);
+  }
 
   /**
    * Register a new staff member under a business branch, link services, and check subscription limits.
@@ -324,12 +334,18 @@ export class StaffService {
       },
     });
 
+    // Generate secure activation token
+    const token = uuidv4();
+    const redisKey = `auth:invite:token:${token}`;
+    await this.redis.set(redisKey, user.id, 'EX', 86400); // 24 hours
+
     // 4. Queue the invite job
     await this.notificationQueue.add('staff-invite', {
       staffId: staff.id,
       businessId,
       email: staff.email,
       phone: staff.phone,
+      token,
     });
 
     return { message: 'Staff invitation sent successfully' };

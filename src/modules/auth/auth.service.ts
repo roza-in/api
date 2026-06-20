@@ -553,4 +553,45 @@ export class AuthService {
 
     return { message: 'Phone number linked successfully' };
   }
+
+  async completeInvite(
+    token: string,
+    password: string,
+  ): Promise<TokenPair> {
+    const redisKey = `auth:invite:token:${token}`;
+    const userId = await this.redis.get(redisKey);
+
+    if (!userId) {
+      throw new UnauthorizedException('Invalid or expired invitation token');
+    }
+
+    const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
+
+    const user = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        passwordHash,
+        status: 'ACTIVE',
+        updatedAt: new Date(),
+      },
+    });
+
+    await this.redis.del(redisKey);
+
+    this.logger.log(`User ${user.email} activated account via invitation`);
+
+    const membership = await this.prisma.businessMember.findFirst({
+      where: { userId: user.id, deletedAt: null },
+      include: { business: true },
+    });
+
+    return this.generateTokenPair(
+      user.id,
+      user.email,
+      membership?.businessId,
+      membership?.id,
+      membership?.roleId,
+    );
+  }
 }
+
