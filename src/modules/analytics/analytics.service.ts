@@ -656,7 +656,6 @@ export class AnalyticsService {
           staffMetrics.activeStaffCount > 0
             ? appointmentMetrics.completed / staffMetrics.activeStaffCount
             : 0,
-        list: staffMetrics.staffList,
       },
       growth: growthMetrics,
       recentActivity,
