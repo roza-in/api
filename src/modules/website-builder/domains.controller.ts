@@ -21,13 +21,16 @@ import { CreateDomainDto } from './dto/create-domain.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { TenantGuard } from '../../common/guards/tenant.guard';
 import { PermissionsGuard } from '../../common/guards/permissions.guard';
+import { SubscriptionGuard } from '../../common/guards/subscription.guard';
+import { RequireFeature } from '../../common/decorators/require-feature.decorator';
 import { Permissions } from '../../common/decorators/permissions.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import type { UserPayload } from '../../common/interfaces/user-payload.interface';
 
 @ApiTags('Website Domains')
 @Controller('websites/domains')
-@UseGuards(JwtAuthGuard, TenantGuard, PermissionsGuard)
+@UseGuards(JwtAuthGuard, TenantGuard, PermissionsGuard, SubscriptionGuard)
+@RequireFeature('customDomain')
 @ApiBearerAuth()
 @Permissions('website:manage')
 export class DomainsController {

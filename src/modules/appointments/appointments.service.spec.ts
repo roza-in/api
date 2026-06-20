@@ -3,7 +3,8 @@ import { AppointmentsService } from './appointments.service';
 import { ConflictService } from './conflict.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
-import { NotFoundException, ConflictException } from '@nestjs/common';
+import { EntitlementsService } from '../permissions/entitlements.service';
+import { NotFoundException, ConflictException, ForbiddenException } from '@nestjs/common';
 import { AppointmentStatus } from '../../generated/prisma';
 
 describe('AppointmentsService', () => {
@@ -42,6 +43,10 @@ describe('AppointmentsService', () => {
     send: jest.fn(),
   };
 
+  const mockEntitlements = {
+    assertAppointmentLimit: jest.fn(),
+  };
+
   const businessId = 'biz-1';
   const userId = 'user-1';
   const appointmentId = 'appt-1';
@@ -61,6 +66,7 @@ describe('AppointmentsService', () => {
     branch: { timezone: 'Asia/Kolkata', address: '123 St' },
     customer: { name: 'John Doe' },
     service: { name: 'Haircut' },
+    business: { name: 'Test Business' },
   };
 
   beforeEach(async () => {
@@ -81,11 +87,13 @@ describe('AppointmentsService', () => {
         { provide: PrismaService, useValue: mockPrisma },
         { provide: ConflictService, useValue: mockConflictService },
         { provide: NotificationsService, useValue: mockNotificationsService },
+        { provide: EntitlementsService, useValue: mockEntitlements },
       ],
     }).compile();
 
     service = module.get<AppointmentsService>(AppointmentsService);
     jest.clearAllMocks();
+    mockEntitlements.assertAppointmentLimit.mockResolvedValue(undefined);
   });
 
   describe('createAppointment', () => {
@@ -169,6 +177,18 @@ describe('AppointmentsService', () => {
       await expect(
         service.createAppointment(businessId, userId, createDto),
       ).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw ForbiddenException if appointment limit is reached', async () => {
+      const errorMsg = 'Appointment limit reached';
+      mockEntitlements.assertAppointmentLimit.mockRejectedValue(
+        new ForbiddenException(errorMsg),
+      );
+
+      await expect(
+        service.createAppointment(businessId, userId, createDto),
+      ).rejects.toThrow(ForbiddenException);
+      expect(mockEntitlements.assertAppointmentLimit).toHaveBeenCalledWith(businessId);
     });
   });
 

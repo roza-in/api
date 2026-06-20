@@ -7,6 +7,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { ConflictService } from './conflict.service';
 import { NotificationsService } from '../notifications/notifications.service';
+import { EntitlementsService } from '../permissions/entitlements.service';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 import { AppointmentSearchDto } from './dto/appointment-search.dto';
@@ -20,6 +21,7 @@ export class AppointmentsService {
     private readonly prisma: PrismaService,
     private readonly conflictService: ConflictService,
     private readonly notificationsService: NotificationsService,
+    private readonly entitlementsService: EntitlementsService,
   ) {}
 
   /**
@@ -30,7 +32,10 @@ export class AppointmentsService {
     userId: string | null,
     dto: CreateAppointmentDto,
   ) {
-    // 1. Verify Customer exists and belongs to the business
+    // 1. Assert appointment limit
+    await this.entitlementsService.assertAppointmentLimit(businessId);
+
+    // 2. Verify Customer exists and belongs to the business
     const customer = await this.prisma.customer.findFirst({
       where: { id: dto.customerId, businessId, deletedAt: null },
     });

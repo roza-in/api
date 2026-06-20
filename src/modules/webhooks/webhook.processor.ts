@@ -17,6 +17,8 @@ import {
   Prisma,
 } from '../../generated/prisma';
 import { WhatsAppStatusPayload, Msg91StatusItem } from './webhook.interfaces';
+import { EmailAdapter } from '../notifications/adapters/email.adapter';
+import { TemplateService } from '../notifications/template.service';
 
 interface RazorpayPaymentEntity {
   id: string;
@@ -68,6 +70,8 @@ export class WebhookProcessor extends WorkerHost {
     private readonly customersService: CustomersService,
     private readonly configService: ConfigService,
     private readonly notificationsService: NotificationsService,
+    private readonly emailAdapter: EmailAdapter,
+    private readonly templateService: TemplateService,
   ) {
     super();
     const redisUrl = this.configService.getOrThrow<string>('REDIS_URL');
@@ -633,6 +637,44 @@ export class WebhookProcessor extends WorkerHost {
         },
       },
     });
+
+    // Send subscription renewal email notification to business owner
+    try {
+      const business = await this.prisma.business.findUnique({
+        where: { id: businessId },
+        include: {
+          members: {
+            where: { role: { name: 'OWNER' } },
+            include: { user: true },
+          },
+        },
+      });
+      const owner = business?.members[0]?.user;
+      if (owner && owner.email) {
+        const renderResult = this.templateService.render(
+          'SUBSCRIPTION_RENEWAL',
+          {
+            ownerName: owner.name || owner.email.split('@')[0] || 'Owner',
+          },
+          'email',
+        );
+        if (renderResult.email) {
+          await this.emailAdapter.sendEmail(
+            owner.email,
+            renderResult.email.subject,
+            renderResult.email.html,
+          );
+          this.logger.log(
+            `Subscription renewal email sent successfully to ${owner.email} for business ${businessId}`,
+          );
+        }
+      }
+    } catch (notifyError) {
+      this.logger.error(
+        `Failed to send subscription renewal email notification for business ${businessId}`,
+        notifyError instanceof Error ? notifyError.stack : String(notifyError),
+      );
+    }
   }
 
   private async handleSubscriptionCancelled(

@@ -20,6 +20,8 @@ import { ExportReportDto } from './dto/export-report.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { TenantGuard } from '../../common/guards/tenant.guard';
+import { SubscriptionGuard } from '../../common/guards/subscription.guard';
+import { RequireFeature } from '../../common/decorators/require-feature.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { Role } from '../../common/constants/roles.constants';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -27,6 +29,8 @@ import type { UserPayload } from '../../common/interfaces/user-payload.interface
 
 @ApiTags('Analytics & Dashboards')
 @Controller('analytics')
+@UseGuards(JwtAuthGuard, TenantGuard, RolesGuard, SubscriptionGuard)
+@RequireFeature('analytics')
 @ApiBearerAuth()
 export class AnalyticsController {
   constructor(
@@ -35,7 +39,6 @@ export class AnalyticsController {
   ) {}
 
   @Get('owner')
-  @UseGuards(JwtAuthGuard, TenantGuard, RolesGuard)
   @Roles(Role.OWNER)
   @ApiOperation({ summary: 'Retrieve Owner dashboard analytical metrics' })
   @ApiResponse({ status: 200, description: 'Owner dashboard metrics' })
@@ -52,7 +55,6 @@ export class AnalyticsController {
   }
 
   @Get('manager')
-  @UseGuards(JwtAuthGuard, TenantGuard, RolesGuard)
   @Roles(Role.OWNER, Role.MANAGER)
   @ApiOperation({ summary: 'Retrieve Manager dashboard operational metrics' })
   @ApiResponse({ status: 200, description: 'Manager dashboard metrics' })
@@ -69,7 +71,6 @@ export class AnalyticsController {
   }
 
   @Get('reception')
-  @UseGuards(JwtAuthGuard, TenantGuard, RolesGuard)
   @Roles(Role.OWNER, Role.MANAGER, Role.RECEPTION)
   @ApiOperation({
     summary: 'Retrieve Reception dashboard real-time queue metrics',
@@ -88,7 +89,6 @@ export class AnalyticsController {
   }
 
   @Get('professional')
-  @UseGuards(JwtAuthGuard, TenantGuard, RolesGuard)
   @Roles(Role.OWNER, Role.MANAGER, Role.RECEPTION, Role.PROFESSIONAL)
   @ApiOperation({
     summary: 'Retrieve personal Professional performance dashboard',
@@ -108,7 +108,6 @@ export class AnalyticsController {
   }
 
   @Post('export')
-  @UseGuards(JwtAuthGuard, TenantGuard, RolesGuard)
   @Roles(Role.OWNER, Role.MANAGER)
   @ApiOperation({ summary: 'Trigger analytical report export' })
   @ApiResponse({ status: 201, description: 'Export triggered or completed' })
@@ -137,7 +136,6 @@ export class AnalyticsController {
   }
 
   @Get('export/status/:jobId')
-  @UseGuards(JwtAuthGuard, TenantGuard, RolesGuard)
   @Roles(Role.OWNER, Role.MANAGER)
   @ApiOperation({ summary: 'Get background report export job status' })
   @ApiResponse({ status: 200, description: 'Export job status details' })

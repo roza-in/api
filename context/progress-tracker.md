@@ -7,8 +7,8 @@ Update this file after every completed feature. Any AI agent reading this should
 ## Current Status
 
 **Phase:** Completed — Phase 10 — Settings & Auth Extensions
-**Last completed:** 26 Settings Dashboard (Backend)
-**Next:** Production Ready (All 26 Features Completed)
+**Last completed:** 27 Subscription Gating & Limits Enforcement
+**Next:** Production Ready (All 27 Features Completed)
 
 ---
 
@@ -130,6 +130,11 @@ Update this file after every completed feature. Any AI agent reading this should
 - **Forgot Password email template**: Set up a custom HTML template for email OTP password recovery dispatching via SES, utilizing a 6-digit verification code with 10-minute validity.
 - **Phone Number Linkage Uniqueness**: Implemented `linkPhone` to prevent multiple user accounts from linking the same WhatsApp phone number.
 - **User Name Storage (Option 1)**: Added a nullable `name` column to the `User` model in the database schema. Updated user email registration and Google OAuth callback authentication to capture and store names, returning the field in `/auth/me` to enable correct name display on the dashboard sidebar and eliminate the email prefix fallback.
+- **Razorpay Subscription Plan and Pricing Alignment**: Mapped new Razorpay dashboard test plan IDs (`plan_T3sHMSNQdKWSRg`, `plan_T3sJl4DeN3uCg1`, `plan_T3sKnvAUY2Rwoo`, `plan_T3sT2tatdqbSPv`, `plan_T3sTyorHgQ7eSe`, `plan_T3sUykwmvgxc9B`) under environment configuration variables `RAZORPAY_PLAN_*` in both `.env` and `.env.staging`. Updated the database seed script `seed.ts` with matching plan yearly price structures (₹9,999, ₹19,999, ₹29,999) and successfully seeded the updated plans into the PostgreSQL instance.
+- **Subscription Gating & Route Protection**: Enforced subscription plan feature requirements globally across premium modules by applying `SubscriptionGuard` and `@RequireFeature` at the controller levels (Analytics, Campaigns, custom domains, pages, themes, and media asset builders). Additionally, integrated the billing-period appointment limit check (`assertAppointmentLimit`) into the core booking path (`createAppointment`) to block booking requests for expired/limit-exceeded businesses.
+- **Test Suite Telemetry and Mock Diagnostics**: Resolved mock telemetry warnings and TypeError logs in the `AppointmentsService` unit spec file by injecting missing business relationship attributes, ensuring 100% clean log outputs across all 380 passing test cases.
+- **Subscription Renewal & Expiring Reminders Engine**: Integrated the email triggers for `TRIAL_REMINDER` and `SUBSCRIPTION_RENEWAL` templates. Enabled `SubscriptionExpiryProcessor` to run daily and scan for subscriptions or trials expiring in exactly 3 days, notifying the business owner via SES email. Integrated a successful renewal email dispatch inside the `subscription.charged` webhook handler (`handleSubscriptionCharged`), fully covered by updated unit specs (all 381 tests passing cleanly).
+
 
 ---
 

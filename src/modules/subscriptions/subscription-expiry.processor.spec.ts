@@ -4,6 +4,8 @@ import { SubscriptionExpiryProcessor } from './subscription-expiry.processor';
 import { PrismaService } from '../prisma/prisma.service';
 import { SubscriptionStatus } from '../../generated/prisma';
 import { Job } from 'bullmq';
+import { EmailAdapter } from '../notifications/adapters/email.adapter';
+import { TemplateService } from '../notifications/template.service';
 
 describe('SubscriptionExpiryProcessor', () => {
   let processor: SubscriptionExpiryProcessor;
@@ -26,6 +28,16 @@ describe('SubscriptionExpiryProcessor', () => {
     $transaction: jest.fn(),
   };
 
+  const mockEmailAdapter = {
+    sendEmail: jest.fn(),
+  };
+
+  const mockTemplateService = {
+    render: jest.fn().mockReturnValue({
+      email: { subject: 'Reminder', html: '<p>Reminded</p>' },
+    }),
+  };
+
   beforeEach(async () => {
     mockPrisma.$transaction.mockImplementation(async (arg: unknown) => {
       if (typeof arg === 'function') {
@@ -39,6 +51,8 @@ describe('SubscriptionExpiryProcessor', () => {
       providers: [
         SubscriptionExpiryProcessor,
         { provide: PrismaService, useValue: mockPrisma },
+        { provide: EmailAdapter, useValue: mockEmailAdapter },
+        { provide: TemplateService, useValue: mockTemplateService },
       ],
     }).compile();
 
@@ -67,7 +81,9 @@ describe('SubscriptionExpiryProcessor', () => {
         status: SubscriptionStatus.TRIALING,
       };
 
-      mockPrisma.subscription.findMany.mockResolvedValue([mockSub1, mockSub2]);
+      mockPrisma.subscription.findMany
+        .mockResolvedValueOnce([mockSub1, mockSub2])
+        .mockResolvedValueOnce([]);
       mockPrisma.subscriptionPlan.findUnique.mockResolvedValue({
         id: 'free-trial-id',
       });
@@ -121,7 +137,9 @@ describe('SubscriptionExpiryProcessor', () => {
         status: SubscriptionStatus.TRIALING,
       };
 
-      mockPrisma.subscription.findMany.mockResolvedValue([mockSub1, mockSub2]);
+      mockPrisma.subscription.findMany
+        .mockResolvedValueOnce([mockSub1, mockSub2])
+        .mockResolvedValueOnce([]);
       mockPrisma.subscriptionPlan.findUnique.mockResolvedValue({
         id: 'free-trial-id',
       });
@@ -143,6 +161,45 @@ describe('SubscriptionExpiryProcessor', () => {
           subscriptionStatus: SubscriptionStatus.CANCELLED,
         },
       });
+    });
+
+    it('should send trial/expiration reminder emails for expiring subscriptions', async () => {
+      const mockJob = {
+        name: 'check-expired-subscriptions',
+      } as Job;
+
+      mockPrisma.subscription.findMany
+        .mockResolvedValueOnce([]) // expired (empty)
+        .mockResolvedValueOnce([ // expiring
+          {
+            id: 'sub-uuid-expiring',
+            currentPeriodEnd: new Date(Date.now() + 2.5 * 24 * 60 * 60 * 1000),
+            businessId: 'business-uuid-1',
+            business: {
+              members: [
+                {
+                  user: {
+                    email: 'owner@example.com',
+                    name: 'Owner Name',
+                  },
+                },
+              ],
+            },
+          },
+        ]);
+
+      await processor.process(mockJob);
+
+      expect(mockTemplateService.render).toHaveBeenCalledWith(
+        'TRIAL_REMINDER',
+        expect.any(Object),
+        'email',
+      );
+      expect(mockEmailAdapter.sendEmail).toHaveBeenCalledWith(
+        'owner@example.com',
+        'Reminder',
+        '<p>Reminded</p>',
+      );
     });
   });
 });

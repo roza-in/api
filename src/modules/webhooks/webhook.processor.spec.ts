@@ -6,6 +6,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CustomersService } from '../customers/customers.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { WebhookProcessor } from './webhook.processor';
+import { EmailAdapter } from '../notifications/adapters/email.adapter';
+import { TemplateService } from '../notifications/template.service';
 import {
   PaymentStatus,
   WebhookStatus,
@@ -65,6 +67,7 @@ describe('WebhookProcessor', () => {
     },
     business: {
       update: jest.fn(),
+      findUnique: jest.fn(),
     },
     subscriptionPlan: {
       findUnique: jest.fn(),
@@ -86,6 +89,16 @@ describe('WebhookProcessor', () => {
     getOrThrow: jest.fn().mockReturnValue('redis://localhost:6379'),
   };
 
+  const mockEmailAdapter = {
+    sendEmail: jest.fn(),
+  };
+
+  const mockTemplateService = {
+    render: jest.fn().mockReturnValue({
+      email: { subject: 'Renewal', html: '<p>Renewed</p>' },
+    }),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -94,6 +107,8 @@ describe('WebhookProcessor', () => {
         { provide: CustomersService, useValue: mockCustomersService },
         { provide: ConfigService, useValue: mockConfigService },
         { provide: NotificationsService, useValue: mockNotificationsService },
+        { provide: EmailAdapter, useValue: mockEmailAdapter },
+        { provide: TemplateService, useValue: mockTemplateService },
       ],
     }).compile();
 
@@ -299,6 +314,19 @@ describe('WebhookProcessor', () => {
         id: 'local-sub-uuid',
         planId: 'new-plan-uuid',
         status: SubscriptionStatus.ACTIVE,
+      });
+      mockPrismaService.business.findUnique.mockResolvedValue({
+        id: 'business-uuid',
+        name: 'Test Business',
+        email: 'owner@example.com',
+        members: [
+          {
+            user: {
+              email: 'owner@example.com',
+              name: 'Owner Name',
+            },
+          },
+        ],
       });
 
       await processor.process(mockJob);

@@ -7,9 +7,12 @@ import { SubscriptionAdapterFactory } from './subscription-adapter.factory';
 import { SubscriptionExpiryProcessor } from './subscription-expiry.processor';
 import { SubscriptionCronScheduler } from './subscription-cron.scheduler';
 
+import { NotificationsModule } from '../notifications/notifications.module';
+
 @Module({
   imports: [
     ConfigModule,
+    NotificationsModule,
     BullModule.registerQueue({
       name: 'subscriptions',
       defaultJobOptions: {
