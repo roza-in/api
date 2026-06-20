@@ -48,6 +48,19 @@ export class AnalyticsService {
   }
 
   /**
+   * Helper to format a Date object as YYYY-MM-DD in the Asia/Kolkata timezone.
+   */
+  private formatDateKey(date: Date): string {
+    const formatter = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Asia/Kolkata',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
+    return formatter.format(date);
+  }
+
+  /**
    * Helper to retrieve net revenue values.
    */
   async getNetRevenue(businessId: string, start: Date, end: Date) {
@@ -523,6 +536,8 @@ export class AnalyticsService {
       staffMetrics,
       recentActivity,
       upcomingAppointments,
+      periodPayments,
+      periodRefunds,
     ] = await Promise.all([
       this.getNetRevenue(businessId, todayStart, todayEnd),
       this.prisma.appointment.count({
@@ -553,7 +568,68 @@ export class AnalyticsService {
         orderBy: { startTime: 'asc' },
         include: { customer: true, service: true, staff: true },
       }),
+      this.prisma.payment.findMany({
+        where: {
+          businessId,
+          status: 'SUCCESS',
+          createdAt: { gte: start, lte: end },
+        },
+        select: {
+          amount: true,
+          createdAt: true,
+        },
+      }),
+      this.prisma.refund.findMany({
+        where: {
+          businessId,
+          status: RefundStatus.PROCESSED,
+          createdAt: { gte: start, lte: end },
+        },
+        select: {
+          amount: true,
+          createdAt: true,
+        },
+      }),
     ]);
+
+    // Calculate daily revenue trend (paise)
+    const revenueMap: Record<string, number> = {};
+    const current = new Date(start);
+    const endKey = this.formatDateKey(end);
+    let safety = 0;
+    while (safety < 366) {
+      const key = this.formatDateKey(current);
+      revenueMap[key] = 0;
+      if (key === endKey) break;
+      current.setDate(current.getDate() + 1);
+      safety++;
+    }
+
+    for (const p of periodPayments) {
+      const key = this.formatDateKey(p.createdAt);
+      if (revenueMap[key] !== undefined) {
+        revenueMap[key] += Number(p.amount);
+      }
+    }
+
+    for (const r of periodRefunds) {
+      const key = this.formatDateKey(r.createdAt);
+      if (revenueMap[key] !== undefined) {
+        revenueMap[key] -= Number(r.amount);
+      }
+    }
+
+    const revenueByDay = Object.entries(revenueMap).map(([dateStr, amount]) => {
+      const d = new Date(dateStr + 'T12:00:00+05:30'); // parse in IST
+      const dateLabel = d.toLocaleDateString('en-IN', {
+        day: 'numeric',
+        month: 'short',
+      });
+      return {
+        date: dateLabel,
+        amount: Math.round(amount * 100), // convert to paise
+      };
+    });
 
     // Growth metrics need today's resolved values for trend comparisons
     const growthMetrics = await this.getGrowthMetrics(
@@ -584,6 +660,7 @@ export class AnalyticsService {
       growth: growthMetrics,
       recentActivity,
       upcomingAppointments,
+      revenueByDay,
     };
 
     await this.redis.set(cacheKey, JSON.stringify(data), 'EX', 300);

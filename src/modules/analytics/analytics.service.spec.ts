@@ -18,7 +18,9 @@ describe('AnalyticsService', () => {
   let service: AnalyticsService;
 
   const paymentAggregate = jest.fn();
+  const paymentFindMany = jest.fn();
   const refundAggregate = jest.fn();
+  const refundFindMany = jest.fn();
   const appointmentCount = jest.fn();
   const appointmentFindMany = jest.fn();
   const appointmentGroupBy = jest.fn();
@@ -33,9 +35,11 @@ describe('AnalyticsService', () => {
   const mockPrisma = {
     payment: {
       aggregate: paymentAggregate,
+      findMany: paymentFindMany,
     },
     refund: {
       aggregate: refundAggregate,
+      findMany: refundFindMany,
     },
     appointment: {
       count: appointmentCount,
@@ -74,6 +78,8 @@ describe('AnalyticsService', () => {
 
     service = module.get<AnalyticsService>(AnalyticsService);
     jest.clearAllMocks();
+    paymentFindMany.mockResolvedValue([]);
+    refundFindMany.mockResolvedValue([]);
   });
 
   const businessId = 'business-uuid';
