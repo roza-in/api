@@ -286,6 +286,9 @@ jobs:
             # Log in to Docker Registry on EC2
             echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
+            # Clean up dangling images, stopped containers, and build cache to free up space
+            docker system prune -f
+
             # Pull latest containers and start orchestration
             docker compose pull
             docker compose down --remove-orphans
