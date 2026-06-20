@@ -308,15 +308,18 @@ describe('AnalyticsService', () => {
   });
 
   describe('getGrowthMetrics', () => {
-    it('should calculate growth rates compared to previous month', async () => {
-      // Mock getNetRevenue
+    it('should calculate growth rates compared to previous month and daily trends', async () => {
+      // Mock getNetRevenue (called multiple times for current, prev, yesterday)
       paymentAggregate.mockResolvedValue({ _sum: { amount: 1000 } });
       refundAggregate.mockResolvedValue({ _sum: { amount: 0 } });
       customerCount.mockResolvedValue(10); // current new / prev new / prev total
+      appointmentCount.mockResolvedValue(5); // same weekday last week
 
-      const result = await service.getGrowthMetrics(businessId);
+      const result = await service.getGrowthMetrics(businessId, 800, 8);
       expect(result).toHaveProperty('monthlyRevenueGrowth');
       expect(result).toHaveProperty('customerGrowth');
+      expect(result).toHaveProperty('todayRevenueGrowth');
+      expect(result).toHaveProperty('todayAppointmentsGrowth');
     });
   });
 

@@ -380,9 +380,14 @@ export class AnalyticsService {
   }
 
   /**
-   * Helper to retrieve growth calculations (current month vs previous month).
+   * Helper to retrieve growth calculations (current month vs previous month)
+   * plus today vs yesterday revenue and today vs same weekday last week appointment trends.
    */
-  async getGrowthMetrics(businessId: string) {
+  async getGrowthMetrics(
+    businessId: string,
+    todayRevenue: number,
+    todayAppointments: number,
+  ) {
     const now = new Date();
     const startOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const startOfPrevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
@@ -396,52 +401,95 @@ export class AnalyticsService {
       999,
     );
 
-    const currentRevenue = await this.getNetRevenue(
-      businessId,
-      startOfCurrentMonth,
-      now,
-    );
-    const prevRevenue = await this.getNetRevenue(
-      businessId,
-      startOfPrevMonth,
-      endOfPrevMonth,
-    );
+    // Yesterday boundaries
+    const yesterdayStart = new Date(now);
+    yesterdayStart.setDate(yesterdayStart.getDate() - 1);
+    yesterdayStart.setHours(0, 0, 0, 0);
+    const yesterdayEnd = new Date(now);
+    yesterdayEnd.setDate(yesterdayEnd.getDate() - 1);
+    yesterdayEnd.setHours(23, 59, 59, 999);
+
+    // Same weekday last week boundaries
+    const lastWeekDayStart = new Date(now);
+    lastWeekDayStart.setDate(lastWeekDayStart.getDate() - 7);
+    lastWeekDayStart.setHours(0, 0, 0, 0);
+    const lastWeekDayEnd = new Date(now);
+    lastWeekDayEnd.setDate(lastWeekDayEnd.getDate() - 7);
+    lastWeekDayEnd.setHours(23, 59, 59, 999);
+
+    const [
+      currentRevenue,
+      prevRevenue,
+      currentNewCust,
+      prevNewCust,
+      prevTotalCust,
+      yesterdayRevenueData,
+      sameWeekdayAppts,
+    ] = await Promise.all([
+      this.getNetRevenue(businessId, startOfCurrentMonth, now),
+      this.getNetRevenue(businessId, startOfPrevMonth, endOfPrevMonth),
+      this.prisma.customer.count({
+        where: {
+          businessId,
+          createdAt: { gte: startOfCurrentMonth, lte: now },
+          deletedAt: null,
+        },
+      }),
+      this.prisma.customer.count({
+        where: {
+          businessId,
+          createdAt: { gte: startOfPrevMonth, lte: endOfPrevMonth },
+          deletedAt: null,
+        },
+      }),
+      this.prisma.customer.count({
+        where: {
+          businessId,
+          createdAt: { lt: startOfCurrentMonth },
+          deletedAt: null,
+        },
+      }),
+      // Yesterday net revenue for todayRevenueGrowth
+      this.getNetRevenue(businessId, yesterdayStart, yesterdayEnd),
+      // Same weekday last week appointment count for todayAppointmentsGrowth
+      this.prisma.appointment.count({
+        where: {
+          businessId,
+          startTime: { gte: lastWeekDayStart, lte: lastWeekDayEnd },
+          deletedAt: null,
+        },
+      }),
+    ]);
 
     const monthlyRevenueGrowth =
       prevRevenue.net > 0
         ? ((currentRevenue.net - prevRevenue.net) / prevRevenue.net) * 100
         : 0;
 
-    const currentNewCust = await this.prisma.customer.count({
-      where: {
-        businessId,
-        createdAt: { gte: startOfCurrentMonth, lte: now },
-        deletedAt: null,
-      },
-    });
-    const prevNewCust = await this.prisma.customer.count({
-      where: {
-        businessId,
-        createdAt: { gte: startOfPrevMonth, lte: endOfPrevMonth },
-        deletedAt: null,
-      },
-    });
-    const prevTotalCust = await this.prisma.customer.count({
-      where: {
-        businessId,
-        createdAt: { lt: startOfCurrentMonth },
-        deletedAt: null,
-      },
-    });
-
     const customerGrowth =
       prevTotalCust > 0
         ? ((currentNewCust - prevNewCust) / prevTotalCust) * 100
         : 0;
 
+    // todayRevenueGrowth: null when yesterday had no revenue (new business / no history)
+    const todayRevenueGrowth: number | null =
+      yesterdayRevenueData.net > 0
+        ? ((todayRevenue - yesterdayRevenueData.net) /
+            yesterdayRevenueData.net) *
+          100
+        : null;
+
+    // todayAppointmentsGrowth: null when same weekday last week had no appointments
+    const todayAppointmentsGrowth: number | null =
+      sameWeekdayAppts > 0
+        ? ((todayAppointments - sameWeekdayAppts) / sameWeekdayAppts) * 100
+        : null;
+
     return {
       monthlyRevenueGrowth,
       customerGrowth,
+      todayRevenueGrowth,
+      todayAppointmentsGrowth,
     };
   }
 
@@ -473,7 +521,6 @@ export class AnalyticsService {
       appointmentMetrics,
       customerMetrics,
       staffMetrics,
-      growthMetrics,
       recentActivity,
       upcomingAppointments,
     ] = await Promise.all([
@@ -489,7 +536,6 @@ export class AnalyticsService {
       this.getAppointmentMetrics(businessId, start, end, days),
       this.getCustomerMetrics(businessId, start, end),
       this.getStaffMetrics(businessId, start, end),
-      this.getGrowthMetrics(businessId),
       this.prisma.appointment.findMany({
         where: { businessId, deletedAt: null },
         take: 5,
@@ -508,6 +554,13 @@ export class AnalyticsService {
         include: { customer: true, service: true, staff: true },
       }),
     ]);
+
+    // Growth metrics need today's resolved values for trend comparisons
+    const growthMetrics = await this.getGrowthMetrics(
+      businessId,
+      todayRevenue.net,
+      todayAppointments,
+    );
 
     const data = {
       today: {
