@@ -143,7 +143,7 @@ export class SubscriptionsService {
       });
 
       // Update or create a pending subscription record locally
-      await this.prisma.subscription.upsert({
+      const subscription = await this.prisma.subscription.upsert({
         where: {
           razorpaySubscriptionId: checkoutResult.providerSubscriptionId,
         },
@@ -173,7 +173,7 @@ export class SubscriptionsService {
           userId,
           action: 'CREATE',
           entity: 'Subscription',
-          entityId: checkoutResult.providerSubscriptionId,
+          entityId: subscription.id,
           metadata: {
             planSlug: dto.planSlug,
             billingCycle: dto.billingCycle,

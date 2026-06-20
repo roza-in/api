@@ -263,6 +263,24 @@ export class AuthService {
                 name: true,
                 slug: true,
                 status: true,
+                subscriptionStatus: true,
+                subscriptions: {
+                  orderBy: { createdAt: 'desc' },
+                  take: 1,
+                  select: {
+                    plan: {
+                      select: {
+                        id: true,
+                        name: true,
+                        slug: true,
+                        maxBranches: true,
+                        maxStaff: true,
+                        maxAppointments: true,
+                        features: true,
+                      },
+                    },
+                  },
+                },
               },
             },
             role: {
