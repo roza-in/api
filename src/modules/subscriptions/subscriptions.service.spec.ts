@@ -217,6 +217,13 @@ describe('SubscriptionsService', () => {
       mockPrismaService.branch.count.mockResolvedValue(2);
       mockPrismaService.staff.count.mockResolvedValue(4);
       mockPrismaService.business.findUnique.mockResolvedValue(mockBusiness);
+      mockPrismaService.subscription.upsert.mockResolvedValue({
+        id: 'mock-sub-uuid',
+        businessId,
+        planId: 'plan-uuid',
+        status: 'PENDING',
+        razorpaySubscriptionId: 'sub_rzp_999',
+      });
 
       mockAdapter.createSubscription.mockResolvedValue({
         providerSubscriptionId: 'sub_rzp_999',
