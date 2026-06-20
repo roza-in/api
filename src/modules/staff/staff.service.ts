@@ -228,6 +228,19 @@ export class StaffService {
         );
       }
 
+      // Sync name update to User table if linked
+      if (updateData.name && existing.memberId) {
+        const member = await tx.businessMember.findUnique({
+          where: { id: existing.memberId },
+        });
+        if (member) {
+          await tx.user.update({
+            where: { id: member.userId },
+            data: { name: updateData.name },
+          });
+        }
+      }
+
       if (serviceIds !== undefined) {
         await tx.staffService.deleteMany({ where: { staffId: id } });
         if (serviceIds.length > 0) {
@@ -298,9 +311,15 @@ export class StaffService {
       user = await this.prisma.user.create({
         data: {
           email: staff.email,
+          name: staff.name,
           passwordHash: '', // Set dummy hash for pending user
           status: 'PENDING',
         },
+      });
+    } else if (!user.name) {
+      user = await this.prisma.user.update({
+        where: { id: user.id },
+        data: { name: staff.name },
       });
     }
 

@@ -39,6 +39,7 @@ describe('StaffService', () => {
 
   const userFindUnique = jest.fn();
   const userCreate = jest.fn();
+  const userUpdate = jest.fn();
 
   const roleFindFirst = jest.fn();
 
@@ -73,6 +74,7 @@ describe('StaffService', () => {
     user: {
       findUnique: userFindUnique,
       create: userCreate,
+      update: userUpdate,
     },
     role: {
       findFirst: roleFindFirst,
@@ -221,6 +223,33 @@ describe('StaffService', () => {
       });
     });
 
+    it('should update staff details and sync name to User if linked', async () => {
+      staffFindFirst.mockResolvedValue({ id: staffId, memberId: 'member-uuid' });
+      staffUpdateMany.mockResolvedValue({ count: 1 });
+      serviceCount.mockResolvedValue(1);
+      businessMemberFindUnique.mockResolvedValue({ userId: 'user-uuid' });
+      userUpdate.mockResolvedValue({});
+
+      const updatedMock = { id: staffId, name: 'John Updated' };
+      staffFindUniqueOrThrow.mockResolvedValue(updatedMock);
+
+      const result = await service.updateStaff(
+        businessId,
+        userId,
+        staffId,
+        updateDto,
+      );
+
+      expect(result).toEqual(updatedMock);
+      expect(businessMemberFindUnique).toHaveBeenCalledWith({
+        where: { id: 'member-uuid' },
+      });
+      expect(userUpdate).toHaveBeenCalledWith({
+        where: { id: 'user-uuid' },
+        data: { name: 'John Updated' },
+      });
+    });
+
     it('should throw ConflictException if version mismatch occurs', async () => {
       staffFindFirst.mockResolvedValue({ id: staffId });
       staffUpdateMany.mockResolvedValue({ count: 0 });
@@ -289,6 +318,7 @@ describe('StaffService', () => {
       expect(userCreate).toHaveBeenCalledWith({
         data: {
           email: 'john@example.com',
+          name: 'John Doe',
           passwordHash: '',
           status: 'PENDING',
         },
