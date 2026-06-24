@@ -170,7 +170,8 @@ describe('SubscriptionExpiryProcessor', () => {
 
       mockPrisma.subscription.findMany
         .mockResolvedValueOnce([]) // expired (empty)
-        .mockResolvedValueOnce([ // expiring
+        .mockResolvedValueOnce([
+          // expiring
           {
             id: 'sub-uuid-expiring',
             currentPeriodEnd: new Date(Date.now() + 2.5 * 24 * 60 * 60 * 1000),

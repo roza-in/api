@@ -4,7 +4,11 @@ import { ConflictService } from './conflict.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { EntitlementsService } from '../permissions/entitlements.service';
-import { NotFoundException, ConflictException, ForbiddenException } from '@nestjs/common';
+import {
+  NotFoundException,
+  ConflictException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { AppointmentStatus } from '../../generated/prisma';
 
 describe('AppointmentsService', () => {
@@ -188,7 +192,9 @@ describe('AppointmentsService', () => {
       await expect(
         service.createAppointment(businessId, userId, createDto),
       ).rejects.toThrow(ForbiddenException);
-      expect(mockEntitlements.assertAppointmentLimit).toHaveBeenCalledWith(businessId);
+      expect(mockEntitlements.assertAppointmentLimit).toHaveBeenCalledWith(
+        businessId,
+      );
     });
   });
 

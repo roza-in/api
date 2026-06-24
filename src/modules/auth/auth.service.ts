@@ -572,10 +572,7 @@ export class AuthService {
     return { message: 'Phone number linked successfully' };
   }
 
-  async completeInvite(
-    token: string,
-    password: string,
-  ): Promise<TokenPair> {
+  async completeInvite(token: string, password: string): Promise<TokenPair> {
     const redisKey = `auth:invite:token:${token}`;
     const userId = await this.redis.get(redisKey);
 
@@ -612,4 +609,3 @@ export class AuthService {
     );
   }
 }
-

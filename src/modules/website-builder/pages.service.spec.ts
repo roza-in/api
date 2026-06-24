@@ -106,7 +106,7 @@ describe('PagesService', () => {
   });
 
   describe('update', () => {
-    const updateDto = { title: 'New About Us Title', slug: 'new-about' };
+    const updateDto = { title: 'New About Title', slug: 'new-about' };
 
     it('should throw NotFoundException if page to update is not found', async () => {
       websiteFindFirst.mockResolvedValue({ id: websiteId });
@@ -137,12 +137,49 @@ describe('PagesService', () => {
       const mockUpdatedPage = {
         id: pageId,
         slug: 'new-about',
-        title: 'New About Us Title',
+        title: 'New About Title',
       };
       pageUpdate.mockResolvedValue(mockUpdatedPage);
 
       const result = await service.update(businessId, pageId, updateDto);
       expect(result).toEqual(mockUpdatedPage);
+    });
+
+    it('should update page sortOrder and isPublished successfully', async () => {
+      websiteFindFirst.mockResolvedValue({ id: websiteId });
+      pageFindFirst.mockResolvedValueOnce({
+        id: pageId,
+        slug: 'about',
+        title: 'About',
+      }); // Find the page (no slug change, so no duplicate check needed)
+
+      const navigationUpdateDto = {
+        sortOrder: 3,
+        isPublished: true,
+      };
+
+      const mockUpdatedPage = {
+        id: pageId,
+        slug: 'about',
+        title: 'About',
+        sortOrder: 3,
+        isPublished: true,
+      };
+      pageUpdate.mockResolvedValue(mockUpdatedPage);
+
+      const result = await service.update(
+        businessId,
+        pageId,
+        navigationUpdateDto,
+      );
+      expect(result).toEqual(mockUpdatedPage);
+      expect(pageUpdate).toHaveBeenCalledWith({
+        where: { id: pageId },
+        data: {
+          sortOrder: 3,
+          isPublished: true,
+        },
+      });
     });
   });
 });

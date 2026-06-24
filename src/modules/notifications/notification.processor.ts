@@ -68,7 +68,11 @@ export class NotificationProcessor extends WorkerHost {
     try {
       const [staff, business] = await Promise.all([
         this.prisma.staff.findFirst({
-          where: { id: data.staffId, businessId: data.businessId, deletedAt: null },
+          where: {
+            id: data.staffId,
+            businessId: data.businessId,
+            deletedAt: null,
+          },
         }),
         this.prisma.business.findUnique({
           where: { id: data.businessId },
@@ -83,7 +87,8 @@ export class NotificationProcessor extends WorkerHost {
       }
 
       const allowedOrigins =
-        this.configService.get<string>('CORS_ALLOWED_ORIGINS')?.split(',') || [];
+        this.configService.get<string>('CORS_ALLOWED_ORIGINS')?.split(',') ||
+        [];
       const frontendUrl = allowedOrigins[0] || 'http://localhost:3000';
       const inviteUrl = `${frontendUrl}/staff-oboarding?token=${data.token}`;
 

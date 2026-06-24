@@ -262,148 +262,118 @@ async function main() {
   // 4. Seed Default System Themes
   const systemThemes = [
     {
-      id: '00000000-0000-0000-0000-000000000011',
+      id: '00000000-0000-0000-0000-000000000001',
       name: 'Modern',
       isSystem: true,
       colorsJson: {
-        primary: '#0F172A',
-        secondary: '#3B82F6',
-        background: '#F8FAFC',
-        text: '#1E293B',
-        accent: '#F59E0B',
+        primary: '#10B981',
+        secondary: '#059669',
+        background: '#FFFFFF',
+        text: '#0F172A',
       },
       typographyJson: {
-        fontFamily: 'Inter, sans-serif',
-        headingSize: '2.25rem',
-        bodySize: '1rem',
+        fontFamily: 'Inter',
       },
       spacingJson: {
         containerPadding: '2rem',
-        sectionMargin: '4rem',
       },
       buttonStylesJson: {
-        borderRadius: '0.375rem',
-        padding: '0.5rem 1rem',
+        borderRadius: '8px',
       },
       layoutRulesJson: {
         headerStyle: 'sticky',
-        footerStyle: 'simple',
       },
     },
     {
-      id: '00000000-0000-0000-0000-000000000012',
+      id: '00000000-0000-0000-0000-000000000002',
       name: 'Luxury',
       isSystem: true,
       colorsJson: {
-        primary: '#1A1A1A',
-        secondary: '#D4AF37',
-        background: '#FAF9F6',
-        text: '#222222',
-        accent: '#800020',
+        primary: '#C9A96E',
+        secondary: '#2C2C2C',
+        background: '#1A1A1A',
+        text: '#F5F0E8',
       },
       typographyJson: {
-        fontFamily: 'Playfair Display, serif',
-        headingSize: '2.5rem',
-        bodySize: '1.05rem',
+        fontFamily: 'Cormorant Garamond',
       },
       spacingJson: {
         containerPadding: '2.5rem',
-        sectionMargin: '5rem',
       },
       buttonStylesJson: {
-        borderRadius: '0px',
-        padding: '0.75rem 1.5rem',
+        borderRadius: '2px',
       },
       layoutRulesJson: {
-        headerStyle: 'centered',
-        footerStyle: 'detailed',
+        headerStyle: 'fixed',
       },
     },
     {
-      id: '00000000-0000-0000-0000-000000000013',
-      name: 'Minimal',
-      isSystem: true,
-      colorsJson: {
-        primary: '#18181B',
-        secondary: '#71717A',
-        background: '#FFFFFF',
-        text: '#09090B',
-        accent: '#27272A',
-      },
-      typographyJson: {
-        fontFamily: 'Roboto Mono, monospace',
-        headingSize: '2rem',
-        bodySize: '0.95rem',
-      },
-      spacingJson: {
-        containerPadding: '1.5rem',
-        sectionMargin: '3.5rem',
-      },
-      buttonStylesJson: {
-        borderRadius: '0.25rem',
-        padding: '0.5rem 1rem',
-      },
-      layoutRulesJson: {
-        headerStyle: 'minimalist',
-        footerStyle: 'minimalist',
-      },
-    },
-    {
-      id: '00000000-0000-0000-0000-000000000014',
+      id: '00000000-0000-0000-0000-000000000003',
       name: 'Beauty',
       isSystem: true,
       colorsJson: {
-        primary: '#D946EF',
-        secondary: '#EC4899',
-        background: '#FFF1F2',
-        text: '#4C0519',
-        accent: '#F43F5E',
+        primary: '#9B4D6F',
+        secondary: '#D4A0B5',
+        background: '#FDF8F9',
+        text: '#2D1B2E',
       },
       typographyJson: {
-        fontFamily: 'Outfit, sans-serif',
-        headingSize: '2.3rem',
-        bodySize: '1rem',
+        fontFamily: 'Cormorant Garamond',
       },
       spacingJson: {
         containerPadding: '2rem',
-        sectionMargin: '4rem',
       },
       buttonStylesJson: {
         borderRadius: '9999px',
-        padding: '0.6rem 1.2rem',
       },
       layoutRulesJson: {
-        headerStyle: 'glassmorphism',
-        footerStyle: 'simple',
+        headerStyle: 'sticky',
       },
     },
     {
-      id: '00000000-0000-0000-0000-000000000015',
+      id: '00000000-0000-0000-0000-000000000004',
       name: 'Wellness',
       isSystem: true,
       colorsJson: {
-        primary: '#064E3B',
-        secondary: '#10B981',
-        background: '#F0FDF4',
-        text: '#062F4F',
-        accent: '#F59E0B',
+        primary: '#5B8C6E',
+        secondary: '#A8C5B5',
+        background: '#F5F7F4',
+        text: '#1E2D25',
       },
       typographyJson: {
-        fontFamily: 'DM Sans, sans-serif',
-        headingSize: '2.25rem',
-        bodySize: '1rem',
+        fontFamily: 'Inter',
       },
       spacingJson: {
         containerPadding: '2rem',
-        sectionMargin: '4.5rem',
       },
       buttonStylesJson: {
-        borderRadius: '0.5rem',
-        padding: '0.5rem 1rem',
+        borderRadius: '6px',
       },
       layoutRulesJson: {
-        headerStyle: 'standard',
-        footerStyle: 'simple',
+        headerStyle: 'sticky',
+      },
+    },
+    {
+      id: '00000000-0000-0000-0000-000000000005',
+      name: 'Minimal',
+      isSystem: true,
+      colorsJson: {
+        primary: '#2C2C2C',
+        secondary: '#8A8A8A',
+        background: '#FFFFFF',
+        text: '#1A1A1A',
+      },
+      typographyJson: {
+        fontFamily: 'Inter',
+      },
+      spacingJson: {
+        containerPadding: '2rem',
+      },
+      buttonStylesJson: {
+        borderRadius: '4px',
+      },
+      layoutRulesJson: {
+        headerStyle: 'scroll',
       },
     },
   ];

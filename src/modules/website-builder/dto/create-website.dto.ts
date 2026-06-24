@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateWebsiteDto {
   @ApiProperty({
-    example: '00000000-0000-0000-0000-000000000011',
+    example: '00000000-0000-0000-0000-000000000001',
     description: 'Selected system or custom theme ID',
   })
   @Matches(

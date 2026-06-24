@@ -191,8 +191,14 @@ export class AuthController {
   @Post('complete-invite')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Complete staff invitation and set password' })
-  @ApiResponse({ status: 200, description: 'Account activated, tokens returned' })
-  @ApiResponse({ status: 401, description: 'Invalid or expired invitation token' })
+  @ApiResponse({
+    status: 200,
+    description: 'Account activated, tokens returned',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Invalid or expired invitation token',
+  })
   async completeInvite(@Body() dto: CompleteInviteDto) {
     return this.authService.completeInvite(dto.token, dto.password);
   }

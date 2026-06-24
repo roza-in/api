@@ -581,6 +581,10 @@ model Website {
   isPublished      Boolean      @default(false)
   publishedVersion Int          @default(0)
   version          Int          @default(1)
+  logoUrl          String?
+  faviconUrl       String?
+  logoAltText      String?
+  socialLinksJson  Json? // { instagram?, facebook?, twitter?, youtube?, tiktok?, linkedin?, whatsapp? }
   createdBy        String?      @db.Uuid
   updatedBy        String?      @db.Uuid
   createdAt        DateTime     @default(now()) @db.Timestamptz
@@ -603,9 +607,10 @@ model Page {
   websiteId      String    @db.Uuid
   title          String
   slug           String
-  type           String // "home", "services", "staff", "about", "contact", "reviews", "policies"
+  type           String
   contentJson    Json
   isPublished    Boolean   @default(false)
+  sortOrder      Int       @default(0)
   seoTitle       String?
   seoDescription String?
   seoOgImage     String?

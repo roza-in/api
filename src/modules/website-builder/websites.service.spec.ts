@@ -14,6 +14,7 @@ describe('WebsitesService', () => {
   const themeFindUnique = jest.fn();
   const pageCreate = jest.fn();
   const pageUpdateMany = jest.fn();
+  const domainFindFirst = jest.fn();
 
   const mockPrisma = {
     website: {
@@ -31,6 +32,9 @@ describe('WebsitesService', () => {
     page: {
       create: pageCreate,
       updateMany: pageUpdateMany,
+    },
+    domain: {
+      findFirst: domainFindFirst,
     },
     $transaction: jest.fn(),
   };
@@ -103,7 +107,7 @@ describe('WebsitesService', () => {
       );
     });
 
-    it('should create website and 7 default pages in a transaction', async () => {
+    it('should create website and 6 default pages in a transaction', async () => {
       websiteFindFirst.mockResolvedValue(null);
       businessFindUnique.mockResolvedValue({
         id: businessId,
@@ -133,7 +137,7 @@ describe('WebsitesService', () => {
           isPublished: false,
         },
       });
-      expect(pageCreate).toHaveBeenCalledTimes(7);
+      expect(pageCreate).toHaveBeenCalledTimes(6);
     });
   });
 
@@ -215,6 +219,59 @@ describe('WebsitesService', () => {
         data: { deletedAt: expect.any(Date) },
       });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment */
+    });
+  });
+
+  describe('validateDomain', () => {
+    it('should return false for empty domain', async () => {
+      const result = await service.validateDomain('');
+      expect(result).toBe(false);
+    });
+
+    it('should return true for system domains', async () => {
+      const result = await service.validateDomain('app.staging.rozx.in');
+      expect(result).toBe(true);
+    });
+
+    it('should check and return true for registered subdomain', async () => {
+      websiteFindUnique.mockResolvedValue({
+        id: 'web-id',
+        subdomain: 'my-salon',
+      });
+      const result = await service.validateDomain('my-salon.rozx.in');
+      expect(result).toBe(true);
+      expect(websiteFindUnique).toHaveBeenCalledWith({
+        where: { subdomain: 'my-salon' },
+      });
+    });
+
+    it('should check and return true for registered custom domain in website', async () => {
+      websiteFindUnique.mockResolvedValue(null);
+      websiteFindFirst.mockResolvedValue({
+        id: 'web-id',
+        customDomain: 'mybeauty.com',
+      });
+      const result = await service.validateDomain('mybeauty.com');
+      expect(result).toBe(true);
+    });
+
+    it('should check and return true for registered custom domain in domains table', async () => {
+      websiteFindUnique.mockResolvedValue(null);
+      websiteFindFirst.mockResolvedValue(null);
+      domainFindFirst.mockResolvedValue({
+        id: 'domain-id',
+        hostname: 'mybeauty.com',
+      });
+      const result = await service.validateDomain('mybeauty.com');
+      expect(result).toBe(true);
+    });
+
+    it('should return false if domain is not registered anywhere', async () => {
+      websiteFindUnique.mockResolvedValue(null);
+      websiteFindFirst.mockResolvedValue(null);
+      domainFindFirst.mockResolvedValue(null);
+      const result = await service.validateDomain('unknown-domain.com');
+      expect(result).toBe(false);
     });
   });
 });

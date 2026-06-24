@@ -69,6 +69,7 @@ Update this file after every completed feature. Any AI agent reading this should
 
 - [x] 25 Security & Auth Extensions
 - [x] 26 Settings Dashboard (Backend)
+- [x] 27 Automatic Website Onboarding & Welcome Wizard Removal
 
 ---
 
@@ -134,6 +135,9 @@ Update this file after every completed feature. Any AI agent reading this should
 - **Subscription Gating & Route Protection**: Enforced subscription plan feature requirements globally across premium modules by applying `SubscriptionGuard` and `@RequireFeature` at the controller levels (Analytics, Campaigns, custom domains, pages, themes, and media asset builders). Additionally, integrated the billing-period appointment limit check (`assertAppointmentLimit`) into the core booking path (`createAppointment`) to block booking requests for expired/limit-exceeded businesses.
 - **Test Suite Telemetry and Mock Diagnostics**: Resolved mock telemetry warnings and TypeError logs in the `AppointmentsService` unit spec file by injecting missing business relationship attributes, ensuring 100% clean log outputs across all 380 passing test cases.
 - **Subscription Renewal & Expiring Reminders Engine**: Integrated the email triggers for `TRIAL_REMINDER` and `SUBSCRIPTION_RENEWAL` templates. Enabled `SubscriptionExpiryProcessor` to run daily and scan for subscriptions or trials expiring in exactly 3 days, notifying the business owner via SES email. Integrated a successful renewal email dispatch inside the `subscription.charged` webhook handler (`handleSubscriptionCharged`), fully covered by updated unit specs (all 381 tests passing cleanly).
+- **Automatic Website Onboarding**: Configured the business onboarding registration flow to automatically create a default website configuration using the "Modern" system theme (UUID `00000000-0000-0000-0000-000000000001`) in the background. This allowed the removal of the onboarding welcome wizard and subdomain setup steps from the `/website` dashboard page, allowing onboarded businesses to immediately access the template editor.
+- **Default Onboarding Pages & Sort Order**: Added a `sortOrder` column to the `Page` model in the database schema. Streamlined the onboarding page creation logic in `websites.service.ts` to seed 6 standard layout pages (Home, Services, About, Contact, Privacy Policy, Terms & Conditions) with sequential `sortOrder` values (1 to 6) and a flat array layout JSON format. Standardized the core page slug security arrays in both the NestJS API and the Next.js frontend to align with the new slugs, preventing accidental deletions. Added rendering support in the website customizer preview frame for `features` and `text-block` section types to display the seeded default layouts.
+- **Caddy On-Demand TLS & Domain Validation**: Configured Caddy's `ask` endpoint targeting `v1/websites/public/validate-domain` to prevent certificate rate limit attacks. Implemented validation inside `WebsitesService` allowing system domains, staging wildcard subdomains, and active customer domains, covered by unit tests (389 passing total).
 
 
 ---

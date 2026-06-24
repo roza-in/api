@@ -454,14 +454,21 @@ describe('AuthService', () => {
         roleId: 'role-uuid',
       });
 
-      const result = await service.completeInvite('mock-token', 'new-password-123');
+      const result = await service.completeInvite(
+        'mock-token',
+        'new-password-123',
+      );
 
       expect(result).toEqual({
         accessToken: 'mock-jwt-token',
         refreshToken: 'mock-jwt-token',
       });
-      expect(mockRedis.get).toHaveBeenCalledWith('auth:invite:token:mock-token');
-      expect(mockRedis.del).toHaveBeenCalledWith('auth:invite:token:mock-token');
+      expect(mockRedis.get).toHaveBeenCalledWith(
+        'auth:invite:token:mock-token',
+      );
+      expect(mockRedis.del).toHaveBeenCalledWith(
+        'auth:invite:token:mock-token',
+      );
       expect(mockPrismaService.user.update).toHaveBeenCalledWith({
         where: { id: 'user-uuid' },
         data: {

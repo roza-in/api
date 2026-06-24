@@ -14,7 +14,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U rozx_database_local -d rozx_local"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -52,7 +52,7 @@ services:
     container_name: api
     restart: always
     ports:
-      - "3000:3000"
+      - "3001:3001"
     env_file:
       - .env.docker
     depends_on:

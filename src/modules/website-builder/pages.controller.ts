@@ -2,6 +2,8 @@ import {
   Controller,
   Get,
   Patch,
+  Post,
+  Delete,
   Param,
   Body,
   UseGuards,
@@ -16,6 +18,7 @@ import {
 } from '@nestjs/swagger';
 import { PagesService } from './pages.service';
 import { UpdatePageDto } from './dto/update-page.dto';
+import { CreatePageDto } from './dto/create-page.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { TenantGuard } from '../../common/guards/tenant.guard';
 import { PermissionsGuard } from '../../common/guards/permissions.guard';
@@ -86,5 +89,28 @@ export class PagesController {
       throw new BadRequestException('No business context');
     }
     return this.pagesService.update(user.businessId, pageId, dto);
+  }
+
+  @Post()
+  @ApiOperation({ summary: 'Create a new custom page' })
+  @ApiResponse({ status: 201, description: 'Page created successfully' })
+  async create(@CurrentUser() user: UserPayload, @Body() dto: CreatePageDto) {
+    if (!user.businessId) {
+      throw new BadRequestException('No business context');
+    }
+    return this.pagesService.create(user.businessId, dto);
+  }
+
+  @Delete(':pageId')
+  @ApiOperation({ summary: 'Delete a custom page' })
+  @ApiResponse({ status: 200, description: 'Page deleted successfully' })
+  async remove(
+    @CurrentUser() user: UserPayload,
+    @Param('pageId', ParseUUIDPipe) pageId: string,
+  ) {
+    if (!user.businessId) {
+      throw new BadRequestException('No business context');
+    }
+    return this.pagesService.remove(user.businessId, pageId);
   }
 }

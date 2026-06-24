@@ -28877,6 +28877,9 @@ export namespace Prisma {
     isPublished: boolean | null
     publishedVersion: number | null
     version: number | null
+    logoUrl: string | null
+    faviconUrl: string | null
+    logoAltText: string | null
     createdBy: string | null
     updatedBy: string | null
     createdAt: Date | null
@@ -28894,6 +28897,9 @@ export namespace Prisma {
     isPublished: boolean | null
     publishedVersion: number | null
     version: number | null
+    logoUrl: string | null
+    faviconUrl: string | null
+    logoAltText: string | null
     createdBy: string | null
     updatedBy: string | null
     createdAt: Date | null
@@ -28911,6 +28917,10 @@ export namespace Prisma {
     isPublished: number
     publishedVersion: number
     version: number
+    logoUrl: number
+    faviconUrl: number
+    logoAltText: number
+    socialLinksJson: number
     createdBy: number
     updatedBy: number
     createdAt: number
@@ -28940,6 +28950,9 @@ export namespace Prisma {
     isPublished?: true
     publishedVersion?: true
     version?: true
+    logoUrl?: true
+    faviconUrl?: true
+    logoAltText?: true
     createdBy?: true
     updatedBy?: true
     createdAt?: true
@@ -28957,6 +28970,9 @@ export namespace Prisma {
     isPublished?: true
     publishedVersion?: true
     version?: true
+    logoUrl?: true
+    faviconUrl?: true
+    logoAltText?: true
     createdBy?: true
     updatedBy?: true
     createdAt?: true
@@ -28974,6 +28990,10 @@ export namespace Prisma {
     isPublished?: true
     publishedVersion?: true
     version?: true
+    logoUrl?: true
+    faviconUrl?: true
+    logoAltText?: true
+    socialLinksJson?: true
     createdBy?: true
     updatedBy?: true
     createdAt?: true
@@ -29078,6 +29098,10 @@ export namespace Prisma {
     isPublished: boolean
     publishedVersion: number
     version: number
+    logoUrl: string | null
+    faviconUrl: string | null
+    logoAltText: string | null
+    socialLinksJson: JsonValue | null
     createdBy: string | null
     updatedBy: string | null
     createdAt: Date
@@ -29114,6 +29138,10 @@ export namespace Prisma {
     isPublished?: boolean
     publishedVersion?: boolean
     version?: boolean
+    logoUrl?: boolean
+    faviconUrl?: boolean
+    logoAltText?: boolean
+    socialLinksJson?: boolean
     createdBy?: boolean
     updatedBy?: boolean
     createdAt?: boolean
@@ -29138,6 +29166,10 @@ export namespace Prisma {
     isPublished?: boolean
     publishedVersion?: boolean
     version?: boolean
+    logoUrl?: boolean
+    faviconUrl?: boolean
+    logoAltText?: boolean
+    socialLinksJson?: boolean
     createdBy?: boolean
     updatedBy?: boolean
     createdAt?: boolean
@@ -29157,6 +29189,10 @@ export namespace Prisma {
     isPublished?: boolean
     publishedVersion?: boolean
     version?: boolean
+    logoUrl?: boolean
+    faviconUrl?: boolean
+    logoAltText?: boolean
+    socialLinksJson?: boolean
     createdBy?: boolean
     updatedBy?: boolean
     createdAt?: boolean
@@ -29176,6 +29212,10 @@ export namespace Prisma {
     isPublished?: boolean
     publishedVersion?: boolean
     version?: boolean
+    logoUrl?: boolean
+    faviconUrl?: boolean
+    logoAltText?: boolean
+    socialLinksJson?: boolean
     createdBy?: boolean
     updatedBy?: boolean
     createdAt?: boolean
@@ -29183,7 +29223,7 @@ export namespace Prisma {
     deletedAt?: boolean
   }
 
-  export type WebsiteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "businessId" | "themeId" | "subdomain" | "customDomain" | "domainStatus" | "isPublished" | "publishedVersion" | "version" | "createdBy" | "updatedBy" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["website"]>
+  export type WebsiteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "businessId" | "themeId" | "subdomain" | "customDomain" | "domainStatus" | "isPublished" | "publishedVersion" | "version" | "logoUrl" | "faviconUrl" | "logoAltText" | "socialLinksJson" | "createdBy" | "updatedBy" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["website"]>
   export type WebsiteInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     business?: boolean | BusinessDefaultArgs<ExtArgs>
     theme?: boolean | ThemeDefaultArgs<ExtArgs>
@@ -29222,6 +29262,10 @@ export namespace Prisma {
       isPublished: boolean
       publishedVersion: number
       version: number
+      logoUrl: string | null
+      faviconUrl: string | null
+      logoAltText: string | null
+      socialLinksJson: Prisma.JsonValue | null
       createdBy: string | null
       updatedBy: string | null
       createdAt: Date
@@ -29665,6 +29709,10 @@ export namespace Prisma {
     readonly isPublished: FieldRef<"Website", 'Boolean'>
     readonly publishedVersion: FieldRef<"Website", 'Int'>
     readonly version: FieldRef<"Website", 'Int'>
+    readonly logoUrl: FieldRef<"Website", 'String'>
+    readonly faviconUrl: FieldRef<"Website", 'String'>
+    readonly logoAltText: FieldRef<"Website", 'String'>
+    readonly socialLinksJson: FieldRef<"Website", 'Json'>
     readonly createdBy: FieldRef<"Website", 'String'>
     readonly updatedBy: FieldRef<"Website", 'String'>
     readonly createdAt: FieldRef<"Website", 'DateTime'>
@@ -30191,8 +30239,18 @@ export namespace Prisma {
 
   export type AggregatePage = {
     _count: PageCountAggregateOutputType | null
+    _avg: PageAvgAggregateOutputType | null
+    _sum: PageSumAggregateOutputType | null
     _min: PageMinAggregateOutputType | null
     _max: PageMaxAggregateOutputType | null
+  }
+
+  export type PageAvgAggregateOutputType = {
+    sortOrder: number | null
+  }
+
+  export type PageSumAggregateOutputType = {
+    sortOrder: number | null
   }
 
   export type PageMinAggregateOutputType = {
@@ -30202,6 +30260,7 @@ export namespace Prisma {
     slug: string | null
     type: string | null
     isPublished: boolean | null
+    sortOrder: number | null
     seoTitle: string | null
     seoDescription: string | null
     seoOgImage: string | null
@@ -30217,6 +30276,7 @@ export namespace Prisma {
     slug: string | null
     type: string | null
     isPublished: boolean | null
+    sortOrder: number | null
     seoTitle: string | null
     seoDescription: string | null
     seoOgImage: string | null
@@ -30233,6 +30293,7 @@ export namespace Prisma {
     type: number
     contentJson: number
     isPublished: number
+    sortOrder: number
     seoTitle: number
     seoDescription: number
     seoOgImage: number
@@ -30243,6 +30304,14 @@ export namespace Prisma {
   }
 
 
+  export type PageAvgAggregateInputType = {
+    sortOrder?: true
+  }
+
+  export type PageSumAggregateInputType = {
+    sortOrder?: true
+  }
+
   export type PageMinAggregateInputType = {
     id?: true
     websiteId?: true
@@ -30250,6 +30319,7 @@ export namespace Prisma {
     slug?: true
     type?: true
     isPublished?: true
+    sortOrder?: true
     seoTitle?: true
     seoDescription?: true
     seoOgImage?: true
@@ -30265,6 +30335,7 @@ export namespace Prisma {
     slug?: true
     type?: true
     isPublished?: true
+    sortOrder?: true
     seoTitle?: true
     seoDescription?: true
     seoOgImage?: true
@@ -30281,6 +30352,7 @@ export namespace Prisma {
     type?: true
     contentJson?: true
     isPublished?: true
+    sortOrder?: true
     seoTitle?: true
     seoDescription?: true
     seoOgImage?: true
@@ -30328,6 +30400,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: PageAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: PageSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: PageMinAggregateInputType
@@ -30358,6 +30442,8 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: PageCountAggregateInputType | true
+    _avg?: PageAvgAggregateInputType
+    _sum?: PageSumAggregateInputType
     _min?: PageMinAggregateInputType
     _max?: PageMaxAggregateInputType
   }
@@ -30370,6 +30456,7 @@ export namespace Prisma {
     type: string
     contentJson: JsonValue
     isPublished: boolean
+    sortOrder: number
     seoTitle: string | null
     seoDescription: string | null
     seoOgImage: string | null
@@ -30377,6 +30464,8 @@ export namespace Prisma {
     updatedAt: Date
     deletedAt: Date | null
     _count: PageCountAggregateOutputType | null
+    _avg: PageAvgAggregateOutputType | null
+    _sum: PageSumAggregateOutputType | null
     _min: PageMinAggregateOutputType | null
     _max: PageMaxAggregateOutputType | null
   }
@@ -30403,6 +30492,7 @@ export namespace Prisma {
     type?: boolean
     contentJson?: boolean
     isPublished?: boolean
+    sortOrder?: boolean
     seoTitle?: boolean
     seoDescription?: boolean
     seoOgImage?: boolean
@@ -30420,6 +30510,7 @@ export namespace Prisma {
     type?: boolean
     contentJson?: boolean
     isPublished?: boolean
+    sortOrder?: boolean
     seoTitle?: boolean
     seoDescription?: boolean
     seoOgImage?: boolean
@@ -30437,6 +30528,7 @@ export namespace Prisma {
     type?: boolean
     contentJson?: boolean
     isPublished?: boolean
+    sortOrder?: boolean
     seoTitle?: boolean
     seoDescription?: boolean
     seoOgImage?: boolean
@@ -30454,6 +30546,7 @@ export namespace Prisma {
     type?: boolean
     contentJson?: boolean
     isPublished?: boolean
+    sortOrder?: boolean
     seoTitle?: boolean
     seoDescription?: boolean
     seoOgImage?: boolean
@@ -30462,7 +30555,7 @@ export namespace Prisma {
     deletedAt?: boolean
   }
 
-  export type PageOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "websiteId" | "title" | "slug" | "type" | "contentJson" | "isPublished" | "seoTitle" | "seoDescription" | "seoOgImage" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["page"]>
+  export type PageOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "websiteId" | "title" | "slug" | "type" | "contentJson" | "isPublished" | "sortOrder" | "seoTitle" | "seoDescription" | "seoOgImage" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["page"]>
   export type PageInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     website?: boolean | WebsiteDefaultArgs<ExtArgs>
   }
@@ -30486,6 +30579,7 @@ export namespace Prisma {
       type: string
       contentJson: Prisma.JsonValue
       isPublished: boolean
+      sortOrder: number
       seoTitle: string | null
       seoDescription: string | null
       seoOgImage: string | null
@@ -30923,6 +31017,7 @@ export namespace Prisma {
     readonly type: FieldRef<"Page", 'String'>
     readonly contentJson: FieldRef<"Page", 'Json'>
     readonly isPublished: FieldRef<"Page", 'Boolean'>
+    readonly sortOrder: FieldRef<"Page", 'Int'>
     readonly seoTitle: FieldRef<"Page", 'String'>
     readonly seoDescription: FieldRef<"Page", 'String'>
     readonly seoOgImage: FieldRef<"Page", 'String'>
@@ -51418,6 +51513,10 @@ export namespace Prisma {
     isPublished: 'isPublished',
     publishedVersion: 'publishedVersion',
     version: 'version',
+    logoUrl: 'logoUrl',
+    faviconUrl: 'faviconUrl',
+    logoAltText: 'logoAltText',
+    socialLinksJson: 'socialLinksJson',
     createdBy: 'createdBy',
     updatedBy: 'updatedBy',
     createdAt: 'createdAt',
@@ -51436,6 +51535,7 @@ export namespace Prisma {
     type: 'type',
     contentJson: 'contentJson',
     isPublished: 'isPublished',
+    sortOrder: 'sortOrder',
     seoTitle: 'seoTitle',
     seoDescription: 'seoDescription',
     seoOgImage: 'seoOgImage',
@@ -53945,6 +54045,10 @@ export namespace Prisma {
     isPublished?: BoolFilter<"Website"> | boolean
     publishedVersion?: IntFilter<"Website"> | number
     version?: IntFilter<"Website"> | number
+    logoUrl?: StringNullableFilter<"Website"> | string | null
+    faviconUrl?: StringNullableFilter<"Website"> | string | null
+    logoAltText?: StringNullableFilter<"Website"> | string | null
+    socialLinksJson?: JsonNullableFilter<"Website">
     createdBy?: UuidNullableFilter<"Website"> | string | null
     updatedBy?: UuidNullableFilter<"Website"> | string | null
     createdAt?: DateTimeFilter<"Website"> | Date | string
@@ -53968,6 +54072,10 @@ export namespace Prisma {
     isPublished?: SortOrder
     publishedVersion?: SortOrder
     version?: SortOrder
+    logoUrl?: SortOrderInput | SortOrder
+    faviconUrl?: SortOrderInput | SortOrder
+    logoAltText?: SortOrderInput | SortOrder
+    socialLinksJson?: SortOrderInput | SortOrder
     createdBy?: SortOrderInput | SortOrder
     updatedBy?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -53994,6 +54102,10 @@ export namespace Prisma {
     isPublished?: BoolFilter<"Website"> | boolean
     publishedVersion?: IntFilter<"Website"> | number
     version?: IntFilter<"Website"> | number
+    logoUrl?: StringNullableFilter<"Website"> | string | null
+    faviconUrl?: StringNullableFilter<"Website"> | string | null
+    logoAltText?: StringNullableFilter<"Website"> | string | null
+    socialLinksJson?: JsonNullableFilter<"Website">
     createdBy?: UuidNullableFilter<"Website"> | string | null
     updatedBy?: UuidNullableFilter<"Website"> | string | null
     createdAt?: DateTimeFilter<"Website"> | Date | string
@@ -54017,6 +54129,10 @@ export namespace Prisma {
     isPublished?: SortOrder
     publishedVersion?: SortOrder
     version?: SortOrder
+    logoUrl?: SortOrderInput | SortOrder
+    faviconUrl?: SortOrderInput | SortOrder
+    logoAltText?: SortOrderInput | SortOrder
+    socialLinksJson?: SortOrderInput | SortOrder
     createdBy?: SortOrderInput | SortOrder
     updatedBy?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -54042,6 +54158,10 @@ export namespace Prisma {
     isPublished?: BoolWithAggregatesFilter<"Website"> | boolean
     publishedVersion?: IntWithAggregatesFilter<"Website"> | number
     version?: IntWithAggregatesFilter<"Website"> | number
+    logoUrl?: StringNullableWithAggregatesFilter<"Website"> | string | null
+    faviconUrl?: StringNullableWithAggregatesFilter<"Website"> | string | null
+    logoAltText?: StringNullableWithAggregatesFilter<"Website"> | string | null
+    socialLinksJson?: JsonNullableWithAggregatesFilter<"Website">
     createdBy?: UuidNullableWithAggregatesFilter<"Website"> | string | null
     updatedBy?: UuidNullableWithAggregatesFilter<"Website"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Website"> | Date | string
@@ -54060,6 +54180,7 @@ export namespace Prisma {
     type?: StringFilter<"Page"> | string
     contentJson?: JsonFilter<"Page">
     isPublished?: BoolFilter<"Page"> | boolean
+    sortOrder?: IntFilter<"Page"> | number
     seoTitle?: StringNullableFilter<"Page"> | string | null
     seoDescription?: StringNullableFilter<"Page"> | string | null
     seoOgImage?: StringNullableFilter<"Page"> | string | null
@@ -54077,6 +54198,7 @@ export namespace Prisma {
     type?: SortOrder
     contentJson?: SortOrder
     isPublished?: SortOrder
+    sortOrder?: SortOrder
     seoTitle?: SortOrderInput | SortOrder
     seoDescription?: SortOrderInput | SortOrder
     seoOgImage?: SortOrderInput | SortOrder
@@ -54098,6 +54220,7 @@ export namespace Prisma {
     type?: StringFilter<"Page"> | string
     contentJson?: JsonFilter<"Page">
     isPublished?: BoolFilter<"Page"> | boolean
+    sortOrder?: IntFilter<"Page"> | number
     seoTitle?: StringNullableFilter<"Page"> | string | null
     seoDescription?: StringNullableFilter<"Page"> | string | null
     seoOgImage?: StringNullableFilter<"Page"> | string | null
@@ -54115,6 +54238,7 @@ export namespace Prisma {
     type?: SortOrder
     contentJson?: SortOrder
     isPublished?: SortOrder
+    sortOrder?: SortOrder
     seoTitle?: SortOrderInput | SortOrder
     seoDescription?: SortOrderInput | SortOrder
     seoOgImage?: SortOrderInput | SortOrder
@@ -54122,8 +54246,10 @@ export namespace Prisma {
     updatedAt?: SortOrder
     deletedAt?: SortOrderInput | SortOrder
     _count?: PageCountOrderByAggregateInput
+    _avg?: PageAvgOrderByAggregateInput
     _max?: PageMaxOrderByAggregateInput
     _min?: PageMinOrderByAggregateInput
+    _sum?: PageSumOrderByAggregateInput
   }
 
   export type PageScalarWhereWithAggregatesInput = {
@@ -54137,6 +54263,7 @@ export namespace Prisma {
     type?: StringWithAggregatesFilter<"Page"> | string
     contentJson?: JsonWithAggregatesFilter<"Page">
     isPublished?: BoolWithAggregatesFilter<"Page"> | boolean
+    sortOrder?: IntWithAggregatesFilter<"Page"> | number
     seoTitle?: StringNullableWithAggregatesFilter<"Page"> | string | null
     seoDescription?: StringNullableWithAggregatesFilter<"Page"> | string | null
     seoOgImage?: StringNullableWithAggregatesFilter<"Page"> | string | null
@@ -57619,6 +57746,10 @@ export namespace Prisma {
     isPublished?: boolean
     publishedVersion?: number
     version?: number
+    logoUrl?: string | null
+    faviconUrl?: string | null
+    logoAltText?: string | null
+    socialLinksJson?: NullableJsonNullValueInput | InputJsonValue
     createdBy?: string | null
     updatedBy?: string | null
     createdAt?: Date | string
@@ -57642,6 +57773,10 @@ export namespace Prisma {
     isPublished?: boolean
     publishedVersion?: number
     version?: number
+    logoUrl?: string | null
+    faviconUrl?: string | null
+    logoAltText?: string | null
+    socialLinksJson?: NullableJsonNullValueInput | InputJsonValue
     createdBy?: string | null
     updatedBy?: string | null
     createdAt?: Date | string
@@ -57661,6 +57796,10 @@ export namespace Prisma {
     isPublished?: BoolFieldUpdateOperationsInput | boolean
     publishedVersion?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    faviconUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    logoAltText?: NullableStringFieldUpdateOperationsInput | string | null
+    socialLinksJson?: NullableJsonNullValueInput | InputJsonValue
     createdBy?: NullableStringFieldUpdateOperationsInput | string | null
     updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -57684,6 +57823,10 @@ export namespace Prisma {
     isPublished?: BoolFieldUpdateOperationsInput | boolean
     publishedVersion?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    faviconUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    logoAltText?: NullableStringFieldUpdateOperationsInput | string | null
+    socialLinksJson?: NullableJsonNullValueInput | InputJsonValue
     createdBy?: NullableStringFieldUpdateOperationsInput | string | null
     updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -57705,6 +57848,10 @@ export namespace Prisma {
     isPublished?: boolean
     publishedVersion?: number
     version?: number
+    logoUrl?: string | null
+    faviconUrl?: string | null
+    logoAltText?: string | null
+    socialLinksJson?: NullableJsonNullValueInput | InputJsonValue
     createdBy?: string | null
     updatedBy?: string | null
     createdAt?: Date | string
@@ -57720,6 +57867,10 @@ export namespace Prisma {
     isPublished?: BoolFieldUpdateOperationsInput | boolean
     publishedVersion?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    faviconUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    logoAltText?: NullableStringFieldUpdateOperationsInput | string | null
+    socialLinksJson?: NullableJsonNullValueInput | InputJsonValue
     createdBy?: NullableStringFieldUpdateOperationsInput | string | null
     updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -57737,6 +57888,10 @@ export namespace Prisma {
     isPublished?: BoolFieldUpdateOperationsInput | boolean
     publishedVersion?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    faviconUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    logoAltText?: NullableStringFieldUpdateOperationsInput | string | null
+    socialLinksJson?: NullableJsonNullValueInput | InputJsonValue
     createdBy?: NullableStringFieldUpdateOperationsInput | string | null
     updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -57751,6 +57906,7 @@ export namespace Prisma {
     type: string
     contentJson: JsonNullValueInput | InputJsonValue
     isPublished?: boolean
+    sortOrder?: number
     seoTitle?: string | null
     seoDescription?: string | null
     seoOgImage?: string | null
@@ -57768,6 +57924,7 @@ export namespace Prisma {
     type: string
     contentJson: JsonNullValueInput | InputJsonValue
     isPublished?: boolean
+    sortOrder?: number
     seoTitle?: string | null
     seoDescription?: string | null
     seoOgImage?: string | null
@@ -57783,6 +57940,7 @@ export namespace Prisma {
     type?: StringFieldUpdateOperationsInput | string
     contentJson?: JsonNullValueInput | InputJsonValue
     isPublished?: BoolFieldUpdateOperationsInput | boolean
+    sortOrder?: IntFieldUpdateOperationsInput | number
     seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
     seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
     seoOgImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -57800,6 +57958,7 @@ export namespace Prisma {
     type?: StringFieldUpdateOperationsInput | string
     contentJson?: JsonNullValueInput | InputJsonValue
     isPublished?: BoolFieldUpdateOperationsInput | boolean
+    sortOrder?: IntFieldUpdateOperationsInput | number
     seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
     seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
     seoOgImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -57816,6 +57975,7 @@ export namespace Prisma {
     type: string
     contentJson: JsonNullValueInput | InputJsonValue
     isPublished?: boolean
+    sortOrder?: number
     seoTitle?: string | null
     seoDescription?: string | null
     seoOgImage?: string | null
@@ -57831,6 +57991,7 @@ export namespace Prisma {
     type?: StringFieldUpdateOperationsInput | string
     contentJson?: JsonNullValueInput | InputJsonValue
     isPublished?: BoolFieldUpdateOperationsInput | boolean
+    sortOrder?: IntFieldUpdateOperationsInput | number
     seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
     seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
     seoOgImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -57847,6 +58008,7 @@ export namespace Prisma {
     type?: StringFieldUpdateOperationsInput | string
     contentJson?: JsonNullValueInput | InputJsonValue
     isPublished?: BoolFieldUpdateOperationsInput | boolean
+    sortOrder?: IntFieldUpdateOperationsInput | number
     seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
     seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
     seoOgImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -61176,6 +61338,29 @@ export namespace Prisma {
     notIn?: $Enums.DomainStatus[] | ListEnumDomainStatusFieldRefInput<$PrismaModel>
     not?: NestedEnumDomainStatusFilter<$PrismaModel> | $Enums.DomainStatus
   }
+  export type JsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
 
   export type ThemeScalarRelationFilter = {
     is?: ThemeWhereInput
@@ -61222,6 +61407,10 @@ export namespace Prisma {
     isPublished?: SortOrder
     publishedVersion?: SortOrder
     version?: SortOrder
+    logoUrl?: SortOrder
+    faviconUrl?: SortOrder
+    logoAltText?: SortOrder
+    socialLinksJson?: SortOrder
     createdBy?: SortOrder
     updatedBy?: SortOrder
     createdAt?: SortOrder
@@ -61244,6 +61433,9 @@ export namespace Prisma {
     isPublished?: SortOrder
     publishedVersion?: SortOrder
     version?: SortOrder
+    logoUrl?: SortOrder
+    faviconUrl?: SortOrder
+    logoAltText?: SortOrder
     createdBy?: SortOrder
     updatedBy?: SortOrder
     createdAt?: SortOrder
@@ -61261,6 +61453,9 @@ export namespace Prisma {
     isPublished?: SortOrder
     publishedVersion?: SortOrder
     version?: SortOrder
+    logoUrl?: SortOrder
+    faviconUrl?: SortOrder
+    logoAltText?: SortOrder
     createdBy?: SortOrder
     updatedBy?: SortOrder
     createdAt?: SortOrder
@@ -61282,6 +61477,32 @@ export namespace Prisma {
     _min?: NestedEnumDomainStatusFilter<$PrismaModel>
     _max?: NestedEnumDomainStatusFilter<$PrismaModel>
   }
+  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedJsonNullableFilter<$PrismaModel>
+    _max?: NestedJsonNullableFilter<$PrismaModel>
+  }
 
   export type WebsiteScalarRelationFilter = {
     is?: WebsiteWhereInput
@@ -61301,12 +61522,17 @@ export namespace Prisma {
     type?: SortOrder
     contentJson?: SortOrder
     isPublished?: SortOrder
+    sortOrder?: SortOrder
     seoTitle?: SortOrder
     seoDescription?: SortOrder
     seoOgImage?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     deletedAt?: SortOrder
+  }
+
+  export type PageAvgOrderByAggregateInput = {
+    sortOrder?: SortOrder
   }
 
   export type PageMaxOrderByAggregateInput = {
@@ -61316,6 +61542,7 @@ export namespace Prisma {
     slug?: SortOrder
     type?: SortOrder
     isPublished?: SortOrder
+    sortOrder?: SortOrder
     seoTitle?: SortOrder
     seoDescription?: SortOrder
     seoOgImage?: SortOrder
@@ -61331,12 +61558,17 @@ export namespace Prisma {
     slug?: SortOrder
     type?: SortOrder
     isPublished?: SortOrder
+    sortOrder?: SortOrder
     seoTitle?: SortOrder
     seoDescription?: SortOrder
     seoOgImage?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     deletedAt?: SortOrder
+  }
+
+  export type PageSumOrderByAggregateInput = {
+    sortOrder?: SortOrder
   }
 
   export type ThemeCountOrderByAggregateInput = {
@@ -61513,29 +61745,6 @@ export namespace Prisma {
     _min?: NestedEnumWebhookStatusFilter<$PrismaModel>
     _max?: NestedEnumWebhookStatusFilter<$PrismaModel>
   }
-  export type JsonNullableFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonNullableFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonNullableFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-  }
 
   export type AuditLogCountOrderByAggregateInput = {
     id?: SortOrder
@@ -61566,32 +61775,6 @@ export namespace Prisma {
     entity?: SortOrder
     entityId?: SortOrder
     createdAt?: SortOrder
-  }
-  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedJsonNullableFilter<$PrismaModel>
-    _max?: NestedJsonNullableFilter<$PrismaModel>
   }
 
   export type EnumNotificationChannelFilter<$PrismaModel = never> = {
@@ -66103,23 +66286,6 @@ export namespace Prisma {
     _min?: NestedEnumDomainStatusFilter<$PrismaModel>
     _max?: NestedEnumDomainStatusFilter<$PrismaModel>
   }
-
-  export type NestedEnumWebhookStatusFilter<$PrismaModel = never> = {
-    equals?: $Enums.WebhookStatus | EnumWebhookStatusFieldRefInput<$PrismaModel>
-    in?: $Enums.WebhookStatus[] | ListEnumWebhookStatusFieldRefInput<$PrismaModel>
-    notIn?: $Enums.WebhookStatus[] | ListEnumWebhookStatusFieldRefInput<$PrismaModel>
-    not?: NestedEnumWebhookStatusFilter<$PrismaModel> | $Enums.WebhookStatus
-  }
-
-  export type NestedEnumWebhookStatusWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.WebhookStatus | EnumWebhookStatusFieldRefInput<$PrismaModel>
-    in?: $Enums.WebhookStatus[] | ListEnumWebhookStatusFieldRefInput<$PrismaModel>
-    notIn?: $Enums.WebhookStatus[] | ListEnumWebhookStatusFieldRefInput<$PrismaModel>
-    not?: NestedEnumWebhookStatusWithAggregatesFilter<$PrismaModel> | $Enums.WebhookStatus
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumWebhookStatusFilter<$PrismaModel>
-    _max?: NestedEnumWebhookStatusFilter<$PrismaModel>
-  }
   export type NestedJsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
@@ -66142,6 +66308,23 @@ export namespace Prisma {
     gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type NestedEnumWebhookStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.WebhookStatus | EnumWebhookStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.WebhookStatus[] | ListEnumWebhookStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.WebhookStatus[] | ListEnumWebhookStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumWebhookStatusFilter<$PrismaModel> | $Enums.WebhookStatus
+  }
+
+  export type NestedEnumWebhookStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.WebhookStatus | EnumWebhookStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.WebhookStatus[] | ListEnumWebhookStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.WebhookStatus[] | ListEnumWebhookStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumWebhookStatusWithAggregatesFilter<$PrismaModel> | $Enums.WebhookStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumWebhookStatusFilter<$PrismaModel>
+    _max?: NestedEnumWebhookStatusFilter<$PrismaModel>
   }
 
   export type NestedEnumNotificationChannelFilter<$PrismaModel = never> = {
@@ -67449,6 +67632,10 @@ export namespace Prisma {
     isPublished?: boolean
     publishedVersion?: number
     version?: number
+    logoUrl?: string | null
+    faviconUrl?: string | null
+    logoAltText?: string | null
+    socialLinksJson?: NullableJsonNullValueInput | InputJsonValue
     createdBy?: string | null
     updatedBy?: string | null
     createdAt?: Date | string
@@ -67470,6 +67657,10 @@ export namespace Prisma {
     isPublished?: boolean
     publishedVersion?: number
     version?: number
+    logoUrl?: string | null
+    faviconUrl?: string | null
+    logoAltText?: string | null
+    socialLinksJson?: NullableJsonNullValueInput | InputJsonValue
     createdBy?: string | null
     updatedBy?: string | null
     createdAt?: Date | string
@@ -68368,6 +68559,10 @@ export namespace Prisma {
     isPublished?: BoolFilter<"Website"> | boolean
     publishedVersion?: IntFilter<"Website"> | number
     version?: IntFilter<"Website"> | number
+    logoUrl?: StringNullableFilter<"Website"> | string | null
+    faviconUrl?: StringNullableFilter<"Website"> | string | null
+    logoAltText?: StringNullableFilter<"Website"> | string | null
+    socialLinksJson?: JsonNullableFilter<"Website">
     createdBy?: UuidNullableFilter<"Website"> | string | null
     updatedBy?: UuidNullableFilter<"Website"> | string | null
     createdAt?: DateTimeFilter<"Website"> | Date | string
@@ -73814,6 +74009,7 @@ export namespace Prisma {
     type: string
     contentJson: JsonNullValueInput | InputJsonValue
     isPublished?: boolean
+    sortOrder?: number
     seoTitle?: string | null
     seoDescription?: string | null
     seoOgImage?: string | null
@@ -73829,6 +74025,7 @@ export namespace Prisma {
     type: string
     contentJson: JsonNullValueInput | InputJsonValue
     isPublished?: boolean
+    sortOrder?: number
     seoTitle?: string | null
     seoDescription?: string | null
     seoOgImage?: string | null
@@ -74122,6 +74319,7 @@ export namespace Prisma {
     type?: StringFilter<"Page"> | string
     contentJson?: JsonFilter<"Page">
     isPublished?: BoolFilter<"Page"> | boolean
+    sortOrder?: IntFilter<"Page"> | number
     seoTitle?: StringNullableFilter<"Page"> | string | null
     seoDescription?: StringNullableFilter<"Page"> | string | null
     seoOgImage?: StringNullableFilter<"Page"> | string | null
@@ -74217,6 +74415,10 @@ export namespace Prisma {
     isPublished?: boolean
     publishedVersion?: number
     version?: number
+    logoUrl?: string | null
+    faviconUrl?: string | null
+    logoAltText?: string | null
+    socialLinksJson?: NullableJsonNullValueInput | InputJsonValue
     createdBy?: string | null
     updatedBy?: string | null
     createdAt?: Date | string
@@ -74239,6 +74441,10 @@ export namespace Prisma {
     isPublished?: boolean
     publishedVersion?: number
     version?: number
+    logoUrl?: string | null
+    faviconUrl?: string | null
+    logoAltText?: string | null
+    socialLinksJson?: NullableJsonNullValueInput | InputJsonValue
     createdBy?: string | null
     updatedBy?: string | null
     createdAt?: Date | string
@@ -74273,6 +74479,10 @@ export namespace Prisma {
     isPublished?: BoolFieldUpdateOperationsInput | boolean
     publishedVersion?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    faviconUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    logoAltText?: NullableStringFieldUpdateOperationsInput | string | null
+    socialLinksJson?: NullableJsonNullValueInput | InputJsonValue
     createdBy?: NullableStringFieldUpdateOperationsInput | string | null
     updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -74295,6 +74505,10 @@ export namespace Prisma {
     isPublished?: BoolFieldUpdateOperationsInput | boolean
     publishedVersion?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    faviconUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    logoAltText?: NullableStringFieldUpdateOperationsInput | string | null
+    socialLinksJson?: NullableJsonNullValueInput | InputJsonValue
     createdBy?: NullableStringFieldUpdateOperationsInput | string | null
     updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -74408,6 +74622,10 @@ export namespace Prisma {
     isPublished?: boolean
     publishedVersion?: number
     version?: number
+    logoUrl?: string | null
+    faviconUrl?: string | null
+    logoAltText?: string | null
+    socialLinksJson?: NullableJsonNullValueInput | InputJsonValue
     createdBy?: string | null
     updatedBy?: string | null
     createdAt?: Date | string
@@ -74429,6 +74647,10 @@ export namespace Prisma {
     isPublished?: boolean
     publishedVersion?: number
     version?: number
+    logoUrl?: string | null
+    faviconUrl?: string | null
+    logoAltText?: string | null
+    socialLinksJson?: NullableJsonNullValueInput | InputJsonValue
     createdBy?: string | null
     updatedBy?: string | null
     createdAt?: Date | string
@@ -74575,6 +74797,10 @@ export namespace Prisma {
     isPublished?: boolean
     publishedVersion?: number
     version?: number
+    logoUrl?: string | null
+    faviconUrl?: string | null
+    logoAltText?: string | null
+    socialLinksJson?: NullableJsonNullValueInput | InputJsonValue
     createdBy?: string | null
     updatedBy?: string | null
     createdAt?: Date | string
@@ -74597,6 +74823,10 @@ export namespace Prisma {
     isPublished?: boolean
     publishedVersion?: number
     version?: number
+    logoUrl?: string | null
+    faviconUrl?: string | null
+    logoAltText?: string | null
+    socialLinksJson?: NullableJsonNullValueInput | InputJsonValue
     createdBy?: string | null
     updatedBy?: string | null
     createdAt?: Date | string
@@ -74631,6 +74861,10 @@ export namespace Prisma {
     isPublished?: BoolFieldUpdateOperationsInput | boolean
     publishedVersion?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    faviconUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    logoAltText?: NullableStringFieldUpdateOperationsInput | string | null
+    socialLinksJson?: NullableJsonNullValueInput | InputJsonValue
     createdBy?: NullableStringFieldUpdateOperationsInput | string | null
     updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -74653,6 +74887,10 @@ export namespace Prisma {
     isPublished?: BoolFieldUpdateOperationsInput | boolean
     publishedVersion?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    faviconUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    logoAltText?: NullableStringFieldUpdateOperationsInput | string | null
+    socialLinksJson?: NullableJsonNullValueInput | InputJsonValue
     createdBy?: NullableStringFieldUpdateOperationsInput | string | null
     updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -74671,6 +74909,10 @@ export namespace Prisma {
     isPublished?: boolean
     publishedVersion?: number
     version?: number
+    logoUrl?: string | null
+    faviconUrl?: string | null
+    logoAltText?: string | null
+    socialLinksJson?: NullableJsonNullValueInput | InputJsonValue
     createdBy?: string | null
     updatedBy?: string | null
     createdAt?: Date | string
@@ -74693,6 +74935,10 @@ export namespace Prisma {
     isPublished?: boolean
     publishedVersion?: number
     version?: number
+    logoUrl?: string | null
+    faviconUrl?: string | null
+    logoAltText?: string | null
+    socialLinksJson?: NullableJsonNullValueInput | InputJsonValue
     createdBy?: string | null
     updatedBy?: string | null
     createdAt?: Date | string
@@ -74727,6 +74973,10 @@ export namespace Prisma {
     isPublished?: BoolFieldUpdateOperationsInput | boolean
     publishedVersion?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    faviconUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    logoAltText?: NullableStringFieldUpdateOperationsInput | string | null
+    socialLinksJson?: NullableJsonNullValueInput | InputJsonValue
     createdBy?: NullableStringFieldUpdateOperationsInput | string | null
     updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -74749,6 +74999,10 @@ export namespace Prisma {
     isPublished?: BoolFieldUpdateOperationsInput | boolean
     publishedVersion?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    faviconUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    logoAltText?: NullableStringFieldUpdateOperationsInput | string | null
+    socialLinksJson?: NullableJsonNullValueInput | InputJsonValue
     createdBy?: NullableStringFieldUpdateOperationsInput | string | null
     updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -77502,6 +77756,10 @@ export namespace Prisma {
     isPublished?: boolean
     publishedVersion?: number
     version?: number
+    logoUrl?: string | null
+    faviconUrl?: string | null
+    logoAltText?: string | null
+    socialLinksJson?: NullableJsonNullValueInput | InputJsonValue
     createdBy?: string | null
     updatedBy?: string | null
     createdAt?: Date | string
@@ -77524,6 +77782,10 @@ export namespace Prisma {
     isPublished?: boolean
     publishedVersion?: number
     version?: number
+    logoUrl?: string | null
+    faviconUrl?: string | null
+    logoAltText?: string | null
+    socialLinksJson?: NullableJsonNullValueInput | InputJsonValue
     createdBy?: string | null
     updatedBy?: string | null
     createdAt?: Date | string
@@ -77659,6 +77921,10 @@ export namespace Prisma {
     isPublished?: BoolFieldUpdateOperationsInput | boolean
     publishedVersion?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    faviconUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    logoAltText?: NullableStringFieldUpdateOperationsInput | string | null
+    socialLinksJson?: NullableJsonNullValueInput | InputJsonValue
     createdBy?: NullableStringFieldUpdateOperationsInput | string | null
     updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -77681,6 +77947,10 @@ export namespace Prisma {
     isPublished?: BoolFieldUpdateOperationsInput | boolean
     publishedVersion?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    faviconUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    logoAltText?: NullableStringFieldUpdateOperationsInput | string | null
+    socialLinksJson?: NullableJsonNullValueInput | InputJsonValue
     createdBy?: NullableStringFieldUpdateOperationsInput | string | null
     updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -78028,6 +78298,10 @@ export namespace Prisma {
     isPublished?: boolean
     publishedVersion?: number
     version?: number
+    logoUrl?: string | null
+    faviconUrl?: string | null
+    logoAltText?: string | null
+    socialLinksJson?: NullableJsonNullValueInput | InputJsonValue
     createdBy?: string | null
     updatedBy?: string | null
     createdAt?: Date | string
@@ -78761,6 +79035,10 @@ export namespace Prisma {
     isPublished?: BoolFieldUpdateOperationsInput | boolean
     publishedVersion?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    faviconUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    logoAltText?: NullableStringFieldUpdateOperationsInput | string | null
+    socialLinksJson?: NullableJsonNullValueInput | InputJsonValue
     createdBy?: NullableStringFieldUpdateOperationsInput | string | null
     updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -78782,6 +79060,10 @@ export namespace Prisma {
     isPublished?: BoolFieldUpdateOperationsInput | boolean
     publishedVersion?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    faviconUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    logoAltText?: NullableStringFieldUpdateOperationsInput | string | null
+    socialLinksJson?: NullableJsonNullValueInput | InputJsonValue
     createdBy?: NullableStringFieldUpdateOperationsInput | string | null
     updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -78802,6 +79084,10 @@ export namespace Prisma {
     isPublished?: BoolFieldUpdateOperationsInput | boolean
     publishedVersion?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    faviconUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    logoAltText?: NullableStringFieldUpdateOperationsInput | string | null
+    socialLinksJson?: NullableJsonNullValueInput | InputJsonValue
     createdBy?: NullableStringFieldUpdateOperationsInput | string | null
     updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -80434,6 +80720,7 @@ export namespace Prisma {
     type: string
     contentJson: JsonNullValueInput | InputJsonValue
     isPublished?: boolean
+    sortOrder?: number
     seoTitle?: string | null
     seoDescription?: string | null
     seoOgImage?: string | null
@@ -80487,6 +80774,7 @@ export namespace Prisma {
     type?: StringFieldUpdateOperationsInput | string
     contentJson?: JsonNullValueInput | InputJsonValue
     isPublished?: BoolFieldUpdateOperationsInput | boolean
+    sortOrder?: IntFieldUpdateOperationsInput | number
     seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
     seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
     seoOgImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -80502,6 +80790,7 @@ export namespace Prisma {
     type?: StringFieldUpdateOperationsInput | string
     contentJson?: JsonNullValueInput | InputJsonValue
     isPublished?: BoolFieldUpdateOperationsInput | boolean
+    sortOrder?: IntFieldUpdateOperationsInput | number
     seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
     seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
     seoOgImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -80517,6 +80806,7 @@ export namespace Prisma {
     type?: StringFieldUpdateOperationsInput | string
     contentJson?: JsonNullValueInput | InputJsonValue
     isPublished?: BoolFieldUpdateOperationsInput | boolean
+    sortOrder?: IntFieldUpdateOperationsInput | number
     seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
     seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
     seoOgImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -80648,6 +80938,10 @@ export namespace Prisma {
     isPublished?: boolean
     publishedVersion?: number
     version?: number
+    logoUrl?: string | null
+    faviconUrl?: string | null
+    logoAltText?: string | null
+    socialLinksJson?: NullableJsonNullValueInput | InputJsonValue
     createdBy?: string | null
     updatedBy?: string | null
     createdAt?: Date | string
@@ -80663,6 +80957,10 @@ export namespace Prisma {
     isPublished?: BoolFieldUpdateOperationsInput | boolean
     publishedVersion?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    faviconUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    logoAltText?: NullableStringFieldUpdateOperationsInput | string | null
+    socialLinksJson?: NullableJsonNullValueInput | InputJsonValue
     createdBy?: NullableStringFieldUpdateOperationsInput | string | null
     updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -80684,6 +80982,10 @@ export namespace Prisma {
     isPublished?: BoolFieldUpdateOperationsInput | boolean
     publishedVersion?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    faviconUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    logoAltText?: NullableStringFieldUpdateOperationsInput | string | null
+    socialLinksJson?: NullableJsonNullValueInput | InputJsonValue
     createdBy?: NullableStringFieldUpdateOperationsInput | string | null
     updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -80704,6 +81006,10 @@ export namespace Prisma {
     isPublished?: BoolFieldUpdateOperationsInput | boolean
     publishedVersion?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    faviconUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    logoAltText?: NullableStringFieldUpdateOperationsInput | string | null
+    socialLinksJson?: NullableJsonNullValueInput | InputJsonValue
     createdBy?: NullableStringFieldUpdateOperationsInput | string | null
     updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string

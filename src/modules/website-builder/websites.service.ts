@@ -71,23 +71,72 @@ export class WebsitesService {
           title: 'Home',
           slug: 'home',
           type: 'home',
+          sortOrder: 1,
           contentJson: [
             {
               id: 'hero-1',
               type: 'hero',
               title: `Welcome to ${business.name}`,
-              subtitle: 'Book your service online today.',
-              buttonText: 'Book Now',
+              subtitle:
+                'Experience premium treatments by certified professionals in a luxury sanctuary.',
+              buttonText: 'Book Appointment Now',
+              imageUrl:
+                'https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=1000',
             },
             {
               id: 'features-1',
               type: 'features',
-              title: 'Why Choose Us',
+              title: 'Why Choose Our Sanctuary',
               items: [
-                'Professional Staff',
-                'Premium Products',
-                'Comfortable Ambience',
+                'Certified Professionals & Stylists',
+                '100% Toxic-Free & Organic Products',
+                'Ultra-Hygienic & Premium Luxury Environment',
               ],
+            },
+            {
+              id: 'about-1',
+              type: 'about',
+              title: 'Our Story & Vision',
+              subtitle: 'Crafting beautiful experiences since 2018',
+              content:
+                'We believe in holistic wellness and modern beauty treatments. Our team of certified professional stylists and therapist experts are dedicated to pampering you and providing a personalized care program.',
+              imageUrl:
+                'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=1000',
+            },
+            {
+              id: 'services-1',
+              type: 'services',
+              title: 'Our Signature Treatments',
+              subtitle:
+                'Choose from our wide selection of hair, skin, spa, and beauty packages.',
+            },
+            {
+              id: 'reviews-1',
+              type: 'reviews',
+              title: 'What Our Clients Say',
+              subtitle:
+                'Read feedback from verified appointments and salon regulars.',
+              items: [
+                {
+                  name: 'Ananya Iyer',
+                  rating: 5,
+                  comment:
+                    'Absolutely stellar haircut and coloring session. Staff is extremely gentle and professional!',
+                },
+                {
+                  name: 'Vikram Sen',
+                  rating: 5,
+                  comment:
+                    'Very clean spa space and relaxing massage. The online booking confirmation via WhatsApp is very convenient.',
+                },
+              ],
+            },
+            {
+              id: 'contact-1',
+              type: 'contact',
+              title: 'Visit Our Salon',
+              subtitle:
+                'Address details, opening schedule, and inquiry helpline.',
             },
           ],
         },
@@ -95,38 +144,32 @@ export class WebsitesService {
           title: 'Services',
           slug: 'services',
           type: 'services',
+          sortOrder: 2,
           contentJson: [
             {
-              id: 'services-header-1',
-              type: 'header',
-              title: 'Our Services',
-              description: 'Explore our catalog of professional services',
+              id: 'services-list-1',
+              type: 'services',
+              title: 'Our Signature Treatments',
+              subtitle:
+                'Choose from our wide selection of hair, skin, spa, and beauty packages.',
             },
           ],
         },
         {
-          title: 'Staff',
-          slug: 'staff',
-          type: 'staff',
-          contentJson: [
-            {
-              id: 'staff-header-1',
-              type: 'header',
-              title: 'Meet Our Team',
-              description: 'Dedicated professionals at your service',
-            },
-          ],
-        },
-        {
-          title: 'About Us',
+          title: 'About',
           slug: 'about',
           type: 'about',
+          sortOrder: 3,
           contentJson: [
             {
-              id: 'about-text-1',
-              type: 'text-block',
-              title: 'Our Story',
-              text: 'We are committed to delivering the best grooming and wellness experience.',
+              id: 'about-panel-1',
+              type: 'about',
+              title: 'Our Story & Vision',
+              subtitle: 'Crafting beautiful experiences since 2018',
+              content:
+                'We believe in holistic wellness and modern beauty treatments. Our team of certified professional stylists and therapist experts are dedicated to pampering you and providing a personalized care program.',
+              imageUrl:
+                'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=1000',
             },
           ],
         },
@@ -134,39 +177,42 @@ export class WebsitesService {
           title: 'Contact',
           slug: 'contact',
           type: 'contact',
+          sortOrder: 4,
           contentJson: [
             {
               id: 'contact-info-1',
-              type: 'contact-details',
-              title: 'Visit Us',
-              email: business.email || '',
-              phone: business.phone || '',
+              type: 'contact',
+              title: 'Visit Our Salon',
+              subtitle:
+                'Address details, opening schedule, and inquiry helpline.',
             },
           ],
         },
         {
-          title: 'Reviews',
-          slug: 'reviews',
-          type: 'reviews',
+          title: 'Privacy Policy',
+          slug: 'privacy-policy',
+          type: 'privacy-policy',
+          sortOrder: 5,
           contentJson: [
             {
-              id: 'reviews-header-1',
-              type: 'header',
-              title: 'Customer Reviews',
-              description: 'What our clients say about us',
-            },
-          ],
-        },
-        {
-          title: 'Policies',
-          slug: 'policies',
-          type: 'policies',
-          contentJson: [
-            {
-              id: 'policies-text-1',
+              id: 'privacy-policy-text',
               type: 'text-block',
-              title: 'Booking Policies',
-              text: 'Please reschedule or cancel at least 24 hours prior to your slot.',
+              title: 'Privacy Policy',
+              text: 'We value your privacy. This policy outlines how we collect and use your data.',
+            },
+          ],
+        },
+        {
+          title: 'Terms & Conditions',
+          slug: 'terms-and-conditions',
+          type: 'terms-and-conditions',
+          sortOrder: 6,
+          contentJson: [
+            {
+              id: 'terms-and-conditions-text',
+              type: 'text-block',
+              title: 'Terms & Conditions',
+              text: 'By booking with us, you agree to our terms and conditions.',
             },
           ],
         },
@@ -180,6 +226,7 @@ export class WebsitesService {
             slug: page.slug,
             type: page.type,
             contentJson: page.contentJson,
+            sortOrder: page.sortOrder,
             isPublished: true, // Default to true so they are live when the site is published
             seoTitle: `${page.title} | ${business.name}`,
             seoDescription: `Welcome to the ${page.title} page of ${business.name}.`,
@@ -196,7 +243,10 @@ export class WebsitesService {
       where: { businessId, deletedAt: null },
       include: {
         theme: true,
-        pages: true,
+        pages: {
+          where: { deletedAt: null },
+          orderBy: { sortOrder: 'asc' },
+        },
       },
     });
 
@@ -253,6 +303,30 @@ export class WebsitesService {
 
     if (dto.isPublished !== undefined) {
       data.isPublished = dto.isPublished;
+    }
+
+    if (dto.faviconUrl !== undefined) {
+      data.faviconUrl = dto.faviconUrl;
+    }
+
+    if (dto.logoAltText !== undefined) {
+      data.logoAltText = dto.logoAltText;
+    }
+
+    if (dto.logoUrl !== undefined) {
+      data.logoUrl = dto.logoUrl;
+      // Sync logoUrl with Business model
+      await this.prisma.business.update({
+        where: { id: businessId },
+        data: { logoUrl: dto.logoUrl },
+      });
+    }
+
+    if (dto.socialLinks !== undefined) {
+      // Merge with existing social links so partial updates don't wipe other platforms
+      const existing =
+        (website.socialLinksJson as Record<string, string> | null) ?? {};
+      data.socialLinksJson = { ...existing, ...dto.socialLinks };
     }
 
     return this.prisma.website.update({
@@ -338,5 +412,73 @@ export class WebsitesService {
       : `https://${website.subdomain}.rozx.in`;
 
     return `User-agent: *\nAllow: /\n\nSitemap: ${baseUrl}/sitemap.xml\n`;
+  }
+
+  async validateDomain(domain: string): Promise<boolean> {
+    if (!domain) {
+      return false;
+    }
+
+    const lowerDomain = domain.toLowerCase();
+
+    // 1. Allow core system domains
+    const systemDomains = [
+      'rozx.in',
+      'staging.rozx.in',
+      'app.rozx.in',
+      'app.staging.rozx.in',
+      'admin.rozx.in',
+      'admin.staging.rozx.in',
+      'api.rozx.in',
+      'api.staging.rozx.in',
+    ];
+
+    if (systemDomains.includes(lowerDomain)) {
+      return true;
+    }
+
+    // 2. Check if it's a subdomain of staging.rozx.in or rozx.in
+    let subdomain: string | null = null;
+    if (lowerDomain.endsWith('.staging.rozx.in')) {
+      subdomain = lowerDomain.replace('.staging.rozx.in', '');
+    } else if (lowerDomain.endsWith('.rozx.in')) {
+      subdomain = lowerDomain.replace('.rozx.in', '');
+    }
+
+    if (subdomain) {
+      const website = await this.prisma.website.findUnique({
+        where: { subdomain },
+      });
+      if (website && !website.deletedAt) {
+        return true;
+      }
+    }
+
+    // 3. Check if it matches an active custom domain in the websites or domains table
+    const websiteWithCustom = await this.prisma.website.findFirst({
+      where: {
+        customDomain: lowerDomain,
+        domainStatus: 'ACTIVE',
+        deletedAt: null,
+      },
+    });
+
+    if (websiteWithCustom) {
+      return true;
+    }
+
+    const domainRecord = await this.prisma.domain.findFirst({
+      where: {
+        hostname: lowerDomain,
+        status: 'ACTIVE',
+        deletedAt: null,
+      },
+    });
+
+    if (domainRecord) {
+      return true;
+    }
+
+    return false;
   }
 }

@@ -121,3 +121,17 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+
+
+# Step 1: Check if the containers are actually running
+docker compose ps
+
+# Step 2: If the API or Migration container has exited or is dead, check the logs
+docker compose logs api
+docker compose logs migration
+
+# Step 3: Check if something else is blocking the port (Connection Refused)
+sudo netstat -tulnp | grep 3001
+
+# Step 4: Check Nginx error logs on the host to see exactly where Nginx tried to connect
+sudo tail -n 50 /var/log/nginx/error.log

@@ -310,7 +310,11 @@ describe('NotificationProcessor', () => {
       await processor.process(mockJob);
 
       expect(mockPrismaService.staff.findFirst).toHaveBeenCalledWith({
-        where: { id: 'staff-uuid', businessId: 'business-uuid', deletedAt: null },
+        where: {
+          id: 'staff-uuid',
+          businessId: 'business-uuid',
+          deletedAt: null,
+        },
       });
       expect(mockPrismaService.business.findUnique).toHaveBeenCalledWith({
         where: { id: 'business-uuid' },
@@ -320,7 +324,8 @@ describe('NotificationProcessor', () => {
         {
           staffName: 'John Staff',
           businessName: 'Rozx Salon',
-          inviteUrl: 'https://app.staging.rozx.in/staff-oboarding?token=invite-token',
+          inviteUrl:
+            'https://app.staging.rozx.in/staff-oboarding?token=invite-token',
         },
         'email',
       );

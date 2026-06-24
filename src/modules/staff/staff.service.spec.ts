@@ -18,7 +18,6 @@ jest.mock('ioredis', () => {
 
 jest.mock('uuid', () => ({ v4: () => 'mock-uuid' }));
 
-
 describe('StaffService', () => {
   let service: StaffService;
 
@@ -224,7 +223,10 @@ describe('StaffService', () => {
     });
 
     it('should update staff details and sync name to User if linked', async () => {
-      staffFindFirst.mockResolvedValue({ id: staffId, memberId: 'member-uuid' });
+      staffFindFirst.mockResolvedValue({
+        id: staffId,
+        memberId: 'member-uuid',
+      });
       staffUpdateMany.mockResolvedValue({ count: 1 });
       serviceCount.mockResolvedValue(1);
       businessMemberFindUnique.mockResolvedValue({ userId: 'user-uuid' });

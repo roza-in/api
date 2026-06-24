@@ -18,7 +18,6 @@ import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
 import { v4 as uuidv4 } from 'uuid';
 
-
 @Injectable()
 export class StaffService {
   private readonly logger = new Logger(StaffService.name);

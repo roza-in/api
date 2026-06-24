@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdatePageDto } from './dto/update-page.dto';
+import { CreatePageDto } from './dto/create-page.dto';
 import { Prisma } from '../../generated/prisma';
 
 @Injectable()
@@ -111,9 +112,75 @@ export class PagesService {
       data.seoOgImage = dto.seoOgImage;
     }
 
+    if (dto.sortOrder !== undefined) {
+      data.sortOrder = dto.sortOrder;
+    }
+
+    if (dto.isPublished !== undefined) {
+      data.isPublished = dto.isPublished;
+    }
+
     return this.prisma.page.update({
       where: { id: pageId },
       data,
+    });
+  }
+
+  async create(businessId: string, dto: CreatePageDto) {
+    const websiteId = await this.getBusinessWebsiteId(businessId);
+
+    const existing = await this.prisma.page.findFirst({
+      where: { websiteId, slug: dto.slug, deletedAt: null },
+    });
+
+    if (existing) {
+      throw new ConflictException(
+        `A page with slug "${dto.slug}" already exists on your website`,
+      );
+    }
+
+    return this.prisma.page.create({
+      data: {
+        websiteId,
+        title: dto.title,
+        slug: dto.slug,
+        type: 'custom',
+        seoTitle: dto.title,
+        seoDescription: dto.seoDescription || '',
+        contentJson: [],
+        isPublished: true,
+      },
+    });
+  }
+
+  async remove(businessId: string, pageId: string) {
+    const websiteId = await this.getBusinessWebsiteId(businessId);
+
+    const page = await this.prisma.page.findFirst({
+      where: { id: pageId, websiteId, deletedAt: null },
+    });
+
+    if (!page) {
+      throw new NotFoundException('Page not found');
+    }
+
+    const corePages = [
+      'home',
+      'services',
+      'about',
+      'contact',
+      'privacy-policy',
+      'terms-and-conditions',
+    ];
+    if (corePages.includes(page.slug)) {
+      throw new ConflictException(
+        `Cannot delete core system page: ${page.slug}`,
+      );
+    }
+
+    return this.prisma.page.update({
+      where: { id: pageId },
+      data: { deletedAt: new Date() },
     });
   }
 }
