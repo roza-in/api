@@ -196,19 +196,18 @@ jobs:
         uses: appleboy/ssh-action@v1.0.3
         env:
           DIR_NAME: ${{ steps.vars.outputs.dir_name }}
+          ENV_NAME: ${{ steps.vars.outputs.env_name }}
           API_PORT: ${{ steps.vars.outputs.api_port }}
-          FRONTEND_PORT: ${{ steps.vars.outputs.frontend_port }}
           DB_PORT: ${{ steps.vars.outputs.db_port }}
           REDIS_PORT: ${{ steps.vars.outputs.redis_port }}
           APP_ENV: ${{ steps.vars.outputs.app_env }}
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          IMAGE_TAG: ${{ steps.vars.outputs.image_tag }}
           GITHUB_SHA: ${{ github.sha }}
         with:
           host: ${{ steps.vars.outputs.ec2_host }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          envs: DIR_NAME,API_PORT,FRONTEND_PORT,DB_PORT,REDIS_PORT,APP_ENV,DOCKER_USERNAME,IMAGE_TAG,GITHUB_SHA
+          envs: DIR_NAME,ENV_NAME,API_PORT,DB_PORT,REDIS_PORT,APP_ENV,DOCKER_USERNAME,GITHUB_SHA
           script: |
             # Create project directory
             mkdir -p ~/$DIR_NAME
@@ -282,32 +281,30 @@ jobs:
                   migration:
                     condition: service_completed_successfully
 
-              app-frontend:
-                image: $DOCKER_USERNAME/rozx-app:$IMAGE_TAG
-                restart: always
-                ports:
-                  - "$FRONTEND_PORT:3000"
-                environment:
-                  - BACKEND_API_URL=http://api:3000
-                  - NEXT_PUBLIC_APP_ENV=$IMAGE_TAG
-                depends_on:
-                  - api
-
             volumes:
               postgres_data:
               redis_data:
+
+            networks:
+              default:
+                name: rozx-network-$ENV_NAME
+                external: true
             EOF
 
             # Log in to Docker Registry on EC2
             echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
-            # Clean up dangling images, stopped containers, and build cache to free up space
-            docker system prune -f
+            # Ensure external shared network exists
+            docker network inspect rozx-network-$ENV_NAME >/dev/null 2>&1 || docker network create rozx-network-$ENV_NAME
 
-            # Pull latest containers and start orchestration
-            docker compose pull
-            docker compose down --remove-orphans
-            docker compose up -d
+            # Pull latest containers first. Exit if pull fails to protect active containers.
+            docker compose pull api postgres redis migration || { echo "Docker pull failed, aborting deployment"; exit 1; }
+
+            # Recreate containers with zero-downtime rolling updates
+            docker compose up -d --remove-orphans
+
+            # Clean up dangling images
+            docker image prune -f
 
             # Create a directory for utility scripts
             mkdir -p ~/scripts
