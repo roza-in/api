@@ -493,7 +493,8 @@ export class WebhookProcessor extends WorkerHost {
         await this.handleSubscriptionCharged(payload, businessId);
       } else if (
         eventType === 'subscription.cancelled' ||
-        eventType === 'subscription.expired'
+        eventType === 'subscription.completed' ||
+        eventType === 'subscription.halted'
       ) {
         await this.handleSubscriptionCancelled(payload, businessId);
       } else {
