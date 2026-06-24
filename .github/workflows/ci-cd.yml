@@ -287,8 +287,9 @@ jobs:
                 restart: always
                 ports:
                   - "$FRONTEND_PORT:3000"
-                env_file:
-                  - .env.docker
+                environment:
+                  - BACKEND_API_URL=http://api:3000
+                  - NEXT_PUBLIC_APP_ENV=$IMAGE_TAG
                 depends_on:
                   - api
 
