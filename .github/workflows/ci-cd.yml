@@ -132,6 +132,7 @@ jobs:
             echo "image_tag=production" >> $GITHUB_OUTPUT
             echo "dir_name=rozx-api-production" >> $GITHUB_OUTPUT
             echo "api_port=3000" >> $GITHUB_OUTPUT
+            echo "frontend_port=3002" >> $GITHUB_OUTPUT
             echo "db_port=5432" >> $GITHUB_OUTPUT
             echo "redis_port=6379" >> $GITHUB_OUTPUT
             
@@ -145,6 +146,7 @@ jobs:
             echo "image_tag=staging" >> $GITHUB_OUTPUT
             echo "dir_name=rozx-api-staging" >> $GITHUB_OUTPUT
             echo "api_port=3001" >> $GITHUB_OUTPUT
+            echo "frontend_port=3003" >> $GITHUB_OUTPUT
             echo "db_port=5433" >> $GITHUB_OUTPUT
             echo "redis_port=6380" >> $GITHUB_OUTPUT
             
@@ -195,16 +197,18 @@ jobs:
         env:
           DIR_NAME: ${{ steps.vars.outputs.dir_name }}
           API_PORT: ${{ steps.vars.outputs.api_port }}
+          FRONTEND_PORT: ${{ steps.vars.outputs.frontend_port }}
           DB_PORT: ${{ steps.vars.outputs.db_port }}
           REDIS_PORT: ${{ steps.vars.outputs.redis_port }}
           APP_ENV: ${{ steps.vars.outputs.app_env }}
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          IMAGE_TAG: ${{ steps.vars.outputs.image_tag }}
           GITHUB_SHA: ${{ github.sha }}
         with:
           host: ${{ steps.vars.outputs.ec2_host }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          envs: DIR_NAME,API_PORT,DB_PORT,REDIS_PORT,APP_ENV,DOCKER_USERNAME,GITHUB_SHA
+          envs: DIR_NAME,API_PORT,FRONTEND_PORT,DB_PORT,REDIS_PORT,APP_ENV,DOCKER_USERNAME,IMAGE_TAG,GITHUB_SHA
           script: |
             # Create project directory
             mkdir -p ~/$DIR_NAME
@@ -277,6 +281,16 @@ jobs:
                     condition: service_healthy
                   migration:
                     condition: service_completed_successfully
+
+              app-frontend:
+                image: $DOCKER_USERNAME/rozx-app:$IMAGE_TAG
+                restart: always
+                ports:
+                  - "$FRONTEND_PORT:3000"
+                env_file:
+                  - .env.docker
+                depends_on:
+                  - api
 
             volumes:
               postgres_data:
