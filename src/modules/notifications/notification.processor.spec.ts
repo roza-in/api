@@ -42,7 +42,7 @@ describe('NotificationProcessor', () => {
   const mockConfigService = {
     getOrThrow: jest.fn().mockReturnValue('redis://localhost:6379'),
     get: jest.fn((key: string) => {
-      if (key === 'CORS_ALLOWED_ORIGINS') return 'https://app.staging.rozx.in';
+      if (key === 'CORS_ALLOWED_ORIGINS') return 'https://staging.app.rozx.in';
       return null;
     }),
   };
@@ -325,7 +325,7 @@ describe('NotificationProcessor', () => {
           staffName: 'John Staff',
           businessName: 'Rozx Salon',
           inviteUrl:
-            'https://app.staging.rozx.in/staff-oboarding?token=invite-token',
+            'https://staging.app.rozx.in/staff-oboarding?token=invite-token',
         },
         'email',
       );

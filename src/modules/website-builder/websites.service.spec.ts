@@ -229,7 +229,7 @@ describe('WebsitesService', () => {
     });
 
     it('should return true for system domains', async () => {
-      const result = await service.validateDomain('app.staging.rozx.in');
+      const result = await service.validateDomain('staging.app.rozx.in');
       expect(result).toBe(true);
     });
 
