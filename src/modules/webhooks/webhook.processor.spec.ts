@@ -355,6 +355,83 @@ describe('WebhookProcessor', () => {
       });
     });
 
+    it('should route process-razorpay-platform job for subscription.activated', async () => {
+      const mockJob = {
+        name: 'process-razorpay-platform',
+        data: { eventId: 'event-platform-uuid', businessId: 'business-uuid' },
+      } as unknown as Job;
+
+      mockPrismaService.webhookEvent.findUnique.mockResolvedValue({
+        id: 'event-platform-uuid',
+        status: WebhookStatus.PENDING,
+        eventType: 'subscription.activated',
+        payload: {
+          payload: {
+            subscription: {
+              entity: {
+                id: 'sub_rzp_123',
+                current_start: 1770000000,
+                current_end: 1780000000,
+                notes: {
+                  planId: 'new-plan-uuid',
+                },
+              },
+            },
+          },
+        },
+      });
+
+      mockPrismaService.subscription.findUnique.mockResolvedValue(null);
+      mockPrismaService.subscriptionPlan.findUniqueOrThrow.mockResolvedValue({
+        id: 'new-plan-uuid',
+        priceMonthly: 2000,
+        priceYearly: 20000,
+      });
+      mockPrismaService.subscription.create.mockResolvedValue({
+        id: 'local-sub-uuid',
+        planId: 'new-plan-uuid',
+        status: SubscriptionStatus.ACTIVE,
+      });
+      mockPrismaService.business.findUnique.mockResolvedValue({
+        id: 'business-uuid',
+        name: 'Test Business',
+        email: 'owner@example.com',
+        members: [
+          {
+            user: {
+              email: 'owner@example.com',
+              name: 'Owner Name',
+            },
+          },
+        ],
+      });
+
+      await processor.process(mockJob);
+
+      expect(prisma.webhookEvent.findUnique).toHaveBeenCalledWith({
+        where: { id: 'event-platform-uuid' },
+      });
+      expect(prisma.subscription.create).toHaveBeenCalledWith({
+        data: {
+          businessId: 'business-uuid',
+          planId: 'new-plan-uuid',
+          status: SubscriptionStatus.ACTIVE,
+          currentPeriodStart: new Date(1770000000 * 1000),
+          currentPeriodEnd: new Date(1780000000 * 1000),
+          razorpaySubscriptionId: 'sub_rzp_123',
+          billingInterval: 'yearly',
+          amount: 20000,
+        },
+      });
+      expect(prisma.business.update).toHaveBeenCalledWith({
+        where: { id: 'business-uuid' },
+        data: {
+          planId: 'new-plan-uuid',
+          subscriptionStatus: SubscriptionStatus.ACTIVE,
+        },
+      });
+    });
+
     it('should route process-razorpay-platform job for subscription.cancelled', async () => {
       const mockJob = {
         name: 'process-razorpay-platform',

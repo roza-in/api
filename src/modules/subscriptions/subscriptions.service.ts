@@ -8,6 +8,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { SubscriptionAdapterFactory } from './subscription-adapter.factory';
 import { CheckoutSubscriptionDto } from './dto/checkout-subscription.dto';
 import { SubscriptionStatus } from '../../generated/prisma';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class SubscriptionsService {
@@ -16,6 +17,7 @@ export class SubscriptionsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly adapterFactory: SubscriptionAdapterFactory,
+    private readonly configService: ConfigService,
   ) {}
 
   async getPlans() {
@@ -182,7 +184,10 @@ export class SubscriptionsService {
         },
       });
 
-      return checkoutResult;
+      return {
+        ...checkoutResult,
+        razorpayKeyId: this.configService.get<string>('RAZORPAY_KEY_ID'),
+      };
     } catch (error) {
       this.logger.error(
         `Failed to create subscription checkout for business ${businessId}`,

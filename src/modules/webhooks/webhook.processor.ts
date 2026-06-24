@@ -486,7 +486,10 @@ export class WebhookProcessor extends WorkerHost {
         webhookEvent.payload as unknown as RazorpayPlatformWebhookEventPayload;
       const eventType = webhookEvent.eventType;
 
-      if (eventType === 'subscription.charged') {
+      if (
+        eventType === 'subscription.charged' ||
+        eventType === 'subscription.activated'
+      ) {
         await this.handleSubscriptionCharged(payload, businessId);
       } else if (
         eventType === 'subscription.cancelled' ||

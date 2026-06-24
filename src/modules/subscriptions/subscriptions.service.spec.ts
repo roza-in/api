@@ -5,6 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { SubscriptionAdapterFactory } from './subscription-adapter.factory';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { SubscriptionStatus } from '../../generated/prisma';
+import { ConfigService } from '@nestjs/config';
 
 describe('SubscriptionsService', () => {
   let service: SubscriptionsService;
@@ -45,12 +46,20 @@ describe('SubscriptionsService', () => {
     },
   };
 
+  const mockConfigService = {
+    get: jest.fn().mockImplementation((key: string) => {
+      if (key === 'RAZORPAY_KEY_ID') return 'rzp_test_mock';
+      return null;
+    }),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         SubscriptionsService,
         { provide: PrismaService, useValue: mockPrismaService },
         { provide: SubscriptionAdapterFactory, useValue: mockAdapterFactory },
+        { provide: ConfigService, useValue: mockConfigService },
       ],
     }).compile();
 
@@ -235,6 +244,7 @@ describe('SubscriptionsService', () => {
       expect(result).toEqual({
         providerSubscriptionId: 'sub_rzp_999',
         checkoutUrl: 'https://checkout.razorpay.com/sub_rzp_999',
+        razorpayKeyId: 'rzp_test_mock',
       });
       expect(mockAdapter.createSubscription).toHaveBeenCalledWith({
         planSlug: 'growth',
