@@ -5,6 +5,7 @@ import { ValidationPipe, Logger, VersioningType } from '@nestjs/common';
 import helmet from 'helmet';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AllExceptionsFilter } from './common/filters/http-exception.filter';
+import { DomainsService } from './modules/website-builder/domains.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -15,6 +16,7 @@ async function bootstrap() {
         : ['log', 'error', 'warn', 'debug', 'verbose'],
   });
   const configService = app.get(ConfigService);
+  const domainsService = app.get(DomainsService);
 
   // Security Middleware
   app.use(helmet());
@@ -40,13 +42,13 @@ async function bootstrap() {
         callback(null, true);
         return;
       }
-      const isAllowed = allowedOrigins.some((allowedOrigin) => {
+
+      // 1. Static whitelist + *.rozx.in wildcard check (no DB hit)
+      const isStaticallyAllowed = allowedOrigins.some((allowedOrigin) => {
         if (allowedOrigin === '*') return true;
-        // Exact URL match (e.g. https://app.rozx.in === https://app.rozx.in)
         if (origin === allowedOrigin) return true;
-        // Wildcard subdomain match: extract hostnames and check suffix
-        // e.g. origin=https://kapilssalon.rozx.in, allowed=https://rozx.in
-        // → originHost=kapilssalon.rozx.in ends with .rozx.in ✓
+        // Wildcard subdomain match via hostname parsing
+        // e.g. https://kapilssalon.rozx.in matches https://rozx.in
         try {
           const originHost = new URL(origin).hostname;
           const allowedHost = new URL(allowedOrigin).hostname;
@@ -59,11 +61,31 @@ async function bootstrap() {
         }
       });
 
-      if (isAllowed || configService.get('NODE_ENV') !== 'production') {
+      if (isStaticallyAllowed || configService.get('NODE_ENV') !== 'production') {
         callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
+        return;
       }
+
+      // 2. Dynamic DB check for verified custom domains (e.g. premacai.com)
+      //    Only runs for origins that failed the static check in production.
+      let originHostname: string;
+      try {
+        originHostname = new URL(origin).hostname;
+      } catch {
+        callback(new Error('Not allowed by CORS'));
+        return;
+      }
+
+      domainsService
+        .isActiveDomain(originHostname)
+        .then((isCustomDomain) => {
+          if (isCustomDomain) {
+            callback(null, true);
+          } else {
+            callback(new Error('Not allowed by CORS'));
+          }
+        })
+        .catch(() => callback(new Error('Not allowed by CORS')));
     },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
