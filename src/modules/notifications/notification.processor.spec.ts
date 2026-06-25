@@ -325,7 +325,7 @@ describe('NotificationProcessor', () => {
           staffName: 'John Staff',
           businessName: 'Rozx Salon',
           inviteUrl:
-            'https://staging.app.rozx.in/staff-oboarding?token=invite-token',
+            'https://staging.app.rozx.in/staff-onboarding?token=invite-token',
         },
         'email',
       );

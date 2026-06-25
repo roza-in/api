@@ -90,7 +90,7 @@ export class NotificationProcessor extends WorkerHost {
         this.configService.get<string>('CORS_ALLOWED_ORIGINS')?.split(',') ||
         [];
       const frontendUrl = allowedOrigins[0] || 'http://localhost:3000';
-      const inviteUrl = `${frontendUrl}/staff-oboarding?token=${data.token}`;
+      const inviteUrl = `${frontendUrl}/staff-onboarding?token=${data.token}`;
 
       const renderResult = this.templateService.render(
         'STAFF_INVITATION',
