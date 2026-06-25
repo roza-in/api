@@ -51,7 +51,9 @@ export class DomainsService {
           where: { id: existingDomain.id },
         });
       } else {
-        throw new ConflictException(`Domain "${hostname}" is already registered`);
+        throw new ConflictException(
+          `Domain "${hostname}" is already registered`,
+        );
       }
     }
 
@@ -108,19 +110,24 @@ export class DomainsService {
       try {
         // Resolve CNAME records first
         resolvedCnames = await dns.promises.resolveCname(domain.hostname);
-        if (resolvedCnames.some((c) => c.toLowerCase() === cnameTarget.toLowerCase())) {
+        if (
+          resolvedCnames.some(
+            (c) => c.toLowerCase() === cnameTarget.toLowerCase(),
+          )
+        ) {
           dnsVerified = true;
         }
-      } catch (err: any) {
-        resolveError = err.message;
+      } catch (err) {
+        resolveError = err instanceof Error ? err.message : String(err);
         // If CNAME fails, fallback to A record check
         try {
           resolvedIps = await dns.promises.resolve4(domain.hostname);
           if (resolvedIps.includes(aTarget)) {
             dnsVerified = true;
           }
-        } catch (aErr: any) {
-          resolveError = (resolveError ? resolveError + ' | ' : '') + aErr.message;
+        } catch (aErr) {
+          const aErrMsg = aErr instanceof Error ? aErr.message : String(aErr);
+          resolveError = (resolveError ? resolveError + ' | ' : '') + aErrMsg;
           dnsVerified = false;
         }
       }
