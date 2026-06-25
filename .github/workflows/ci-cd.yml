@@ -297,8 +297,17 @@ jobs:
             # Ensure external shared network exists
             docker network inspect rozx-network-$ENV_NAME >/dev/null 2>&1 || docker network create rozx-network-$ENV_NAME
 
-            # Pull latest containers first. Exit if pull fails to protect active containers.
-            docker compose pull api postgres redis migration || { echo "Docker pull failed, aborting deployment"; exit 1; }
+            # Clear stale containerd lease metadata (prevents "lease does not exist" pull errors)
+            # This restarts only the containerd runtime — running containers are NOT affected.
+            sudo systemctl restart containerd
+            sleep 5
+
+            # Pull latest containers first. Retry once on failure before aborting.
+            docker compose pull api postgres redis migration \
+              || { echo "First pull attempt failed, clearing Docker build cache and retrying..."; \
+                   docker builder prune -f; \
+                   docker compose pull api postgres redis migration; } \
+              || { echo "Docker pull failed after retry, aborting deployment"; exit 1; }
 
             # Recreate containers with zero-downtime rolling updates
             docker compose up -d --remove-orphans
