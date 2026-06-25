@@ -8,6 +8,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { SubscriptionAdapterFactory } from './subscription-adapter.factory';
 import { CheckoutSubscriptionDto } from './dto/checkout-subscription.dto';
 import { SubscriptionStatus } from '../../generated/prisma';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class SubscriptionsService {
@@ -16,6 +17,7 @@ export class SubscriptionsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly adapterFactory: SubscriptionAdapterFactory,
+    private readonly configService: ConfigService,
   ) {}
 
   async getPlans() {
@@ -25,14 +27,37 @@ export class SubscriptionsService {
   }
 
   async getActiveSubscription(businessId: string) {
-    const activeSub = await this.prisma.subscription.findFirst({
+    // Query active subscriptions in order of status priority (ACTIVE > TRIALING > PAST_DUE)
+    let activeSub = await this.prisma.subscription.findFirst({
       where: {
         businessId,
-        status: { in: ['ACTIVE', 'TRIALING', 'PAST_DUE'] },
+        status: 'ACTIVE',
       },
       include: { plan: true },
       orderBy: { createdAt: 'desc' },
     });
+
+    if (!activeSub) {
+      activeSub = await this.prisma.subscription.findFirst({
+        where: {
+          businessId,
+          status: 'TRIALING',
+        },
+        include: { plan: true },
+        orderBy: { createdAt: 'desc' },
+      });
+    }
+
+    if (!activeSub) {
+      activeSub = await this.prisma.subscription.findFirst({
+        where: {
+          businessId,
+          status: 'PAST_DUE',
+        },
+        include: { plan: true },
+        orderBy: { createdAt: 'desc' },
+      });
+    }
 
     if (!activeSub) {
       throw new NotFoundException(
@@ -182,7 +207,10 @@ export class SubscriptionsService {
         },
       });
 
-      return checkoutResult;
+      return {
+        ...checkoutResult,
+        razorpayKeyId: this.configService.get<string>('RAZORPAY_KEY_ID'),
+      };
     } catch (error) {
       this.logger.error(
         `Failed to create subscription checkout for business ${businessId}`,

@@ -18,6 +18,7 @@ describe('DomainsService', () => {
   const domainCreate = jest.fn();
   const domainFindUnique = jest.fn();
   const domainUpdate = jest.fn();
+  const domainDelete = jest.fn();
   const domainFindMany = jest.fn();
   const websiteUpdate = jest.fn();
 
@@ -31,6 +32,7 @@ describe('DomainsService', () => {
       create: domainCreate,
       findUnique: domainFindUnique,
       update: domainUpdate,
+      delete: domainDelete,
       findMany: domainFindMany,
     },
     $transaction: jest.fn(),
@@ -191,7 +193,7 @@ describe('DomainsService', () => {
   });
 
   describe('remove', () => {
-    it('should soft-delete domain and clear customDomain if active on website', async () => {
+    it('should permanently delete domain and clear customDomain if active on website', async () => {
       websiteFindFirst.mockResolvedValue({
         id: websiteId,
         customDomain: 'glowstudio.com',
@@ -204,10 +206,8 @@ describe('DomainsService', () => {
 
       await service.remove(businessId, domainId);
 
-      expect(domainUpdate).toHaveBeenCalledWith({
+      expect(domainDelete).toHaveBeenCalledWith({
         where: { id: domainId },
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        data: { deletedAt: expect.any(Date) },
       });
 
       expect(websiteUpdate).toHaveBeenCalledWith({

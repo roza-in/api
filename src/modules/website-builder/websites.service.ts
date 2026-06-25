@@ -426,11 +426,11 @@ export class WebsitesService {
       'rozx.in',
       'staging.rozx.in',
       'app.rozx.in',
-      'app.staging.rozx.in',
+      'staging.app.rozx.in',
       'admin.rozx.in',
-      'admin.staging.rozx.in',
+      'staging.admin.rozx.in',
       'api.rozx.in',
-      'api.staging.rozx.in',
+      'staging.api.rozx.in',
     ];
 
     if (systemDomains.includes(lowerDomain)) {
