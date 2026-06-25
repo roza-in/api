@@ -42,7 +42,21 @@ async function bootstrap() {
       }
       const isAllowed = allowedOrigins.some((allowedOrigin) => {
         if (allowedOrigin === '*') return true;
-        return origin === allowedOrigin || origin.endsWith('.' + allowedOrigin);
+        // Exact URL match (e.g. https://app.rozx.in === https://app.rozx.in)
+        if (origin === allowedOrigin) return true;
+        // Wildcard subdomain match: extract hostnames and check suffix
+        // e.g. origin=https://kapilssalon.rozx.in, allowed=https://rozx.in
+        // → originHost=kapilssalon.rozx.in ends with .rozx.in ✓
+        try {
+          const originHost = new URL(origin).hostname;
+          const allowedHost = new URL(allowedOrigin).hostname;
+          return (
+            originHost === allowedHost ||
+            originHost.endsWith('.' + allowedHost)
+          );
+        } catch {
+          return false;
+        }
       });
 
       if (isAllowed || configService.get('NODE_ENV') !== 'production') {
