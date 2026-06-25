@@ -3,6 +3,7 @@ import {
   NotFoundException,
   ConflictException,
   BadRequestException,
+  Logger,
 } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
@@ -13,6 +14,8 @@ import * as dns from 'dns';
 
 @Injectable()
 export class DomainsService {
+  private readonly logger = new Logger(DomainsService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly configService: ConfigService,
@@ -79,13 +82,19 @@ export class DomainsService {
       return;
     }
 
+    const nodeEnv = this.configService.get<string>('NODE_ENV');
+    const isLocal = nodeEnv === 'development' || nodeEnv === 'test';
+
     const cnameTarget =
       this.configService.get<string>('ROZX_CNAME_TARGET') || 'cname.rozx.in';
     const aTarget =
-      this.configService.get<string>('ROZX_A_TARGET') || '127.0.0.1';
-    const nodeEnv = this.configService.get<string>('NODE_ENV');
+      this.configService.get<string>('ROZX_A_TARGET') ||
+      (isLocal ? '127.0.0.1' : '43.204.219.152');
 
     let dnsVerified = false;
+    let resolvedCnames: string[] = [];
+    let resolvedIps: string[] = [];
+    let resolveError: string | null = null;
 
     // Simulate verification for testing and localhost setups
     if (
@@ -98,24 +107,27 @@ export class DomainsService {
     } else {
       try {
         // Resolve CNAME records first
-        const cnames = await dns.promises.resolveCname(domain.hostname);
-        if (cnames.some((c) => c.toLowerCase() === cnameTarget.toLowerCase())) {
+        resolvedCnames = await dns.promises.resolveCname(domain.hostname);
+        if (resolvedCnames.some((c) => c.toLowerCase() === cnameTarget.toLowerCase())) {
           dnsVerified = true;
         }
-      } catch {
+      } catch (err: any) {
+        resolveError = err.message;
         // If CNAME fails, fallback to A record check
         try {
-          const ips = await dns.promises.resolve4(domain.hostname);
-          if (ips.includes(aTarget)) {
+          resolvedIps = await dns.promises.resolve4(domain.hostname);
+          if (resolvedIps.includes(aTarget)) {
             dnsVerified = true;
           }
-        } catch {
+        } catch (aErr: any) {
+          resolveError = (resolveError ? resolveError + ' | ' : '') + aErr.message;
           dnsVerified = false;
         }
       }
     }
 
     if (dnsVerified) {
+      this.logger.log(`DNS successfully verified for ${domain.hostname}`);
       // Transition status to VERIFIED
       await this.prisma.domain.update({
         where: { id: domain.id },
@@ -128,6 +140,12 @@ export class DomainsService {
       // Proceed to SSL provisioning
       await this.provisionSsl(domain.id);
     } else {
+      this.logger.warn(
+        `DNS verification failed for ${domain.hostname}. ` +
+          `Expected CNAME: ${cnameTarget}, Resolved CNAMEs: ${JSON.stringify(resolvedCnames)}. ` +
+          `Expected A Record: ${aTarget}, Resolved IPs: ${JSON.stringify(resolvedIps)}. ` +
+          `Errors: ${resolveError}`,
+      );
       // Transition status to FAILED
       await this.prisma.domain.update({
         where: { id: domain.id },
