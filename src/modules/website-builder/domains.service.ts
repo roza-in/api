@@ -279,6 +279,23 @@ export class DomainsService {
     return updated;
   }
 
+  /**
+   * Fast indexed lookup — used by the CORS handler in main.ts.
+   * Returns true if the hostname is an ACTIVE custom domain registered
+   * in the platform (e.g. premacai.com, kapilssalon.com).
+   */
+  async isActiveDomain(hostname: string): Promise<boolean> {
+    const domain = await this.prisma.domain.findFirst({
+      where: {
+        hostname,
+        status: 'ACTIVE',
+        deletedAt: null,
+      },
+      select: { id: true },
+    });
+    return domain !== null;
+  }
+
   async findAll(businessId: string) {
     const website = await this.prisma.website.findFirst({
       where: { businessId, deletedAt: null },
