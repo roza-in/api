@@ -18,7 +18,7 @@ export class SubscriptionsService {
     private readonly prisma: PrismaService,
     private readonly adapterFactory: SubscriptionAdapterFactory,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   async getPlans() {
     return this.prisma.subscriptionPlan.findMany({
@@ -183,9 +183,9 @@ export class SubscriptionsService {
           currentPeriodStart: new Date(),
           currentPeriodEnd: new Date(
             Date.now() +
-              (dto.billingCycle === 'monthly'
-                ? 30 * 24 * 60 * 60 * 1000
-                : 365 * 24 * 60 * 60 * 1000),
+            (dto.billingCycle === 'monthly'
+              ? 30 * 24 * 60 * 60 * 1000
+              : 365 * 24 * 60 * 60 * 1000),
           ),
           razorpaySubscriptionId: checkoutResult.providerSubscriptionId,
         },
@@ -217,8 +217,7 @@ export class SubscriptionsService {
         error instanceof Error ? error.stack : String(error),
       );
       throw new BadRequestException(
-        `Subscription initialization failed: ${
-          error instanceof Error ? error.message : 'Unknown gateway error'
+        `Subscription initialization failed: ${error instanceof Error ? error.message : 'Unknown gateway error'
         }`,
       );
     }
@@ -255,8 +254,7 @@ export class SubscriptionsService {
           error instanceof Error ? error.stack : String(error),
         );
         throw new BadRequestException(
-          `Failed to cancel gateway subscription: ${
-            error instanceof Error ? error.message : 'Unknown gateway error'
+          `Failed to cancel gateway subscription: ${error instanceof Error ? error.message : 'Unknown gateway error'
           }`,
         );
       }
