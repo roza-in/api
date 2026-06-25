@@ -38,11 +38,18 @@ export class DomainsService {
 
     // 3. Enforce global uniqueness of custom domains
     const existingDomain = await this.prisma.domain.findFirst({
-      where: { hostname, deletedAt: null },
+      where: { hostname },
     });
 
     if (existingDomain) {
-      throw new ConflictException(`Domain "${hostname}" is already registered`);
+      if (existingDomain.deletedAt) {
+        // Permanently delete the soft-deleted record to free up the unique constraint
+        await this.prisma.domain.delete({
+          where: { id: existingDomain.id },
+        });
+      } else {
+        throw new ConflictException(`Domain "${hostname}" is already registered`);
+      }
     }
 
     // 4. Create database record
@@ -195,10 +202,9 @@ export class DomainsService {
     }
 
     return this.prisma.$transaction(async (tx) => {
-      // Soft-delete domain record
-      await tx.domain.update({
+      // Permanently delete domain record to free up unique hostname constraint
+      await tx.domain.delete({
         where: { id: domain.id },
-        data: { deletedAt: new Date() },
       });
 
       // If this was the website's active custom domain, clear it
